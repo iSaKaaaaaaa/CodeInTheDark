@@ -1,4 +1,3 @@
-import React from 'react';
 import InputField from '../components/InputField';
 import PixelButton from '../components/PixelButton';
 

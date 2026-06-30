@@ -3,6 +3,22 @@ import * as Blockly from "blockly";
 import { registerBlocks } from "../blockly/blocks";
 import { toolbox } from "../blockly/toolbox";
 
+// กำหนดธีมสไตล์อียิปต์โบราณ/พิกเซล ให้กลมกลืนกับม้วนกระดาษปาปิรัสและไม้
+const egyptianTheme = Blockly.Theme.defineTheme("egyptian", {
+  name: "egyptian",
+  base: Blockly.Themes.Classic,
+  blockStyles: {},
+  categoryStyles: {},
+  componentStyles: {
+    workspaceBackgroundColour: "#fef3c7", // bg-amber-100
+    toolboxBackgroundColour: "#d97706", // bg-amber-600
+    flyoutBackgroundColour: "#fef3c7", // bg-amber-100
+    scrollbarColour: "#78350f", // bg-amber-900
+    scrollbarOpacity: 0.4,
+    insertionMarkerColour: "#f97316", // orange-500
+  },
+});
+
 interface Props {
   onReady: (workspace: Blockly.WorkspaceSvg) => void;
 }
@@ -15,10 +31,30 @@ export default function BlocklyEditor({ onReady }: Props) {
 
     if (!blocklyDiv.current) return;
 
-    // เรียกใช้ toolbox จากไฟล์ภายนอก
+    // ทำการฝัง Blockly โดยปรับแต่งธีมให้เข้ากับธีมอียิปต์
     const workspace = Blockly.inject(blocklyDiv.current, {
       toolbox: toolbox,
+      theme: egyptianTheme,
+      grid: {
+        spacing: 20,
+        length: 3,
+        colour: "#f59e0b", // เส้นสีส้ม/ทอง
+        snap: true,
+      },
+      trashcan: true,
+      scrollbars: false,
+      move: {
+        scrollbars: false,
+        drag: false,
+        wheel: false,
+      },
+      zoom: {
+        startScale: 1.3,
+      },
     });
+
+    // ปรับขนาดบล็อกในแถบเมนู (Flyout) ด้านซ้ายให้ขยาย 50% (ขนาดรวม 1.5 เท่า) เหมือนฝั่งกระดานเขียนโค้ด
+    workspace.getFlyout()?.getWorkspace()?.setScale(1.25);
 
     onReady(workspace);
 
@@ -31,9 +67,9 @@ export default function BlocklyEditor({ onReady }: Props) {
       style={{
         width: "100%",
         height: "100%",
-        minHeight: "400px", // เผื่อความสูงขั้นต่ำไว้
       }}
-      className="rounded-lg overflow-hidden bg-white"
+      className="bg-transparent"
     />
   );
 }
+

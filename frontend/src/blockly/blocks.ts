@@ -5,31 +5,59 @@ export function registerBlocks() {
   Blockly.defineBlocksWithJsonArray([
     {
       type: "move_up",
-      message0: "Move Up ⬆️",
+      message0: "Move %1",
+      args0: [
+        {
+          type: "field_label",
+          text: "Up ⬆️",
+          class: "block-text-white",
+        },
+      ],
       previousStatement: null,
       nextStatement: null,
-      colour: 120,
+      colour: "#BFA084",
     },
     {
       type: "move_down",
-      message0: "Move Down ⬇️",
+      message0: "Move %1",
+      args0: [
+        {
+          type: "field_label",
+          text: "Down ⬇️",
+          class: "block-text-white",
+        },
+      ],
       previousStatement: null,
       nextStatement: null,
-      colour: 120,
+      colour: "#CB7444",
     },
     {
       type: "move_left",
-      message0: "Move Left ⬅️",
+      message0: "Move %1",
+      args0: [
+        {
+          type: "field_label",
+          text: "Left ⬅️",
+          class: "block-text-white",
+        },
+      ],
       previousStatement: null,
       nextStatement: null,
-      colour: 230,
+      colour: "#BF8641",
     },
     {
       type: "move_right",
-      message0: "Move Right ➡️",
+      message0: "Move %1",
+      args0: [
+        {
+          type: "field_label",
+          text: "Right ➡️",
+          class: "block-text-white",
+        },
+      ],
       previousStatement: null,
       nextStatement: null,
-      colour: 230,
+      colour: "#AF6F37",
     },
   ]);
 

@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface LandingPageProps {
   onStart: () => void;
   // ซ่อนข้อความหน้าแรกตอนป๊อปอัป Login เปิดอยู่ (เหมือนพฤติกรรมเดิม)

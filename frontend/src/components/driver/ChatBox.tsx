@@ -19,7 +19,7 @@ export default function ChatBox({
   };
 
   return (
-    <div className="h-40 bg-black/80 rounded-xl border-4 border-black p-3 flex flex-col">
+    <div className="h-56 bg-black/80 rounded-xl border-4 border-black p-3 flex flex-col shadow-2xl">
       <span className="text-white font-bold text-xl mb-2 tracking-wider">
         CHAT BOX
       </span>

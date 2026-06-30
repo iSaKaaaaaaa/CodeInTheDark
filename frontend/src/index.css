@@ -9,3 +9,78 @@ body {
   margin: 0;
   padding: 0;
 }
+
+/* --- การปรับแต่งสไตล์ Blockly ให้เข้ากับธีมพิกเซลอียิปต์โบราณ --- */
+
+/* กำหนดฟอนต์พิกเซลให้กับข้อความทั้งหมดใน Blockly */
+.blocklyText, 
+.blocklyFlyoutLabelText, 
+.blocklyToolboxContents,
+.blocklyTreeLabel {
+  font-family: "VT323", monospace !important;
+  font-size: 20px !important;
+  font-weight: bold !important;
+}
+
+/* ซ่อนกรอบแถบเครื่องมือดั้งเดิม (เนื่องจากใช้ flyoutToolbox) */
+.blocklyToolboxDiv {
+  display: none !important;
+}
+
+/* ปรับแต่งขนาดและสีของแถบบิน (Flyout) ให้มีความกว้าง 220px พอดีกับฝั่ง Blocks ของ Header */
+.blocklyFlyout,
+.blocklyFlyoutBackground {
+  width: 220px !important;
+}
+
+.blocklyFlyoutBackground {
+  fill: transparent !important; /* ทำให้โปร่งใสเพื่อให้ลวดลายกระดานจุดสีเหลืองเชื่อมต่อกันทั้งซ้ายขวา */
+  fill-opacity: 0 !important;
+  stroke: none !important;
+}
+
+/* ลบเส้นขอบสไตล์โมเดิร์นของตัวเลือกลากวาง */
+.blocklySvg {
+  border: none !important;
+  background-color: transparent !important;
+}
+
+/* ซ่อนปุ่มซูมดั้งเดิมเพื่อความคลีน (ถ้าต้องการ) */
+.blocklyZoom {
+  display: none !important;
+}
+
+/* ซ่อนสไลเดอร์เลื่อนหน้าจอ (Scrollbar) ของ Blockly ทั้งหมดเพื่อความราบเรียบ */
+.blocklyScrollbarBackground,
+.blocklyScrollbarHandle,
+.blocklyScrollbarDiv {
+  display: none !important;
+}
+
+/* --- ปรับแต่งหน้าตาตัว Block ให้สวยงามพรีเมียม ขอบสีไม้หนาและมีเงาตกลงสไตล์ Pixel Art --- */
+.blocklyPath {
+  stroke: #572E18 !important; /* เปลี่ยนจากเส้นขอบสีดำเป็นสีไม้เข้มขรึม */
+  stroke-width: 3px !important;
+  filter: drop-shadow(0px 3px 0px rgba(0, 0, 0, 0.2)) !important;
+}
+
+/* เมื่อลากบล็อก (Selected Block) ให้เรืองแสงสีขาวรอบขอบ */
+.blocklySelected > .blocklyPath {
+  stroke: #ffffff !important;
+  stroke-width: 3px !important;
+}
+
+/* ปรับฟอนต์ป้ายข้อความบนตัว Block ให้ใหญ่ขึ้นและอ่านง่าย */
+.blocklyEditableText text,
+.blocklyText {
+  fill: #000000 !important; /* คำหลัก (Move Up/Down/Left/Right) เป็นสีดำ */
+  font-family: "VT323", monospace !important;
+  font-size: 20px !important;
+  font-weight: bold !important;
+}
+
+/* เฉพาะสัญลักษณ์ลูกศรบอกทิศทางที่เป็นสีขาว */
+.block-text-white {
+  fill: #ffffff !important;
+}
+

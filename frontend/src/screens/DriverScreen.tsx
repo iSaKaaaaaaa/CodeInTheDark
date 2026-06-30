@@ -1,23 +1,30 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import * as Blockly from "blockly";
 
-// อิมพอร์ต Component ย่อย (เช็ก Path ให้ตรงกับโฟลเดอร์ของคุณด้วยนะครับ)
-import GameBoard from "../components/GameBoard";
-import BlocklyEditor from "../components/BlocklyEditor";
+// อิมพอร์ต Component ย่อยที่มีสไตล์สวยงามธีมอียิปต์/พิกเซล
+import GameHeader from "../components/driver/GameHeader";
+import GameBoard from "../components/driver/GameBoard";
+import ChatBox from "../components/driver/ChatBox";
+import BlockCodePanel from "../components/driver/BlockCodePanel";
 
 export default function DriverScreen() {
-  // --- ข้อมูลแผนที่ ---
+  // --- ข้อมูลแผนที่เขาวงกต ---
   const MAP = [
-    "##########",
-    "#......#.#",
-    "####.#.#.#",
-    "#....#...#",
-    "#..#.#.#.#",
-    "####.#.#.#",
-    "#....#.#.#",
-    "#..#.###.#",
-    "#..#..#..#",
-    "#####.####",
+    "###############",
+    "#........#....#",
+    "#........#....#",
+    "####..#..###..#",
+    "#.....#.......#",
+    "#.....#.......#",
+    "#..#..#..###..#",
+    "#..#..#....#..#",
+    "####..#....#..#",
+    "#.....#....#..#",
+    "#.....#....#..#",
+    "#..#..######..#",
+    "#..#.....#....#",
+    "#..#.....#....#",
+    "######...######",
   ];
   const WALLS = MAP.flatMap((row, y) =>
     [...row].map((cell, x) => (cell === "#" ? { x, y } : null)).filter(Boolean),
@@ -27,10 +34,10 @@ export default function DriverScreen() {
     return WALLS.some((wall) => wall.x === x && wall.y === y);
   };
 
-  // --- State ของเกม ---
+  // --- State ของการเล่นเกม ---
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null);
-  const [playerX, setPlayerX] = useState(5);
-  const [playerY, setPlayerY] = useState(8);
+  const [playerX, setPlayerX] = useState(7);
+  const [playerY, setPlayerY] = useState(14); // เริ่มต้นที่ F11 (x=8, y=14) ในระบบแผนที่ 15x15
   const [direction, setDirection] = useState<"up" | "right" | "down" | "left">(
     "up",
   );
@@ -39,18 +46,19 @@ export default function DriverScreen() {
   const sleep = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
-  // --- ระบบรันโค้ด 4 ทิศทาง ---
+  // --- ลอจิกการแกะโค้ดบล็อกและรันตามลำดับ ---
   const runProgram = async () => {
     if (!workspaceRef.current) return;
     setIsWin(false);
 
+    // ดึงบล็อกเริ่มต้นใน Workspace
     const topBlocks = workspaceRef.current.getTopBlocks(true);
     if (topBlocks.length === 0) return;
 
-    const commands: string[] = [];
+    const commandBlocks: any[] = [];
     let block = topBlocks[0];
     while (block) {
-      commands.push(block.type);
+      commandBlocks.push(block);
       block = block.getNextBlock() as any;
     }
 
@@ -58,11 +66,15 @@ export default function DriverScreen() {
     let currentY = playerY;
     let currentDirection = direction;
 
-    for (const cmd of commands) {
+    // ทำตามทีละคำสั่งด้วยเอฟเฟกต์การเคลื่อนไหวทีละขั้น (Sleep 300ms)
+    for (const cmdBlock of commandBlocks) {
+      // ไฮไลต์บล็อกที่กำลังทำงานในปัจจุบัน
+      workspaceRef.current.highlightBlock(cmdBlock.id);
+
+      const cmd = cmdBlock.type;
       let nextX = currentX;
       let nextY = currentY;
 
-      // ลอจิกเดินตามทิศทาง
       if (cmd === "move_up") {
         nextY--;
         currentDirection = "up";
@@ -77,11 +89,11 @@ export default function DriverScreen() {
         currentDirection = "right";
       }
 
-      // กันออกนอกแมพ
-      nextX = Math.max(0, Math.min(9, nextX));
-      nextY = Math.max(0, Math.min(9, nextY));
+      // ตรวจจับขอบสนาม (แมพมีขนาด 15x15 ดัชนีสูงสุดคือ 14)
+      nextX = Math.max(0, Math.min(14, nextX));
+      nextY = Math.max(0, Math.min(14, nextY));
 
-      // เช็กกำแพง
+      // เช็กการชนกำแพง
       if (!isWall(nextX, nextY)) {
         currentX = nextX;
         currentY = nextY;
@@ -90,66 +102,61 @@ export default function DriverScreen() {
       }
 
       setDirection(currentDirection);
-      await sleep(300);
+      await sleep(350); // เพิ่ม sleep เล็กน้อยเพื่อให้ผู้เล่นเห็นไฟกะพริบไฮไลต์ชัดขึ้น
 
-      // เช็กชนะ
-      if (currentX === 6 && currentY === 1) {
+      // ตรวจจับจุดหมายเส้นชัย (ประตูทางออก/ธง) อยู่ที่ G1 (x=7, y=1) ในระบบแผนที่ 15x15
+      if (currentX === 7 && currentY === 1) {
         setIsWin(true);
-        workspaceRef.current.clear();
+        workspaceRef.current.highlightBlock(null); // ยกเลิกไฮไลต์
         return;
       }
     }
-    workspaceRef.current.clear();
+    workspaceRef.current.highlightBlock(null); // ยกเลิกไฮไลต์หลังรันเสร็จ โดยเก็บบล็อกโค้ดไว้ไม่ลบออก
   };
 
   return (
-    <div className="w-full min-h-screen bg-neutral-900 p-4 md:p-8 flex flex-col items-center gap-6">
-      <h1 className="text-white text-5xl font-pixel font-bold uppercase drop-shadow-md">
-        DRIVER
-      </h1>
+    <div
+      className="w-full min-h-screen bg-cover bg-center flex flex-col p-4 md:p-6 font-pixel gap-4 cursor-default"
+      style={{ backgroundImage: "url('/ingame.png')" }}
+    >
+      {/* ส่วนหัวเกมแสดงสถานะและข้อมูลปาร์ตี้ */}
+      <GameHeader />
 
-      <div className="flex flex-col xl:flex-row gap-8 w-full max-w-6xl justify-center items-start">
-        {/* ฝั่งซ้าย: กระดานเกม */}
-        <div className="flex flex-col gap-4">
+      {/* หน้าจอหลักแบ่งออกเป็น 2 คอลัมน์ตามแบบฉบับดั้งเดิม */}
+      <div className="flex flex-1 gap-6 w-full max-w-[1600px] mx-auto items-stretch">
+        {/* คอลัมน์ซ้าย: แผนที่เกม และช่องพูดคุย (Chat) */}
+        <div className="w-[55%] flex flex-col gap-4">
           <GameBoard
             playerX={playerX}
             playerY={playerY}
             direction={direction}
             walls={WALLS}
           />
+          <ChatBox />
         </div>
 
-        {/* ฝั่งขวา: กล่องเขียนโค้ด Blockly */}
-        <div className="flex flex-col gap-4 w-full md:w-[500px]">
-          <div className="h-[500px] border-4 border-black rounded-xl overflow-hidden bg-white shadow-xl">
-            <BlocklyEditor
-              onReady={(ws) => {
-                workspaceRef.current = ws;
-              }}
-            />
-          </div>
-          <button
-            className="bg-orange-600 border-4 border-black text-white font-pixel font-bold py-4 text-3xl rounded-xl hover:bg-orange-700 active:scale-95 transition-all shadow-lg"
-            onClick={runProgram}
-          >
-            RUN PROGRAM ▶
-          </button>
-        </div>
+        {/* คอลัมน์ขวา: พื้นที่รหัสบล็อก (Blockly Workspace ในธีมม้วนปาปิรัส) */}
+        <BlockCodePanel
+          onReady={(ws) => {
+            workspaceRef.current = ws;
+          }}
+          onRun={runProgram}
+        />
       </div>
 
-      {/* ป๊อปอัปเมื่อชนะ */}
+      {/* โมดัลแจ้งเตือนเมื่อชนะเกม */}
       {isWin && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
           <div className="bg-amber-100 border-8 border-black p-8 rounded-xl flex flex-col items-center gap-6 shadow-2xl">
-            <h2 className="text-6xl font-pixel font-bold text-orange-600 drop-shadow-sm">
+            <h2 className="text-6xl font-pixel font-bold text-orange-600 drop-shadow-sm animate-bounce">
               Victory!
             </h2>
             <p className="text-4xl">⭐ ⭐ ⭐</p>
             <button
-              className="bg-green-500 border-4 border-black text-white font-pixel font-bold py-3 px-8 text-2xl rounded-lg hover:bg-green-600 active:scale-95 transition-all"
+              className="bg-green-500 border-4 border-black text-white font-pixel font-bold py-3 px-8 text-2xl rounded-lg hover:bg-green-600 active:scale-95 transition-all shadow-lg"
               onClick={() => {
-                setPlayerX(5);
-                setPlayerY(8);
+                setPlayerX(6);
+                setPlayerY(11);
                 setDirection("up");
                 setIsWin(false);
               }}
@@ -162,3 +169,4 @@ export default function DriverScreen() {
     </div>
   );
 }
+
