@@ -1,10 +1,4 @@
-export default {
-  content: [
+content: [
   "./index.html",
-  "./src/**/*.{js,ts,jsx,tsx}",
-],
-theme: {
-  extend: {},
-},
-plugins: [],
-}
+  "./src/**/*.{js,ts,jsx,tsx}",   // ต้องมี ** ครอบทุก subfolder
+]

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import * as Blockly from "blockly";
 import { registerBlocks } from "../blockly/blocks";
+import { toolbox } from "../blockly/toolbox";
 
 interface Props {
   onReady: (workspace: Blockly.WorkspaceSvg) => void;
@@ -14,38 +15,25 @@ export default function BlocklyEditor({ onReady }: Props) {
 
     if (!blocklyDiv.current) return;
 
+    // เรียกใช้ toolbox จากไฟล์ภายนอก
     const workspace = Blockly.inject(blocklyDiv.current, {
-      toolbox: {
-        kind: "flyoutToolbox",
-        contents: [
-          {
-            kind: "block",
-            type: "move_forward",
-          },
-          {
-            kind: "block",
-            type: "turn_left",
-          },
-          {
-            kind: "block",
-            type: "turn_right",
-          },
-        ],
-      },
+      toolbox: toolbox,
     });
 
     onReady(workspace);
 
     return () => workspace.dispose();
-  }, []);
+  }, [onReady]);
 
   return (
     <div
       ref={blocklyDiv}
       style={{
-        width: "500px",
-        height: "600px",
+        width: "100%",
+        height: "100%",
+        minHeight: "400px", // เผื่อความสูงขั้นต่ำไว้
       }}
+      className="rounded-lg overflow-hidden bg-white"
     />
   );
 }
