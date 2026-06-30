@@ -9,7 +9,7 @@ interface BlockCodePanelProps {
 }
 
 export default function BlockCodePanel({
-  blocksLeft = 29,
+  blocksLeft,
   onRun,
   onReady,
 }: BlockCodePanelProps) {
@@ -26,7 +26,9 @@ export default function BlockCodePanel({
             <div className="bg-orange-700 text-white px-4 py-1 rounded-full border-2 border-black text-sm font-pixel shadow-md">
               {blocksLeft} BLOCK LEFT
             </div>
-            <h2 className="text-black text-2xl font-bold font-pixel">Your Program</h2>
+            <h2 className="text-black text-2xl font-bold font-pixel">
+              Your Program
+            </h2>
           </div>
         </div>
 
@@ -49,5 +51,3 @@ export default function BlockCodePanel({
     </div>
   );
 }
-
-

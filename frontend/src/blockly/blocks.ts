@@ -9,7 +9,7 @@ export function registerBlocks() {
       args0: [
         {
           type: "field_label",
-          text: "Up ⬆️",
+          text: "Up 🡹",
           class: "block-text-white",
         },
       ],
@@ -23,7 +23,7 @@ export function registerBlocks() {
       args0: [
         {
           type: "field_label",
-          text: "Down ⬇️",
+          text: "Down 🡻",
           class: "block-text-white",
         },
       ],
@@ -37,7 +37,7 @@ export function registerBlocks() {
       args0: [
         {
           type: "field_label",
-          text: "Left ⬅️",
+          text: "Left 🡸",
           class: "block-text-white",
         },
       ],
@@ -51,7 +51,7 @@ export function registerBlocks() {
       args0: [
         {
           type: "field_label",
-          text: "Right ➡️",
+          text: "Right 🡺",
           class: "block-text-white",
         },
       ],
