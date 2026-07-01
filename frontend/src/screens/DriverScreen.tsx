@@ -36,7 +36,7 @@ export default function DriverScreen() {
   // --- State ของการเล่นเกม ---
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null);
   const [playerX, setPlayerX] = useState(7);
-  const [playerY, setPlayerY] = useState(13);
+  const [playerY, setPlayerY] = useState(14);
   const [direction, setDirection] = useState<"up" | "right" | "down" | "left">(
     "up",
   );
@@ -83,7 +83,7 @@ export default function DriverScreen() {
   // 🌟 [แก้ไขฟังก์ชันนี้] รีเซ็ตแบบทำลายแผงบล็อกเดิมทิ้งเพื่อบังคับปลดล็อกลากวาง
   const resetGameToNewStart = () => {
     setPlayerX(7);
-    setPlayerY(13);
+    setPlayerY(14);
     setDirection("up");
     setIsWin(false);
     setIsLose(false);
