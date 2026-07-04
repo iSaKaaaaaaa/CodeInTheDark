@@ -1,0 +1,43 @@
+import { create } from 'zustand';
+import { io, Socket } from 'socket.io-client';
+
+interface SocketState {
+  socket: Socket | null;
+  username: string;
+  roomCode: string;
+  role: 'driver' | 'navigator' | null;
+  connect: (username: string, roomCode: string, role: 'driver' | 'navigator') => void;
+  disconnect: () => void;
+}
+
+export const useSocketStore = create<SocketState>((set, get) => ({
+  socket: null,
+  username: '',
+  roomCode: '',
+  role: null,
+
+  connect: (username, roomCode, role) => {
+    // If already connected, disconnect first
+    if (get().socket) {
+      get().socket?.disconnect();
+    }
+
+    // Connect to the backend
+    const socket = io('http://localhost:3000'); // Assuming backend runs on 3000
+
+    socket.on('connect', () => {
+      console.log('Connected to socket server with id:', socket.id);
+      socket.emit('join_room', { roomCode, role, username });
+    });
+
+    set({ socket, username, roomCode, role });
+  },
+
+  disconnect: () => {
+    const { socket } = get();
+    if (socket) {
+      socket.disconnect();
+    }
+    set({ socket: null, username: '', roomCode: '', role: null });
+  },
+}));

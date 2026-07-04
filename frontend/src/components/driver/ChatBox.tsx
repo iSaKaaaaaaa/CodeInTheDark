@@ -1,22 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSocketStore } from "../../store/useSocketStore";
 
-interface ChatBoxProps {
-  messages?: string[];
-  onSendMessage?: (message: string) => void;
+interface ChatMessage {
+  sender: string;
+  text: string;
 }
 
-export default function ChatBox({
-  messages = [],
-  onSendMessage,
-}: ChatBoxProps) {
+export default function ChatBox() {
   const [inputValue, setInputValue] = useState("");
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const { socket, username } = useSocketStore();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleMessage = (msg: ChatMessage) => {
+      setMessages((prev) => [...prev, msg]);
+    };
+
+    socket.on("chat_message", handleMessage);
+
+    return () => {
+      socket.off("chat_message", handleMessage);
+    };
+  }, [socket]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && inputValue.trim() !== "") {
-      onSendMessage?.(inputValue);
-      setInputValue(""); // เคลียร์ช่องพิมพ์หลังจากส่ง
+      const newMsg = { sender: username, text: inputValue };
+      // Optimistically add to own screen
+      setMessages((prev) => [...prev, newMsg]);
+      // Emit to server
+      socket?.emit("chat_message", newMsg);
+      setInputValue("");
     }
   };
+
+  const messagesEndRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   return (
     <div className="h-56 bg-black/80 rounded-xl border-4 border-black p-3 flex flex-col shadow-2xl">
@@ -24,14 +48,14 @@ export default function ChatBox({
         CHAT BOX
       </span>
 
-      {/* พื้นที่แสดงข้อความแชท */}
       <div className="flex-1 overflow-y-auto mb-2 flex flex-col gap-1">
         {messages.map((msg, index) => (
           <div key={index} className="text-white text-sm">
-            <span className="text-orange-500 font-bold">{">"} </span>
-            {msg}
+            <span className="text-orange-500 font-bold">{msg.sender}: </span>
+            {msg.text}
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
       <input

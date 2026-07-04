@@ -15,11 +15,74 @@ const io = new Server(server, {
   },
 });
 
+// Map roomCode -> Set of socket IDs
+const rooms = new Map<string, Set<string>>();
+
+// Map socketId -> { roomCode, role, username }
+const users = new Map<string, { roomCode: string; role: string; username: string }>();
+
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
+  socket.on("join_room", ({ roomCode, role, username }) => {
+    socket.join(roomCode);
+    users.set(socket.id, { roomCode, role, username });
+
+    if (!rooms.has(roomCode)) {
+      rooms.set(roomCode, new Set());
+    }
+    rooms.get(roomCode)!.add(socket.id);
+
+    console.log(`User ${username} (${socket.id}) joined room ${roomCode} as ${role}`);
+    
+    // Notify others in the room
+    socket.to(roomCode).emit("user_joined", { username, role });
+  });
+
+  socket.on("chat_message", ({ text, sender }) => {
+    const user = users.get(socket.id);
+    if (user) {
+      socket.to(user.roomCode).emit("chat_message", { text, sender });
+    }
+  });
+
+  socket.on("sync_game_state", (state) => {
+    const user = users.get(socket.id);
+    if (user) {
+      // Broadcast to everyone else in the room (Navigator)
+      socket.to(user.roomCode).emit("sync_game_state", state);
+    }
+  });
+
+  socket.on("sync_blockly", (workspaceXml) => {
+    const user = users.get(socket.id);
+    if (user) {
+      socket.to(user.roomCode).emit("sync_blockly", workspaceXml);
+    }
+  });
+
+  socket.on("highlight_block", (blockId) => {
+    const user = users.get(socket.id);
+    if (user) {
+      socket.to(user.roomCode).emit("highlight_block", blockId);
+    }
+  });
+
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
+    const user = users.get(socket.id);
+    if (user) {
+      const roomUsers = rooms.get(user.roomCode);
+      if (roomUsers) {
+        roomUsers.delete(socket.id);
+        if (roomUsers.size === 0) {
+          rooms.delete(user.roomCode);
+        } else {
+          socket.to(user.roomCode).emit("user_left", { username: user.username, role: user.role });
+        }
+      }
+      users.delete(socket.id);
+    }
   });
 });
 

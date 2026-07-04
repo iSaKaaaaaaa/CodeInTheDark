@@ -21,9 +21,10 @@ const egyptianTheme = Blockly.Theme.defineTheme("egyptian", {
 
 interface Props {
   onReady: (workspace: Blockly.WorkspaceSvg) => void;
+  readOnly?: boolean;
 }
 
-export default function BlocklyEditor({ onReady }: Props) {
+export default function BlocklyEditor({ onReady, readOnly = false }: Props) {
   const blocklyDiv = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -41,7 +42,7 @@ export default function BlocklyEditor({ onReady }: Props) {
         colour: "#f59e0b", // เส้นสีส้ม/ทอง
         snap: true,
       },
-      trashcan: true,
+      trashcan: !readOnly, // ซ่อนถังขยะถ้า readOnly
       scrollbars: false,
       move: {
         scrollbars: false,
@@ -59,7 +60,7 @@ export default function BlocklyEditor({ onReady }: Props) {
     onReady(workspace);
 
     return () => workspace.dispose();
-  }, [onReady]);
+  }, [onReady, readOnly]);
 
   return (
     <div

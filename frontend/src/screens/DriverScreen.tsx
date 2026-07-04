@@ -1,5 +1,6 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import * as Blockly from "blockly";
+import { useSocketStore } from "../store/useSocketStore";
 
 import GameHeader from "../components/driver/GameHeader";
 import GameBoard from "../components/driver/GameBoard";
@@ -7,6 +8,8 @@ import ChatBox from "../components/driver/ChatBox";
 import BlockCodePanel from "../components/driver/BlockCodePanel";
 
 export default function DriverScreen() {
+  const { socket, role } = useSocketStore();
+
   // --- ข้อมูลแผนที่ ---
   const MAP = [
     "###############",
@@ -43,7 +46,6 @@ export default function DriverScreen() {
   const [isWin, setIsWin] = useState(false);
   const [isLose, setIsLose] = useState(false);
 
-  // 🌟 [เพิ่มจุดนี้] ใช้ Key เป็นตัวบังคับให้ BlockCodePanel Re-mount (เกิดใหม่) เมื่อกดเล่นอีกครั้ง
   const [panelKey, setPanelKey] = useState(0);
 
   const MAX_BLOCKS = 25;
@@ -52,7 +54,6 @@ export default function DriverScreen() {
 
   const availableQuotaRef = useRef(MAX_BLOCKS);
 
-  // ควบคุม maxBlocks ผ่าน useEffect ปกติ
   useEffect(() => {
     availableQuotaRef.current = availableQuota;
     if (workspaceRef.current) {
@@ -60,27 +61,42 @@ export default function DriverScreen() {
     }
   }, [availableQuota]);
 
+  // Driver doesn't need to listen to sync events from Navigator since Driver is the source of truth
+
+
   const sleep = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
   // ฟังก์ชันจัดการ Workspace
-  const handleWorkspaceReady = useCallback((ws: Blockly.WorkspaceSvg) => {
-    workspaceRef.current = ws;
-    ws.options.maxBlocks = availableQuotaRef.current;
+  const handleWorkspaceReady = useCallback(
+    (ws: Blockly.WorkspaceSvg) => {
+      workspaceRef.current = ws;
+      ws.options.maxBlocks = availableQuotaRef.current;
 
-    ws.addChangeListener((event) => {
-      if (
-        event.type === Blockly.Events.BLOCK_CREATE ||
-        event.type === Blockly.Events.BLOCK_DELETE ||
-        event.type === Blockly.Events.BLOCK_MOVE
-      ) {
-        const used = ws.getAllBlocks(false).length;
-        setBlocksLeft(Math.max(0, availableQuotaRef.current - used));
-      }
-    });
-  }, []);
+      ws.addChangeListener((event) => {
+        // ถ้าเป็น Driver เมื่อมีการแก้ไข Block ให้ส่ง XML ไปให้ Navigator
+        if (role === "driver") {
+          if (
+            event.type === Blockly.Events.BLOCK_CREATE ||
+            event.type === Blockly.Events.BLOCK_DELETE ||
+            event.type === Blockly.Events.BLOCK_MOVE ||
+            event.type === Blockly.Events.BLOCK_CHANGE
+          ) {
+            const used = ws.getAllBlocks(false).length;
+            setBlocksLeft(Math.max(0, availableQuotaRef.current - used));
 
-  // 🌟 [แก้ไขฟังก์ชันนี้] รีเซ็ตแบบทำลายแผงบล็อกเดิมทิ้งเพื่อบังคับปลดล็อกลากวาง
+            if (socket) {
+              const xml = Blockly.Xml.workspaceToDom(ws);
+              const xmlText = Blockly.Xml.domToText(xml);
+              socket.emit("sync_blockly", xmlText);
+            }
+          }
+        }
+      });
+    },
+    [role, socket],
+  );
+
   const resetGameToNewStart = () => {
     setPlayerX(7);
     setPlayerY(14);
@@ -88,23 +104,46 @@ export default function DriverScreen() {
     setIsWin(false);
     setIsLose(false);
 
-    // 1. ล้างกระดาน
     if (workspaceRef.current) {
       workspaceRef.current.clear();
     }
 
-    // 2. คืนค่าตัวเลขโควต้ากลับไปที่ 25
     availableQuotaRef.current = MAX_BLOCKS;
     setAvailableQuota(MAX_BLOCKS);
     setBlocksLeft(MAX_BLOCKS);
 
-    // 3. 🔥 เปลี่ยนค่า Key เพื่อลบ Blockly Component ทิ้งแล้วสร้างใหม่แกะกล่องทันที
     setPanelKey((prev) => prev + 1);
+
+    if (role === "driver" && socket) {
+      socket.emit("sync_game_state", {
+        playerX: 7,
+        playerY: 14,
+        direction: "up",
+        blocksLeft: MAX_BLOCKS,
+        isWin: false,
+        isLose: false,
+        reset: true,
+      });
+      socket.emit("sync_blockly", "<xml></xml>");
+    }
   };
 
-  // --- ลอจิกการรันและหักโควต้าหลังจบโปรแกรม ---
+  const emitGameState = (stateOverrides: any = {}) => {
+    if (role === "driver" && socket) {
+      socket.emit("sync_game_state", {
+        playerX,
+        playerY,
+        direction,
+        blocksLeft,
+        isWin,
+        isLose,
+        ...stateOverrides,
+      });
+    }
+  };
+
   const runProgram = async () => {
-    if (!workspaceRef.current) return;
+    if (!workspaceRef.current || role !== "driver") return;
     setIsWin(false);
     setIsLose(false);
 
@@ -126,6 +165,10 @@ export default function DriverScreen() {
 
     for (const cmdBlock of commandBlocks) {
       workspaceRef.current.highlightBlock(cmdBlock.id);
+      
+      if (socket) {
+        socket.emit("highlight_block", cmdBlock.id);
+      }
 
       const cmd = cmdBlock.type;
       let nextX = currentX;
@@ -156,10 +199,20 @@ export default function DriverScreen() {
       }
 
       setDirection(currentDirection);
+
+      // ส่ง State ไปให้ Navigator
+      emitGameState({
+        playerX: currentX,
+        playerY: currentY,
+        direction: currentDirection,
+      });
+
       await sleep(350);
 
       if (currentX === 7 && currentY === 1) {
         workspaceRef.current.highlightBlock(null);
+        if (socket) socket.emit("highlight_block", null);
+        
         await sleep(500);
         setIsWin(true);
 
@@ -167,11 +220,20 @@ export default function DriverScreen() {
         availableQuotaRef.current = nextQuota;
         setAvailableQuota(nextQuota);
         workspaceRef.current.clear();
+
+        emitGameState({
+          playerX: currentX,
+          playerY: currentY,
+          direction: currentDirection,
+          isWin: true,
+        });
         return;
       }
     }
 
     workspaceRef.current.highlightBlock(null);
+    if (socket) socket.emit("highlight_block", null);
+    
     await sleep(500);
 
     const nextQuota = availableQuotaRef.current - blocksToUse;
@@ -181,8 +243,16 @@ export default function DriverScreen() {
 
     if (nextQuota <= 0) {
       setIsLose(true);
+      emitGameState({
+        playerX: currentX,
+        playerY: currentY,
+        direction: currentDirection,
+        isLose: true,
+      });
     }
   };
+
+  const BOUNDARY_WALLS = WALLS.filter(wall => wall.x === 0 || wall.x === 14 || wall.y === 0 || wall.y === 14);
 
   return (
     <div
@@ -197,21 +267,21 @@ export default function DriverScreen() {
             playerX={playerX}
             playerY={playerY}
             direction={direction}
-            walls={WALLS}
+            walls={BOUNDARY_WALLS}
+            role="driver"
           />
           <ChatBox />
         </div>
 
-        {/* 🌟 [แก้ไขจุดนี้] ใส่ key={panelKey} เข้าไปเพื่อให้คอมโพเนนต์ยอมเกิดใหม่พร้อมปลดล็อกบล็อกทั้งหมด */}
         <BlockCodePanel
           key={panelKey}
           blocksLeft={blocksLeft}
           onReady={handleWorkspaceReady}
           onRun={runProgram}
+          readOnly={false}
         />
       </div>
 
-      {/* --- โมดัลเมื่อชนะเกม --- */}
       {isWin && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
           <div className="bg-amber-100 border-8 border-black p-8 rounded-xl flex flex-col items-center gap-6 shadow-2xl">
@@ -229,7 +299,6 @@ export default function DriverScreen() {
         </div>
       )}
 
-      {/* --- โมดัลเมื่อแพ้เกม --- */}
       {isLose && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
           <div className="bg-amber-100 border-8 border-black p-8 rounded-xl flex flex-col items-center gap-6 shadow-2xl">
