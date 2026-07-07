@@ -37,12 +37,24 @@ io.on("connection", (socket) => {
     
     // Notify others in the room
     socket.to(roomCode).emit("user_joined", { username, role });
+
+    // Send updated user list to everyone in the room
+    const usersInRoom = Array.from(rooms.get(roomCode)!).map(id => users.get(id));
+    io.to(roomCode).emit("room_users", usersInRoom);
   });
 
   socket.on("chat_message", ({ text, sender }) => {
     const user = users.get(socket.id);
     if (user) {
       socket.to(user.roomCode).emit("chat_message", { text, sender });
+    }
+  });
+
+  socket.on("start_game", () => {
+    const user = users.get(socket.id);
+    if (user) {
+      // Broadcast to everyone else in the room
+      socket.to(user.roomCode).emit("start_game");
     }
   });
 
@@ -79,6 +91,8 @@ io.on("connection", (socket) => {
           rooms.delete(user.roomCode);
         } else {
           socket.to(user.roomCode).emit("user_left", { username: user.username, role: user.role });
+          const usersInRoom = Array.from(roomUsers).map(id => users.get(id));
+          io.to(user.roomCode).emit("room_users", usersInRoom);
         }
       }
       users.delete(socket.id);
