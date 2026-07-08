@@ -23,7 +23,8 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     }
 
     // Connect to the backend
-    const socket = io('http://localhost:3000'); // Assuming backend runs on 3000
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+    const socket = io(backendUrl);
 
     socket.on('connect', () => {
       console.log('Connected to socket server with id:', socket.id);
