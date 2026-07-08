@@ -4,12 +4,11 @@ import LoginModal from "./screens/LoginModal";
 import SelectPlayScreen from "./screens/SelectPlayScreen";
 import CreateRoomScreen from "./screens/CreateRoomScreen";
 import JoinRoomScreen from "./screens/JoinRoomScreen";
-import DriverScreen from "./screens/DriverScreen";
-import NavigatorScreen from "./screens/NavigatorScreen";
+import GameScreen from "./screens/GameScreen";
 import { useSocketStore } from "./store/useSocketStore";
 
 export default function App() {
-  const { currentScreen, role, setScreen } = useSocketStore();
+  const { currentScreen, setScreen } = useSocketStore();
 
   switch (currentScreen) {
     case 'landing':
@@ -32,10 +31,7 @@ export default function App() {
     case 'join':
       return <JoinRoomScreen />;
     case 'game':
-      if (role === "navigator") {
-        return <NavigatorScreen />;
-      }
-      return <DriverScreen />;
+      return <GameScreen />;
     default:
       return <LandingPage onStart={() => setScreen('login')} />;
   }

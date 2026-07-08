@@ -80,6 +80,13 @@ io.on("connection", (socket) => {
     }
   });
 
+  socket.on("trigger_role_swap", (data) => {
+    const user = users.get(socket.id);
+    if (user) {
+      socket.to(user.roomCode).emit("role_swap", data);
+    }
+  });
+
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
     const user = users.get(socket.id);
