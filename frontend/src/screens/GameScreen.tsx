@@ -73,8 +73,8 @@ export default function GameScreen() {
   }, [availableQuota]);
 
   // --- Timer State ---
-  const [dungeonTimeLeft, setDungeonTimeLeft] = useState(120); // 5 นาที
-  const [swapTimeLeft, setSwapTimeLeft] = useState(30); // 2 นาที
+  const [dungeonTimeLeft, setDungeonTimeLeft] = useState(300); // 5 นาที
+  const [swapTimeLeft, setSwapTimeLeft] = useState(120); // 2 นาที
   const [showSwapAlert, setShowSwapAlert] = useState(false);
 
   // Driver Timer Logic
@@ -125,7 +125,7 @@ export default function GameScreen() {
             }
           }, 3000);
 
-          next = 30; // รีเซ็ตเวลาหลอดใหม่
+          next = 120; // รีเซ็ตเวลาหลอดใหม่
         }
         if (socket) socket.emit("sync_game_state", { swapTimeLeft: next });
         return next;
@@ -257,8 +257,8 @@ export default function GameScreen() {
     setIsWin(false);
     setIsLose(false);
     setLoseReason(null);
-    setDungeonTimeLeft(120);
-    setSwapTimeLeft(30);
+    setDungeonTimeLeft(300);
+    setSwapTimeLeft(120);
 
     if (workspaceRef.current) {
       workspaceRef.current.clear();
@@ -280,8 +280,8 @@ export default function GameScreen() {
         isWin: false,
         isLose: false,
         loseReason: null,
-        dungeonTimeLeft: 120,
-        swapTimeLeft: 30,
+        dungeonTimeLeft: 300,
+        swapTimeLeft: 120,
         reset: true,
       });
       socket.emit("sync_blockly", "<xml></xml>");
@@ -446,7 +446,7 @@ export default function GameScreen() {
         role={role === "driver" ? "DRIVER" : "NAVIGATOR"}
         dungeonTime={formatTime(dungeonTimeLeft)}
         swapTime={formatTime(swapTimeLeft)}
-        swapProgress={(swapTimeLeft / 30) * 100}
+        swapProgress={(swapTimeLeft / 120) * 100}
       />
 
       <div className="flex flex-1 gap-6 w-full max-w-[1600px] mx-auto items-stretch">
