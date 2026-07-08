@@ -6,6 +6,7 @@ interface SocketState {
   username: string;
   roomCode: string;
   role: 'driver' | 'navigator' | null;
+  setRole: (role: 'driver' | 'navigator') => void;
   connect: (username: string, roomCode: string, role: 'driver' | 'navigator') => void;
   disconnect: () => void;
 }
@@ -22,8 +23,8 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       get().socket?.disconnect();
     }
 
-    // Connect to the backend
-    const socket = io('http://localhost:3000'); // Assuming backend runs on 3000
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+    const socket = io(backendUrl);
 
     socket.on('connect', () => {
       console.log('Connected to socket server with id:', socket.id);
@@ -31,6 +32,10 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     });
 
     set({ socket, username, roomCode, role });
+  },
+
+  setRole: (role) => {
+    set({ role });
   },
 
   disconnect: () => {

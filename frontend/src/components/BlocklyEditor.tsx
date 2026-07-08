@@ -26,6 +26,7 @@ interface Props {
 
 export default function BlocklyEditor({ onReady, readOnly = false }: Props) {
   const blocklyDiv = useRef<HTMLDivElement>(null);
+  const savedXmlRef = useRef<string | null>(null);
 
   useEffect(() => {
     registerBlocks();
@@ -57,9 +58,22 @@ export default function BlocklyEditor({ onReady, readOnly = false }: Props) {
     // ปรับขนาดบล็อกในแถบเมนู (Flyout) ด้านซ้ายให้ขยาย 50% (ขนาดรวม 1.5 เท่า) เหมือนฝั่งกระดานเขียนโค้ด
     workspace.getFlyout()?.getWorkspace()?.setScale(1.25);
 
+    if (savedXmlRef.current) {
+      try {
+        const xml = Blockly.utils.xml.textToDom(savedXmlRef.current);
+        Blockly.Xml.domToWorkspace(xml, workspace);
+      } catch (e) {
+        console.error("Failed to restore Blockly XML", e);
+      }
+    }
+
     onReady(workspace);
 
-    return () => workspace.dispose();
+    return () => {
+      const xml = Blockly.Xml.workspaceToDom(workspace);
+      savedXmlRef.current = Blockly.Xml.domToText(xml);
+      workspace.dispose();
+    };
   }, [onReady, readOnly]);
 
   return (
