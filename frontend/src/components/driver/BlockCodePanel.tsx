@@ -24,12 +24,12 @@ export default function BlockCodePanel({
             <h2 className="text-black text-2xl font-bold font-pixel">Blocks</h2>
           </div>
           <div className="flex-1 p-4 flex flex-col items-center justify-center gap-1">
-            <div className="bg-orange-700 text-white px-4 py-1 rounded-full border-2 border-black text-sm font-pixel shadow-md">
-              {blocksLeft} BLOCK LEFT
-            </div>
-            <h2 className="text-black text-2xl font-bold font-pixel">
+            <h2 className="text-black text-2xl font-bold font-pixel mb-1">
               Your Program
             </h2>
+            <div className="bg-red-500 text-white px-6 py-2 rounded-full border-4 border-black text-lg md:text-xl font-bold font-pixel shadow-[4px_4px_0_rgba(0,0,0,1)] tracking-wider">
+              {blocksLeft} BLOCKS LEFT
+            </div>
           </div>
         </div>
 
