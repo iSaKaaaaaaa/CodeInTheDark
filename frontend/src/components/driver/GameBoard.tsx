@@ -23,7 +23,7 @@ export default function GameBoard({
   const playerYPercent = (playerInnerY + 0.5) * (100 / 13);
   
   const fogMask = role === "navigator" 
-    ? `radial-gradient(circle at ${playerXPercent}% ${playerYPercent}%, transparent 0%, transparent 20%, black 45%)`
+    ? `radial-gradient(circle at ${playerXPercent}% ${playerYPercent}%, transparent 0%, transparent 16%, black 38%)`
     : undefined;
 
   return (
@@ -108,15 +108,14 @@ export default function GameBoard({
                 left: "6.666%",
                 width: "86.666%",
                 height: "86.666%",
-                backgroundColor: "rgba(255, 255, 255, 0.95)", // หมอกสีขาวหนา
-                // เพิ่มลายเมฆด้วย CSS พื้นฐาน (หรือถ้ายากก็ใช้สีขาวทึบกับ mask)
-                backgroundImage: "radial-gradient(circle at center, rgba(255,255,255,0.8) 0%, rgba(240,240,240,0.95) 100%)",
+                backgroundColor: "rgba(225, 228, 232, 0.85)", // หมอกสีเทาอ่อน สบายตา
+                backgroundImage: "radial-gradient(circle at center, rgba(240, 243, 248, 0.6) 0%, rgba(205, 210, 215, 0.9) 100%)",
                 maskImage: fogMask,
                 WebkitMaskImage: fogMask,
               }}
             >
                {/* ใส่ลูกเล่นเมฆเบาๆ ด้วยเงา */}
-               <div className="w-full h-full backdrop-blur-md opacity-80" />
+               <div className="w-full h-full backdrop-blur-sm opacity-60" />
             </div>
           )}
         </div>
