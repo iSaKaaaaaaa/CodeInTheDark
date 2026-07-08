@@ -11,32 +11,38 @@ export default function GameHeader({
   swapTime = "02:00",
   swapProgress = 100,
 }: GameHeaderProps) {
+  let barColor = "bg-green-500";
+  if (swapProgress <= 25) {
+    barColor = "bg-red-600 shadow-[0_0_15px_rgba(220,38,38,0.8)]"; // Add glowing effect when critical
+  } else if (swapProgress <= 50) {
+    barColor = "bg-orange-500";
+  }
+
   return (
     <header className="grid grid-cols-3 items-center w-full">
       <h1 className="text-white text-5xl md:text-6xl font-bold drop-shadow-md uppercase justify-self-start">
         {role}
       </h1>
 
-      <div className="flex flex-col items-center bg-black/60 px-8 py-2 rounded-full border-4 border-black shadow-lg justify-self-center">
-        <span className="text-blue-300 font-bold tracking-widest mb-1 text-sm md:text-base">
+      <div className="flex flex-col items-center bg-black/80 px-8 md:px-16 py-3 rounded-full border-4 border-black shadow-2xl justify-self-center">
+        <span className="text-blue-300 font-bold tracking-widest mb-1 text-xl md:text-2xl drop-shadow-sm">
           ROLE SWAP
         </span>
-        <div className="w-48 md:w-80 h-4 bg-black rounded-full border-2 border-black overflow-hidden relative">
-          {/* ปรับความกว้างของหลอดตามค่า swapProgress */}
+        <div className="w-72 md:w-[600px] h-4 md:h-5 bg-gray-900 rounded-full border-2 border-black overflow-hidden relative shadow-inner">
           <div
-            className="absolute top-0 left-0 h-full bg-green-500 transition-all duration-1000 linear"
+            className={`absolute top-0 left-0 h-full ${barColor} transition-all duration-1000 linear`}
             style={{ width: `${swapProgress}%` }}
           ></div>
         </div>
-        <span className="text-white text-xs mt-1">{swapTime}</span>
+        <span className="text-white text-xl md:text-2xl mt-2 font-bold tracking-widest drop-shadow-md">{swapTime}</span>
       </div>
 
       <div className="flex flex-col items-end justify-self-end">
-        <span className="text-orange-600 font-bold text-sm md:text-base drop-shadow-sm tracking-widest">
+        <span className="text-orange-600 font-bold text-xl md:text-2xl drop-shadow-sm tracking-widest mb-1">
           DUNGEON TIME
         </span>
         <div className="flex items-center gap-2">
-          <span className="text-white text-4xl md:text-5xl font-bold drop-shadow-md">
+          <span className="text-white text-5xl md:text-6xl font-bold drop-shadow-md">
             {dungeonTime}
           </span>
           <div className="w-10 h-10 border-4 border-orange-600 rounded-full flex items-center justify-center">

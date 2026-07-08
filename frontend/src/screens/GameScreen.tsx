@@ -450,7 +450,7 @@ export default function GameScreen() {
       />
 
       <div className="flex flex-1 gap-6 w-full max-w-[1600px] mx-auto items-stretch">
-        <div className="w-[55%] flex flex-col gap-4">
+        <div className="flex-[6] min-w-0 flex flex-col gap-4">
           <GameBoard
             playerX={playerX}
             playerY={playerY}
@@ -461,13 +461,15 @@ export default function GameScreen() {
           <ChatBox />
         </div>
 
-        <BlockCodePanel
-          key={panelKey}
-          blocksLeft={blocksLeft}
-          onReady={handleWorkspaceReady}
-          onRun={role === "driver" ? runProgram : undefined}
-          readOnly={role !== "driver"}
-        />
+        <div className="flex-[4] min-w-0 flex flex-col">
+          <BlockCodePanel
+            key={panelKey}
+            blocksLeft={blocksLeft}
+            onReady={handleWorkspaceReady}
+            onRun={role === "driver" ? runProgram : undefined}
+            readOnly={role !== "driver"}
+          />
+        </div>
       </div>
 
       {isWin && (

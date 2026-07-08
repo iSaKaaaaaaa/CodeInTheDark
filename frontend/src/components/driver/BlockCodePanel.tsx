@@ -16,32 +16,32 @@ export default function BlockCodePanel({
   readOnly = false,
 }: BlockCodePanelProps) {
   return (
-    <div className="w-[45%] relative min-h-[500px] flex flex-col">
+    <div className="w-full h-full relative min-h-[300px] flex flex-col">
       {/* กล่องหลัก */}
       <div className="flex-1 bg-amber-100/90 rounded-xl border-4 border-black flex flex-col overflow-hidden shadow-2xl relative">
         <div className="flex bg-amber-200/50 border-b-4 border-black">
-          <div className="w-[220px] flex-shrink-0 p-4 text-center border-r-4 border-black">
-            <h2 className="text-black text-2xl font-bold font-pixel">Blocks</h2>
+          <div className="w-[190px] flex-shrink-0 p-2 text-center border-r-4 border-black flex items-center justify-center">
+            <h2 className="text-black text-xl font-bold font-pixel">Blocks</h2>
           </div>
-          <div className="flex-1 p-4 flex flex-col items-center justify-center gap-1">
-            <h2 className="text-black text-2xl font-bold font-pixel mb-1">
+          <div className="flex-1 p-2 flex flex-col items-center justify-center gap-1">
+            <h2 className="text-black text-xl font-bold font-pixel mb-1">
               Your Program
             </h2>
-            <div className="bg-red-500 text-white px-6 py-2 rounded-full border-4 border-black text-lg md:text-xl font-bold font-pixel shadow-[4px_4px_0_rgba(0,0,0,1)] tracking-wider">
+            <div className="bg-red-500 text-white px-4 py-1 rounded-full border-4 border-black text-base md:text-lg font-bold font-pixel shadow-[2px_2px_0_rgba(0,0,0,1)] tracking-wider">
               {blocksLeft} BLOCKS LEFT
             </div>
           </div>
         </div>
 
         {/* พื้นที่ของ Blockly Workspace */}
-        <div className={`flex-1 w-full relative min-h-[420px] ${readOnly ? "pointer-events-none" : ""}`}>
-          <div className="absolute top-0 bottom-0 left-[220px] w-1 bg-black z-10" />
+        <div className={`flex-1 w-full relative min-h-[250px] ${readOnly ? "pointer-events-none" : ""}`}>
+          <div className="absolute top-0 bottom-0 left-[190px] w-1 bg-black z-10" />
           
           {readOnly && (
-            <div className="absolute top-0 bottom-0 left-0 w-[220px] bg-black/60 z-20 flex items-center justify-center">
-              <div className="bg-red-600 border-4 border-black text-white px-4 py-2 font-pixel text-center shadow-lg -rotate-12">
-                <p className="text-xl font-bold">DRIVER</p>
-                <p className="text-lg">ONLY</p>
+            <div className="absolute top-0 bottom-0 left-0 w-[190px] bg-black/60 z-20 flex items-center justify-center">
+              <div className="bg-red-600 border-4 border-black text-white px-2 py-1 font-pixel text-center shadow-lg -rotate-12">
+                <p className="text-sm font-bold">DRIVER</p>
+                <p className="text-xs">ONLY</p>
               </div>
             </div>
           )}
