@@ -99,11 +99,11 @@ export default function GameBoard({
                   ) : (isGoal && role !== "navigator") ? (
                     <span className="drop-shadow-md animate-bounce z-10 text-2xl">🚩</span>
                   ) : (isTrap && role !== "navigator") ? (
-                    <span className="drop-shadow-md z-10 text-2xl" title="Trap">🕳️</span>
+                    <img src="/hole.webp" alt="Trap" className="w-[100%] h-[100%] object-contain z-10 drop-shadow-md" title="Trap" />
                   ) : (isRock && role !== "navigator") ? (
-                    <span className="drop-shadow-md z-10 text-2xl" title="Rock">🪨</span>
+                    <img src="/rock.webp" alt="Rock" className="w-[100%] h-[100%] object-contain z-10 drop-shadow-md" title="Rock" />
                   ) : (isSpike && role !== "navigator") ? (
-                    <span className="drop-shadow-md z-10 text-2xl" title="Spike">💥</span>
+                    <img src="/spike.webp" alt="Spike" className="w-[100%] h-[100%] object-contain z-10 drop-shadow-md" title="Spike" />
                   ) : isWall ? (
                     <img
                       src="/wall.png"
