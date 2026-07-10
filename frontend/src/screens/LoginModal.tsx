@@ -43,7 +43,7 @@ export default function LoginModal() {
         onClick={(e) => e.stopPropagation()}
       >
         <button
-          className="absolute top-12 left-16 text-black text-4xl font-bold hover:text-orange-700 transition-colors flex items-center gap-2 z-10 drop-shadow-sm font-pixel"
+          className="absolute top-12 left-24 md:left-28 text-black text-4xl font-bold hover:text-orange-700 transition-colors flex items-center gap-2 z-10 drop-shadow-sm font-pixel"
           onClick={() => setScreen('landing')}
         >
           <span>&#8592;</span>

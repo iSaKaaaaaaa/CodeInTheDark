@@ -3,6 +3,10 @@ interface Props {
   playerY: number;
   direction: "up" | "right" | "down" | "left";
   walls?: { x: number; y: number }[];
+  traps?: { x: number; y: number }[];
+  rocks?: { x: number; y: number }[];
+  spikes?: { x: number; y: number }[];
+  goal?: { x: number; y: number };
   role?: "driver" | "navigator" | null;
 }
 
@@ -14,6 +18,10 @@ export default function GameBoard({
   playerY = 11, // F11 is index (6, 11) in 15x15 grid
   direction = "up",
   walls = [],
+  traps = [],
+  rocks = [],
+  spikes = [],
+  goal = { x: 7, y: 1 },
   role = "driver",
 }: Props) {
   // คำนวณเปอร์เซ็นต์ตำแหน่งของตัวละครสำหรับ Fog of War ในพื้นที่ 13x13 (ด้านใน)
@@ -68,8 +76,11 @@ export default function GameBoard({
               const y = Math.floor(index / 15);
 
               const isPlayer = x === playerX && y === playerY;
-              const isGoal = x === 7 && y === 1; // เป้าหมายอยู่ที่ G1 (index 7, 1)
+              const isGoal = x === goal.x && y === goal.y;
               const isWall = walls.some((wall) => wall.x === x && wall.y === y);
+              const isTrap = traps.some((trap) => trap.x === x && trap.y === y);
+              const isRock = rocks.some((rock) => rock.x === x && rock.y === y);
+              const isSpike = spikes.some((spike) => spike.x === x && spike.y === y);
 
               return (
                 <div
@@ -86,7 +97,13 @@ export default function GameBoard({
                       }}
                     />
                   ) : (isGoal && role !== "navigator") ? (
-                    <span className="drop-shadow-md animate-bounce z-10">🚩</span>
+                    <span className="drop-shadow-md animate-bounce z-10 text-2xl">🚩</span>
+                  ) : (isTrap && role !== "navigator") ? (
+                    <span className="drop-shadow-md z-10 text-2xl" title="Trap">🕳️</span>
+                  ) : (isRock && role !== "navigator") ? (
+                    <span className="drop-shadow-md z-10 text-2xl" title="Rock">🪨</span>
+                  ) : (isSpike && role !== "navigator") ? (
+                    <span className="drop-shadow-md z-10 text-2xl" title="Spike">💥</span>
                   ) : isWall ? (
                     <img
                       src="/wall.png"
@@ -108,14 +125,14 @@ export default function GameBoard({
                 left: "6.666%",
                 width: "86.666%",
                 height: "86.666%",
-                backgroundColor: "rgba(225, 228, 232, 0.85)", // หมอกสีเทาอ่อน สบายตา
-                backgroundImage: "radial-gradient(circle at center, rgba(240, 243, 248, 0.6) 0%, rgba(205, 210, 215, 0.9) 100%)",
+                backgroundColor: "rgb(225, 228, 232)", // หมอกทึบ 100%
+                backgroundImage: "radial-gradient(circle at center, rgb(240, 243, 248) 0%, rgb(185, 190, 195) 100%)",
                 maskImage: fogMask,
                 WebkitMaskImage: fogMask,
               }}
             >
                {/* ใส่ลูกเล่นเมฆเบาๆ ด้วยเงา */}
-               <div className="w-full h-full backdrop-blur-sm opacity-60" />
+               <div className="w-full h-full backdrop-blur-md opacity-100" />
             </div>
           )}
         </div>

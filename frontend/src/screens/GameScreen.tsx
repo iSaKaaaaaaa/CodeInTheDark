@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import * as Blockly from "blockly";
 import { useSocketStore } from "../store/useSocketStore";
+import { getMapData } from "../data/maps";
 
 import GameHeader from "../components/driver/GameHeader";
 import GameBoard from "../components/driver/GameBoard";
@@ -8,38 +9,31 @@ import ChatBox from "../components/driver/ChatBox";
 import BlockCodePanel from "../components/driver/BlockCodePanel";
 
 export default function GameScreen() {
-  const { socket, role, setRole } = useSocketStore();
+  const { socket, role, setRole, selectedMapIndex, setSelectedMapIndex, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft } = useSocketStore();
 
   // --- ข้อมูลแผนที่ ---
-  const MAP = [
-    "###############",
-    "#........#....#",
-    "#........#....#",
-    "####..#..###..#",
-    "#.....#.......#",
-    "#.....#.......#",
-    "#..#..#..###..#",
-    "#..#..#....#..#",
-    "####..#....#..#",
-    "#.....#....#..#",
-    "#.....#....#..#",
-    "#..#..######..#",
-    "#..#.....#....#",
-    "#..#.....#....#",
-    "######...######",
-  ];
-  const WALLS = MAP.flatMap((row, y) =>
-    [...row].map((cell, x) => (cell === "#" ? { x, y } : null)).filter(Boolean),
-  ) as { x: number; y: number }[];
+  const { walls: WALLS, traps: TRAPS, rocks: ROCKS, spikes: SPIKES, start: START, goal: GOAL } = getMapData(selectedMapIndex);
 
   const isWall = (x: number, y: number) => {
     return WALLS.some((wall) => wall.x === x && wall.y === y);
   };
 
+  const isTrap = (x: number, y: number) => {
+    return TRAPS.some((trap) => trap.x === x && trap.y === y);
+  };
+
+  const isRock = (x: number, y: number) => {
+    return ROCKS.some((rock) => rock.x === x && rock.y === y);
+  };
+
+  const isSpike = (x: number, y: number) => {
+    return SPIKES.some((spike) => spike.x === x && spike.y === y);
+  };
+
   // --- State ของการเล่นเกม ---
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null);
-  const [playerX, setPlayerX] = useState(7);
-  const [playerY, setPlayerY] = useState(14);
+  const [playerX, setPlayerX] = useState(START.x);
+  const [playerY, setPlayerY] = useState(START.y);
   const [direction, setDirection] = useState<"up" | "right" | "down" | "left">(
     "up",
   );
@@ -59,9 +53,11 @@ export default function GameScreen() {
 
   const [panelKey, setPanelKey] = useState(0);
 
-  const MAX_BLOCKS = 25;
+  const MAX_BLOCKS = 50;
   const [availableQuota, setAvailableQuota] = useState(MAX_BLOCKS);
   const [blocksLeft, setBlocksLeft] = useState(MAX_BLOCKS);
+
+  const [executionError, setExecutionError] = useState<string | null>(null);
 
   const availableQuotaRef = useRef(MAX_BLOCKS);
 
@@ -73,8 +69,6 @@ export default function GameScreen() {
   }, [availableQuota]);
 
   // --- Timer State ---
-  const [dungeonTimeLeft, setDungeonTimeLeft] = useState(300); // 5 นาที
-  const [swapTimeLeft, setSwapTimeLeft] = useState(120); // 2 นาที
   const [showSwapAlert, setShowSwapAlert] = useState(false);
 
   // Driver Timer Logic
@@ -117,7 +111,7 @@ export default function GameScreen() {
           setTimeout(() => {
             setShowSwapAlert(false);
             if (socket)
-              socket.emit("sync_game_state", { showSwapAlert: false });
+              socket.emit("sync_game_state", { showSwapAlert: false, roleSwapped: true });
             setRole("navigator");
             if (workspaceRef.current) {
               workspaceRef.current.clear();
@@ -155,6 +149,18 @@ export default function GameScreen() {
       if (state.swapTimeLeft !== undefined) setSwapTimeLeft(state.swapTimeLeft);
       if (state.showSwapAlert !== undefined)
         setShowSwapAlert(state.showSwapAlert);
+      if (state.selectedMapIndex !== undefined)
+        setSelectedMapIndex(state.selectedMapIndex);
+      if (state.executionError !== undefined)
+        setExecutionError(state.executionError);
+      
+      if (state.roleSwapped) {
+        setRole("driver");
+        if (workspaceRef.current) {
+          workspaceRef.current.clear();
+          setBlocksLeft(availableQuotaRef.current);
+        }
+      }
 
       if (state.reset) {
         setPanelKey((prev) => prev + 1);
@@ -249,10 +255,10 @@ export default function GameScreen() {
     [role, socket],
   );
 
-  const resetGameToNewStart = () => {
+  const resetGameToNewStart = useCallback(() => {
     if (role !== "driver") return; // Only driver can reset
-    setPlayerX(7);
-    setPlayerY(14);
+    setPlayerX(START.x);
+    setPlayerY(START.y);
     setDirection("up");
     setIsWin(false);
     setIsLose(false);
@@ -272,8 +278,8 @@ export default function GameScreen() {
 
     if (socket) {
       socket.emit("sync_game_state", {
-        playerX: 7,
-        playerY: 14,
+        playerX: START.x,
+        playerY: START.y,
         direction: "up",
         blocksLeft: MAX_BLOCKS,
         availableQuota: MAX_BLOCKS,
@@ -286,7 +292,15 @@ export default function GameScreen() {
       });
       socket.emit("sync_blockly", "<xml></xml>");
     }
-  };
+  }, [role, socket, START.x, START.y]);
+
+  const prevMapIndexRef = useRef(selectedMapIndex);
+  useEffect(() => {
+    if (prevMapIndexRef.current !== selectedMapIndex) {
+      prevMapIndexRef.current = selectedMapIndex;
+      resetGameToNewStart();
+    }
+  }, [selectedMapIndex, resetGameToNewStart]);
 
   const emitGameState = (stateOverrides: any = {}) => {
     if (role === "driver" && socket) {
@@ -302,6 +316,7 @@ export default function GameScreen() {
         dungeonTimeLeft,
         swapTimeLeft,
         showSwapAlert,
+        executionError,
         ...stateOverrides,
       });
     }
@@ -311,6 +326,8 @@ export default function GameScreen() {
     if (!workspaceRef.current || role !== "driver") return;
     setIsWin(false);
     setIsLose(false);
+    setExecutionError(null);
+    emitGameState({ executionError: null });
 
     const topBlocks = workspaceRef.current.getTopBlocks(true);
     if (topBlocks.length === 0) return;
@@ -356,14 +373,82 @@ export default function GameScreen() {
       nextX = Math.max(0, Math.min(14, nextX));
       nextY = Math.max(0, Math.min(14, nextY));
 
-      if (!isWall(nextX, nextY)) {
+      let bounceX = currentX;
+      let bounceY = currentY;
+
+      if (!isWall(nextX, nextY) && !isRock(nextX, nextY)) {
         currentX = nextX;
         currentY = nextY;
         setPlayerX(currentX);
         setPlayerY(currentY);
+      } else if (isWall(nextX, nextY)) {
+        setExecutionError("Hit The Wall");
+        emitGameState({ executionError: "Hit The Wall" });
+        workspaceRef.current.highlightBlock(null);
+        if (socket) socket.emit("highlight_block", null);
+        await sleep(350);
+        break; // หยุดเมื่อชนกำแพง
+      } else if (isRock(nextX, nextY)) {
+        setExecutionError("Hit The Rock");
+        emitGameState({ executionError: "Hit The Rock" });
+        // ชนก้อนหิน: ติดแหง็ก หยุดการรันทันที
+        workspaceRef.current.highlightBlock(null);
+        if (socket) socket.emit("highlight_block", null);
+        await sleep(350);
+        break; // หลุดจาก loop การทำงานทันที
       }
 
       setDirection(currentDirection);
+
+      if (isSpike(currentX, currentY)) {
+        setExecutionError("Hit The Spike");
+        emitGameState({ playerX: currentX, playerY: currentY, direction: currentDirection, executionError: "Hit The Spike" });
+        await sleep(350);
+
+        // เหยียบหนาม: เด้งกลับช่องที่เพิ่งเดินมา และหยุดการทำงาน
+        if (currentDirection === "up") bounceY = currentY + 1;
+        if (currentDirection === "down") bounceY = currentY - 1;
+        if (currentDirection === "left") bounceX = currentX + 1;
+        if (currentDirection === "right") bounceX = currentX - 1;
+        
+        currentX = bounceX;
+        currentY = bounceY;
+        setPlayerX(currentX);
+        setPlayerY(currentY);
+        setDirection(currentDirection);
+        emitGameState({
+          playerX: currentX,
+          playerY: currentY,
+          direction: currentDirection,
+        });
+        workspaceRef.current.highlightBlock(null);
+        if (socket) socket.emit("highlight_block", null);
+        await sleep(350);
+        break;
+      }
+
+      if (isTrap(currentX, currentY)) {
+        setExecutionError("Fall In Trap");
+        emitGameState({ playerX: currentX, playerY: currentY, direction: currentDirection, executionError: "Fall In Trap" });
+        await sleep(350);
+
+        // เหยียบหลุม: เด้งกลับจุดเริ่มต้น และหยุดการรันทันที
+        currentX = START.x;
+        currentY = START.y;
+        currentDirection = "up";
+        setPlayerX(currentX);
+        setPlayerY(currentY);
+        setDirection(currentDirection);
+        emitGameState({
+          playerX: currentX,
+          playerY: currentY,
+          direction: currentDirection,
+        });
+        workspaceRef.current.highlightBlock(null);
+        if (socket) socket.emit("highlight_block", null);
+        await sleep(350);
+        break; // หลุดจาก loop การทำงานทันที
+      }
 
       // ส่ง State ไปให้ Navigator
       emitGameState({
@@ -372,9 +457,11 @@ export default function GameScreen() {
         direction: currentDirection,
       });
 
-      await sleep(350);
+      await sleep(350); // ดีเลย์แต่ละการเดิน 350ms
 
-      if (currentX === 7 && currentY === 1) {
+      if (currentX === GOAL.x && currentY === GOAL.y) {
+        setIsWin(true);
+        if (socket) socket.emit("game_win");
         workspaceRef.current.highlightBlock(null);
         if (socket) socket.emit("highlight_block", null);
 
@@ -437,10 +524,18 @@ export default function GameScreen() {
     (wall) => wall.x === 0 || wall.x === 14 || wall.y === 0 || wall.y === 14,
   );
 
+  const handleScreenClick = () => {
+    if (executionError && role === "driver") {
+      setExecutionError(null);
+      emitGameState({ executionError: null });
+    }
+  };
+
   return (
     <div
       className="w-full min-h-screen bg-cover bg-center flex flex-col p-4 md:p-6 font-pixel gap-4 cursor-default"
       style={{ backgroundImage: "url('/ingame.png')" }}
+      onClick={handleScreenClick}
     >
       <GameHeader
         role={role === "driver" ? "DRIVER" : "NAVIGATOR"}
@@ -456,6 +551,10 @@ export default function GameScreen() {
             playerY={playerY}
             direction={direction}
             walls={role === "driver" ? BOUNDARY_WALLS : WALLS}
+            traps={TRAPS}
+            rocks={ROCKS}
+            spikes={SPIKES}
+            goal={GOAL}
             role={role || "driver"}
           />
           <ChatBox />
@@ -468,6 +567,7 @@ export default function GameScreen() {
             onReady={handleWorkspaceReady}
             onRun={role === "driver" ? runProgram : undefined}
             readOnly={role !== "driver"}
+            executionError={executionError}
           />
         </div>
       </div>

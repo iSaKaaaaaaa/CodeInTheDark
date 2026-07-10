@@ -20,7 +20,10 @@ export default function GameHeader({
 
   return (
     <header className="grid grid-cols-3 items-center w-full">
-      <h1 className="text-white text-5xl md:text-6xl font-bold drop-shadow-md uppercase justify-self-start">
+      <h1 
+        className="text-white text-5xl md:text-6xl font-bold uppercase justify-self-start"
+        style={{ textShadow: "1px 1px 0 #ea580c, 2px 2px 0 #ea580c, 3px 3px 0 #ea580c, 4px 4px 0 #ea580c, 5px 5px 4px rgba(0,0,0,0.8)" }}
+      >
         {role}
       </h1>
 
@@ -37,7 +40,7 @@ export default function GameHeader({
         <span className="text-white text-xl md:text-2xl mt-2 font-bold tracking-widest drop-shadow-md">{swapTime}</span>
       </div>
 
-      <div className="flex flex-col items-end justify-self-end">
+      <div className="flex flex-col items-center justify-self-end bg-black/70 backdrop-blur-sm px-6 py-3 rounded-2xl border-4 border-[#333] shadow-2xl">
         <span className="text-orange-600 font-bold text-xl md:text-2xl drop-shadow-sm tracking-widest mb-1">
           DUNGEON TIME
         </span>

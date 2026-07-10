@@ -73,7 +73,7 @@ body {
 /* ปรับฟอนต์ป้ายข้อความบนตัว Block ให้ใหญ่ขึ้นและอ่านง่าย */
 .blocklyEditableText text,
 .blocklyText {
-  fill: #000000 !important; /* คำหลัก (Move Up/Down/Left/Right) เป็นสีดำ */
+  fill: #382503 !important; /* คำหลัก (Move Up/Down/Left/Right) เป็นสีดำ */
   font-family: "VT323", monospace !important;
   font-size: 20px !important;
   font-weight: bold !important;
@@ -95,4 +95,4 @@ body {
 .blocklyTrash {
   translate: 0 -80px;
 }
-
+

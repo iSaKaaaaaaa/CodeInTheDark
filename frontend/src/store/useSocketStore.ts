@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import { io, Socket } from 'socket.io-client';
 
 export type ScreenState = 'landing' | 'login' | 'select' | 'create' | 'join' | 'game';
@@ -10,6 +11,10 @@ interface SocketState {
   role: 'driver' | 'navigator' | null;
   currentScreen: ScreenState;
   players: { username: string; role: string }[];
+  selectedMapIndex: number;
+  dungeonTimeLeft: number;
+  swapTimeLeft: number;
+  
   
   setScreen: (screen: ScreenState) => void;
   setUsername: (username: string) => void;
@@ -20,19 +25,31 @@ interface SocketState {
   leaveRoom: () => void;
   startGame: () => void;
   connect: (username: string, roomCode: string, role: 'driver' | 'navigator') => void;
+  reconnect: () => void;
   disconnect: () => void;
+  setSelectedMapIndex: (index: number) => void;
+  setDungeonTimeLeft: (time: number | ((prev: number) => number)) => void;
+  setSwapTimeLeft: (time: number | ((prev: number) => number)) => void;
 }
 
-export const useSocketStore = create<SocketState>((set, get) => ({
+export const useSocketStore = create<SocketState>()(
+  persist(
+    (set, get) => ({
   socket: null,
   username: '',
   roomCode: '',
   role: null,
   currentScreen: 'landing',
   players: [],
+  selectedMapIndex: 0,
+  dungeonTimeLeft: 300,
+  swapTimeLeft: 120,
 
+  setSelectedMapIndex: (index) => set({ selectedMapIndex: index }),
   setScreen: (screen) => set({ currentScreen: screen }),
   setUsername: (username) => set({ username }),
+  setDungeonTimeLeft: (time) => set((state) => ({ dungeonTimeLeft: typeof time === 'function' ? time(state.dungeonTimeLeft) : time })),
+  setSwapTimeLeft: (time) => set((state) => ({ swapTimeLeft: typeof time === 'function' ? time(state.swapTimeLeft) : time })),
 
   createRoom: () => {
     // Generate 6-digit room code
@@ -53,8 +70,8 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       set({ players: users });
     });
 
-    socket.on('start_game', () => {
-      set({ currentScreen: 'game' });
+    socket.on('start_game', (mapIndex: number) => {
+      set({ currentScreen: 'game', selectedMapIndex: mapIndex !== undefined ? mapIndex : 0 });
     });
 
     set({ socket, roomCode: generatedCode, role: 'driver', currentScreen: 'create', players: [] });
@@ -77,8 +94,8 @@ export const useSocketStore = create<SocketState>((set, get) => ({
       set({ players: users });
     });
 
-    socket.on('start_game', () => {
-      set({ currentScreen: 'game' });
+    socket.on('start_game', (mapIndex: number) => {
+      set({ currentScreen: 'game', selectedMapIndex: mapIndex !== undefined ? mapIndex : 0 });
     });
 
     set({ socket, roomCode, role: 'navigator', currentScreen: 'create', players: [] });
@@ -87,9 +104,10 @@ export const useSocketStore = create<SocketState>((set, get) => ({
   startGame: () => {
     const { socket, roomCode } = get();
     if (socket && roomCode) {
-      // Need backend to emit this too
-      socket.emit('start_game');
-      set({ currentScreen: 'game' });
+      const mapIndex = Math.floor(Math.random() * 3);
+      socket.emit('start_game', mapIndex);
+      socket.emit('sync_game_state', { selectedMapIndex: mapIndex });
+      set({ currentScreen: 'game', selectedMapIndex: mapIndex, dungeonTimeLeft: 300, swapTimeLeft: 120 });
     }
   },
 
@@ -127,4 +145,39 @@ export const useSocketStore = create<SocketState>((set, get) => ({
     }
     set({ socket: null, roomCode: '', role: null, currentScreen: 'landing', players: [] });
   },
-}));
+
+  reconnect: () => {
+    const { username, roomCode, role, socket } = get();
+    if (!username || !roomCode || !role || socket) return;
+
+    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+    const newSocket = io(backendUrl);
+    newSocket.on('connect', () => {
+      newSocket.emit('join_room', { roomCode, role, username });
+    });
+
+    newSocket.on('room_users', (users) => {
+      set({ players: users });
+    });
+
+    newSocket.on('start_game', (mapIndex: number) => {
+      set({ currentScreen: 'game', selectedMapIndex: mapIndex !== undefined ? mapIndex : 0 });
+    });
+
+    set({ socket: newSocket });
+  },
+}),
+    {
+      name: 'codeinthedark-storage',
+      partialize: (state) => ({
+        username: state.username,
+        roomCode: state.roomCode,
+        role: state.role,
+        currentScreen: state.currentScreen,
+        selectedMapIndex: state.selectedMapIndex,
+        dungeonTimeLeft: state.dungeonTimeLeft,
+        swapTimeLeft: state.swapTimeLeft,
+      }),
+    }
+  )
+);

@@ -50,11 +50,11 @@ io.on("connection", (socket) => {
     }
   });
 
-  socket.on("start_game", () => {
+  socket.on("start_game", (mapIndex) => {
     const user = users.get(socket.id);
     if (user) {
       // Broadcast to everyone else in the room
-      socket.to(user.roomCode).emit("start_game");
+      socket.to(user.roomCode).emit("start_game", mapIndex);
     }
   });
 
