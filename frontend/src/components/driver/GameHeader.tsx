@@ -12,12 +12,12 @@ export default function GameHeader({
   swapProgress = 100,
 }: GameHeaderProps) {
   return (
-    <header className="flex justify-between items-start md:items-center w-full">
-      <h1 className="text-white text-5xl md:text-6xl font-bold drop-shadow-md uppercase">
+    <header className="grid grid-cols-3 items-center w-full">
+      <h1 className="text-white text-5xl md:text-6xl font-bold drop-shadow-md uppercase justify-self-start">
         {role}
       </h1>
 
-      <div className="flex flex-col items-center bg-black/60 px-8 py-2 rounded-full border-4 border-black shadow-lg">
+      <div className="flex flex-col items-center bg-black/60 px-8 py-2 rounded-full border-4 border-black shadow-lg justify-self-center">
         <span className="text-blue-300 font-bold tracking-widest mb-1 text-sm md:text-base">
           ROLE SWAP
         </span>
@@ -31,7 +31,7 @@ export default function GameHeader({
         <span className="text-white text-xs mt-1">{swapTime}</span>
       </div>
 
-      <div className="flex flex-col items-end">
+      <div className="flex flex-col items-end justify-self-end">
         <span className="text-orange-600 font-bold text-sm md:text-base drop-shadow-sm tracking-widest">
           DUNGEON TIME
         </span>
