@@ -47,17 +47,17 @@ export default function BlockCodePanel({
           <div className="absolute top-0 bottom-0 left-[190px] w-1 bg-black z-10" />
           
           {readOnly && (
-            <div className="absolute top-0 bottom-0 left-0 w-[190px] bg-black/50 z-20 flex flex-col justify-end pb-8 pointer-events-auto">
-              <div className="text-center">
+            <div className="absolute top-0 bottom-0 left-0 w-[190px] bg-black/70 z-20 flex flex-col items-center justify-center pointer-events-auto backdrop-blur-[1px]">
+              <div className="text-center px-2">
                 <p 
                   className="text-red-500 text-2xl font-bold font-pixel tracking-wider"
-                  style={{ textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 4px 4px rgba(0,0,0,0.8)" }}
+                  style={{ textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 2px 4px rgba(0,0,0,0.8)" }}
                 >
                   ONLY DRIVER
                 </p>
                 <p 
-                  className="text-red-500 text-2xl font-bold font-pixel tracking-wider mt-1"
-                  style={{ textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 4px 4px rgba(0,0,0,0.8)" }}
+                  className="text-red-500 text-2xl font-bold font-pixel tracking-wider mt-2"
+                  style={{ textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000, 0 2px 4px rgba(0,0,0,0.8)" }}
                 >
                   CAN USE
                 </p>

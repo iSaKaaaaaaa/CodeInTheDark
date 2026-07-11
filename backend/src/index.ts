@@ -25,6 +25,11 @@ io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
 
   socket.on("join_room", ({ roomCode, role, username }) => {
+    if (role === "navigator" && !rooms.has(roomCode)) {
+      socket.emit("join_error", "Room not found or invalid code.");
+      return;
+    }
+
     socket.join(roomCode);
     users.set(socket.id, { roomCode, role, username });
 
@@ -84,6 +89,13 @@ io.on("connection", (socket) => {
     const user = users.get(socket.id);
     if (user) {
       socket.to(user.roomCode).emit("role_swap", data);
+    }
+  });
+
+  socket.on("return_to_lobby", () => {
+    const user = users.get(socket.id);
+    if (user) {
+      io.to(user.roomCode).emit("return_to_lobby");
     }
   });
 

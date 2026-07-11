@@ -6,10 +6,11 @@ import { getMapData } from "../data/maps";
 import GameHeader from "../components/driver/GameHeader";
 import GameBoard from "../components/driver/GameBoard";
 import ChatBox from "../components/driver/ChatBox";
+import TopRightMenu from "../components/TopRightMenu";
 import BlockCodePanel from "../components/driver/BlockCodePanel";
 
 export default function GameScreen() {
-  const { socket, role, setRole, selectedMapIndex, setSelectedMapIndex, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft } = useSocketStore();
+  const { socket, role, setRole, selectedMapIndex, setSelectedMapIndex, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft, players, leaveStage } = useSocketStore();
 
   // --- ข้อมูลแผนที่ ---
   const { walls: WALLS, traps: TRAPS, rocks: ROCKS, spikes: SPIKES, start: START, goal: GOAL } = getMapData(selectedMapIndex);
@@ -58,6 +59,13 @@ export default function GameScreen() {
   const [blocksLeft, setBlocksLeft] = useState(MAX_BLOCKS);
 
   const [executionError, setExecutionError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (players.length === 1) {
+      alert("Your partner has disconnected. Returning to lobby.");
+      leaveStage();
+    }
+  }, [players.length, leaveStage]);
 
   const availableQuotaRef = useRef(MAX_BLOCKS);
 
@@ -533,91 +541,161 @@ export default function GameScreen() {
 
   return (
     <div
-      className="w-full min-h-screen bg-cover bg-center flex flex-col p-4 md:p-6 font-pixel gap-4 cursor-default"
+      className="w-full min-h-screen bg-cover bg-center flex flex-col font-pixel cursor-default relative overflow-hidden"
       style={{ backgroundImage: "url('/ingame.png')" }}
       onClick={handleScreenClick}
     >
-      <GameHeader
-        role={role === "driver" ? "DRIVER" : "NAVIGATOR"}
-        dungeonTime={formatTime(dungeonTimeLeft)}
-        swapTime={formatTime(swapTimeLeft)}
-        swapProgress={(swapTimeLeft / 120) * 100}
-      />
+      <TopRightMenu />
+      
+      <div className="w-full max-w-[1600px] mx-auto flex flex-col flex-1 p-4 md:p-6 gap-4">
+        <GameHeader
+          role={role === "driver" ? "DRIVER" : "NAVIGATOR"}
+          dungeonTime={formatTime(dungeonTimeLeft)}
+          swapTime={formatTime(swapTimeLeft)}
+          swapProgress={(swapTimeLeft / 120) * 100}
+        />
 
-      <div className="flex flex-1 gap-6 w-full max-w-[1600px] mx-auto items-stretch">
-        <div className="flex-[6] min-w-0 flex flex-col gap-4">
-          <GameBoard
-            playerX={playerX}
-            playerY={playerY}
-            direction={direction}
-            walls={role === "driver" ? BOUNDARY_WALLS : WALLS}
-            traps={TRAPS}
-            rocks={ROCKS}
-            spikes={SPIKES}
-            goal={GOAL}
-            role={role || "driver"}
-          />
-          <ChatBox />
-        </div>
+        <div className="flex flex-1 gap-6 w-full items-stretch">
+          <div className="flex-[6] min-w-0 flex flex-col gap-4">
+            <GameBoard
+              playerX={playerX}
+              playerY={playerY}
+              direction={direction}
+              walls={role === "driver" ? BOUNDARY_WALLS : WALLS}
+              traps={TRAPS}
+              rocks={ROCKS}
+              spikes={SPIKES}
+              goal={GOAL}
+              role={role || "driver"}
+            />
+            <ChatBox />
+          </div>
 
-        <div className="flex-[4] min-w-0 flex flex-col">
-          <BlockCodePanel
-            key={panelKey}
-            blocksLeft={blocksLeft}
-            onReady={handleWorkspaceReady}
-            onRun={role === "driver" ? runProgram : undefined}
-            readOnly={role !== "driver"}
-            executionError={executionError}
-          />
+          <div className="flex-[4] min-w-0 flex flex-col">
+            <BlockCodePanel
+              key={panelKey}
+              blocksLeft={blocksLeft}
+              onReady={handleWorkspaceReady}
+              onRun={role === "driver" ? runProgram : undefined}
+              readOnly={role !== "driver"}
+              executionError={executionError}
+            />
+          </div>
         </div>
       </div>
 
-      {isWin && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
-          <div className="bg-amber-100 border-8 border-black p-8 rounded-xl flex flex-col items-center gap-6 shadow-2xl">
-            <h2 className="text-6xl font-pixel font-bold text-orange-600 drop-shadow-sm animate-bounce">
-              Victory!
-            </h2>
-            <p className="text-4xl">⭐ ⭐ ⭐</p>
-            {role === "driver" ? (
-              <button
-                className="bg-green-500 border-4 border-black text-white font-pixel font-bold py-3 px-8 text-2xl rounded-lg hover:bg-green-600 active:scale-95 transition-all shadow-lg"
-                onClick={resetGameToNewStart}
-              >
-                Play Again
-              </button>
-            ) : (
-              <p className="text-2xl text-black">
-                Waiting for driver to restart...
-              </p>
-            )}
+      {isWin && (() => {
+        const blocksUsed = MAX_BLOCKS - blocksLeft;
+        const timeUsed = 300 - dungeonTimeLeft;
+        const star2 = blocksUsed < 40;
+        const star3 = timeUsed < 240;
+
+        return (
+          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm animate-in fade-in duration-300">
+            <div className="relative inline-block max-w-[90vw]">
+              <img src="/win_bg.png" alt="Victory Background" className="w-[800px] max-w-full h-auto drop-shadow-[0_0_30px_rgba(217,119,6,0.6)]" />
+              
+              <div className="absolute inset-0 flex flex-col items-center">
+                <h2 
+                  className="absolute top-[10%] text-5xl md:text-7xl font-pixel font-bold text-white tracking-widest "
+                  style={{ textShadow: "-3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 6px 0px rgba(0,0,0,0.8)" }}
+                >
+                  VICTORY
+                </h2>
+                
+                <div className="absolute top-[35%] flex items-end justify-center gap-6 md:gap-10">
+                  <span className="text-6xl md:text-7xl drop-shadow-[0_6px_6px_rgba(0,0,0,0.8)]" title="Stage Cleared">⭐</span>
+                  <span className={`text-7xl md:text-8xl drop-shadow-[0_6px_6px_rgba(0,0,0,0.8)] mb-6 ${star2 ? '' : 'opacity-30 grayscale'}`} title="Used less than 40 blocks">⭐</span>
+                  <span className={`text-6xl md:text-7xl drop-shadow-[0_6px_6px_rgba(0,0,0,0.8)] ${star3 ? '' : 'opacity-30 grayscale'}`} title="Finished in under 4 minutes">⭐</span>
+                </div>
+                
+                <div className="absolute bottom-[20%] flex gap-4 md:gap-6 w-full justify-center px-8">
+                  <button 
+                    className="bg-[#78716c] border-[3px] border-[#44403c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full hover:bg-[#57534e] active:scale-95 transition-all shadow-[0_4px_0_#44403c] active:shadow-none active:translate-y-1"
+                    onClick={leaveStage}
+                  >
+                    QUIT
+                  </button>
+                  {role === "driver" ? (
+                    <>
+                      <button
+                        className="bg-transparent border-[3px] border-[#B28B29] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-8 text-xl md:text-2xl rounded-full hover:bg-white/20 active:scale-95 transition-all shadow-md"
+                        onClick={resetGameToNewStart}
+                      >
+                        RESTART
+                      </button>
+                      <button 
+                        className="bg-[#ea580c] border-[3px] border-[#c2410c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full hover:bg-[#c2410c] active:scale-95 transition-all shadow-[0_4px_0_#9a3412] active:shadow-none active:translate-y-1"
+                        onClick={resetGameToNewStart}
+                      >
+                        NEXT
+                      </button>
+                    </>
+                  ) : (
+                    <div className="bg-[#ea580c]/50 border-[3px] border-[#c2410c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full shadow-md flex items-center">
+                      WAITING FOR DRIVER...
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {isLose && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm">
-          <div className="bg-amber-100 border-8 border-black p-8 rounded-xl flex flex-col items-center gap-6 shadow-2xl">
-            <h2 className="text-6xl font-pixel font-bold text-red-600 drop-shadow-sm">
-              GAME OVER
-            </h2>
-            <p className="text-2xl text-black">
-              {loseReason === "time"
-                ? "Time's up! You ran out of dungeon time."
-                : "block left = 0, you have no more blocks to run"}
-            </p>
-            {role === "driver" ? (
-              <button
-                className="bg-orange-600 border-4 border-black text-white font-pixel font-bold py-3 px-8 text-2xl rounded-lg hover:bg-orange-700 active:scale-95 transition-all shadow-lg"
-                onClick={resetGameToNewStart}
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="relative inline-block max-w-[90vw] grayscale-[0.2]">
+            <img src="/win_bg.png" alt="Defeat Background" className="w-[800px] max-w-full h-auto drop-shadow-[0_0_30px_rgba(220,38,38,0.6)]" />
+            
+            <div className="absolute inset-0 flex flex-col items-center">
+              <h2 
+                className="absolute top-[10%] text-5xl md:text-7xl font-pixel font-bold text-red-500 tracking-widest"
+                style={{ textShadow: "-3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 6px 0px rgba(0,0,0,0.8)" }}
               >
-                Try Again
-              </button>
-            ) : (
-              <p className="text-2xl text-black">
-                Waiting for driver to restart...
-              </p>
-            )}
+                DEFEAT
+              </h2>
+              
+              <div className="absolute top-[40%] flex flex-col items-center justify-center w-full px-12">
+                <p 
+                  className="text-3xl md:text-4xl font-pixel font-bold text-white text-center leading-relaxed"
+                  style={{ textShadow: "-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000" }}
+                >
+                  {loseReason === "time"
+                    ? "TIME'S UP!"
+                    : "OUT OF BLOCKS!"}
+                </p>
+                <p 
+                  className="text-xl md:text-2xl font-pixel text-gray-300 mt-4 text-center"
+                  style={{ textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" }}
+                >
+                  {loseReason === "time" 
+                    ? "You ran out of dungeon time." 
+                    : "You have no more blocks to run."}
+                </p>
+              </div>
+              
+              <div className="absolute bottom-[20%] flex gap-4 md:gap-8 w-full justify-center px-8">
+                <button 
+                  className="bg-[#78716c] border-[3px] border-[#44403c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full hover:bg-[#57534e] active:scale-95 transition-all shadow-[0_4px_0_#44403c] active:shadow-none active:translate-y-1"
+                  onClick={leaveStage}
+                >
+                  QUIT
+                </button>
+                {role === "driver" ? (
+                  <button
+                    className="bg-transparent border-[3px] border-[#B28B29] text-white font-pixel font-bold py-2 md:py-3 px-8 md:px-12 text-xl md:text-2xl rounded-full hover:bg-white/20 active:scale-95 transition-all shadow-md"
+                    onClick={resetGameToNewStart}
+                  >
+                    RETRY
+                  </button>
+                ) : (
+                  <div className="bg-[#dc2626]/50 border-[3px] border-[#991b1b] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full shadow-md flex items-center">
+                    WAITING FOR DRIVER...
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}

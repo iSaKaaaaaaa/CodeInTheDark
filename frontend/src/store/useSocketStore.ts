@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { io, Socket } from 'socket.io-client';
 
 export type ScreenState = 'landing' | 'login' | 'select' | 'create' | 'join' | 'game';
@@ -14,6 +14,7 @@ interface SocketState {
   selectedMapIndex: number;
   dungeonTimeLeft: number;
   swapTimeLeft: number;
+  joinError: string | null;
   
   
   setScreen: (screen: ScreenState) => void;
@@ -23,6 +24,7 @@ interface SocketState {
   createRoom: () => void;
   joinRoom: (roomCode: string) => void;
   leaveRoom: () => void;
+  leaveStage: () => void;
   startGame: () => void;
   connect: (username: string, roomCode: string, role: 'driver' | 'navigator') => void;
   reconnect: () => void;
@@ -30,6 +32,7 @@ interface SocketState {
   setSelectedMapIndex: (index: number) => void;
   setDungeonTimeLeft: (time: number | ((prev: number) => number)) => void;
   setSwapTimeLeft: (time: number | ((prev: number) => number)) => void;
+  setJoinError: (error: string | null) => void;
 }
 
 export const useSocketStore = create<SocketState>()(
@@ -44,12 +47,14 @@ export const useSocketStore = create<SocketState>()(
   selectedMapIndex: 0,
   dungeonTimeLeft: 300,
   swapTimeLeft: 120,
+  joinError: null,
 
   setSelectedMapIndex: (index) => set({ selectedMapIndex: index }),
   setScreen: (screen) => set({ currentScreen: screen }),
   setUsername: (username) => set({ username }),
   setDungeonTimeLeft: (time) => set((state) => ({ dungeonTimeLeft: typeof time === 'function' ? time(state.dungeonTimeLeft) : time })),
   setSwapTimeLeft: (time) => set((state) => ({ swapTimeLeft: typeof time === 'function' ? time(state.swapTimeLeft) : time })),
+  setJoinError: (error) => set({ joinError: error }),
 
   createRoom: () => {
     // Generate 6-digit room code
@@ -74,10 +79,15 @@ export const useSocketStore = create<SocketState>()(
       set({ currentScreen: 'game', selectedMapIndex: mapIndex !== undefined ? mapIndex : 0 });
     });
 
+    socket.on('return_to_lobby', () => {
+      set({ currentScreen: 'create' });
+    });
+
     set({ socket, roomCode: generatedCode, role: 'driver', currentScreen: 'create', players: [] });
   },
 
   joinRoom: (roomCode) => {
+    set({ joinError: null });
     if (get().socket) {
       get().socket?.disconnect();
     }
@@ -90,12 +100,21 @@ export const useSocketStore = create<SocketState>()(
       socket.emit('join_room', { roomCode, role: 'navigator', username: get().username });
     });
 
+    socket.on('join_error', (msg) => {
+      set({ joinError: msg, currentScreen: 'join' });
+      socket.disconnect();
+    });
+
     socket.on('room_users', (users) => {
       set({ players: users });
     });
 
     socket.on('start_game', (mapIndex: number) => {
       set({ currentScreen: 'game', selectedMapIndex: mapIndex !== undefined ? mapIndex : 0 });
+    });
+
+    socket.on('return_to_lobby', () => {
+      set({ currentScreen: 'create' });
     });
 
     set({ socket, roomCode, role: 'navigator', currentScreen: 'create', players: [] });
@@ -117,6 +136,13 @@ export const useSocketStore = create<SocketState>()(
       socket.disconnect();
     }
     set({ socket: null, roomCode: '', role: null, currentScreen: 'select', players: [] });
+  },
+
+  leaveStage: () => {
+    const { socket } = get();
+    if (socket) {
+      socket.emit("return_to_lobby");
+    }
   },
 
   setRole: (role) => {
@@ -164,11 +190,17 @@ export const useSocketStore = create<SocketState>()(
       set({ currentScreen: 'game', selectedMapIndex: mapIndex !== undefined ? mapIndex : 0 });
     });
 
+    newSocket.on('join_error', () => {
+      set({ socket: null, roomCode: '', role: null, currentScreen: 'landing', players: [] });
+      newSocket.disconnect();
+    });
+
     set({ socket: newSocket });
   },
 }),
     {
       name: 'codeinthedark-storage',
+      storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         username: state.username,
         roomCode: state.roomCode,

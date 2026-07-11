@@ -4,7 +4,7 @@ import PixelButton from "../components/PixelButton";
 import TopRightMenu from "../components/TopRightMenu";
 
 export default function JoinRoomScreen() {
-  const { leaveRoom, joinRoom } = useSocketStore();
+  const { leaveRoom, joinRoom, joinError } = useSocketStore();
   const [inputCode, setInputCode] = useState('');
 
   const handleJoinPrivate = () => {
@@ -36,15 +36,21 @@ export default function JoinRoomScreen() {
         }}
       >
         <button
-          className="absolute top-10 left-20 md:top-14 md:left-28 text-black text-4xl font-bold hover:text-orange-700 transition-colors flex items-center gap-2 z-10 drop-shadow-sm font-pixel"
+          className="absolute top-8 left-[5%] md:top-12 md:left-[8%] w-12 h-12 bg-amber-800/80 hover:bg-amber-700 border-2 border-black rounded-full flex items-center justify-center text-white text-2xl shadow-md transition-transform hover:scale-105 active:scale-95 z-10"
           onClick={leaveRoom}
+          title="Back"
         >
           <span>&#8592;</span>
         </button>
 
         {/* Private Join Section */}
         <div className="w-full flex flex-col items-center gap-2 mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-black uppercase">ROOM CODE</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-black uppercase">JOIN ROOM CODE</h2>
+          
+          {joinError && (
+            <p className="text-xl text-red-800 font-bold mb-2">{joinError}</p>
+          )}
+
           <div className="flex gap-4">
             <input 
               type="text" 

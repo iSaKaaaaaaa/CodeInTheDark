@@ -40,8 +40,9 @@ export default function CreateRoomScreen() {
         }}
       >
         <button
-          className="absolute top-10 left-20 md:top-14 md:left-28 text-black text-4xl font-bold hover:text-orange-700 transition-colors flex items-center gap-2 z-10 drop-shadow-sm font-pixel"
+          className="absolute top-8 left-[5%] md:top-12 md:left-[8%] w-12 h-12 bg-amber-800/80 hover:bg-amber-700 border-2 border-black rounded-full flex items-center justify-center text-white text-2xl shadow-md transition-transform hover:scale-105 active:scale-95 z-10"
           onClick={leaveRoom}
+          title="Back"
         >
           <span>&#8592;</span>
         </button>
