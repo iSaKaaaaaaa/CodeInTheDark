@@ -53,7 +53,7 @@ export default function LoginModal() {
           <InputField label="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
           <InputField label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           
-          {error && <p className="text-red-500 text-center text-sm">{error}</p>}
+          {error && <p className="text-red-600 font-bold bg-red-100 border-2 border-red-500 rounded-lg p-2 text-center text-lg md:text-xl shadow-sm">{error}</p>}
 
           <div className="flex justify-center gap-6 mt-6">
             <PixelButton variant="wood" className="rounded-xl px-10 py-3 text-xl" onClick={() => setError('Sign up not available yet')}>

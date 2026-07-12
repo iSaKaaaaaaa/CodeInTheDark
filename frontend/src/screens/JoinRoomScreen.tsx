@@ -60,7 +60,7 @@ export default function JoinRoomScreen() {
               className="w-48 bg-[#f4deb3] border-4 border-[#3d1f0f] rounded-lg px-4 py-2 text-center text-2xl font-bold tracking-widest text-black outline-none shadow-inner"
               placeholder="000000"
             />
-            <PixelButton variant="orange" className="px-8 text-xl" onClick={handleJoinPrivate}>
+            <PixelButton variant="orange" className="px-8 rounded-xl text-xl" onClick={handleJoinPrivate}>
               Join
             </PixelButton>
           </div>

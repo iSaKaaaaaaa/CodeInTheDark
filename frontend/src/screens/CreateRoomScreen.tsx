@@ -62,12 +62,7 @@ export default function CreateRoomScreen() {
 
         {/* Visibility Toggle (Mock) */}
         <div className="flex bg-[#dcb98a] border-2 border-[#572e18] rounded-full overflow-hidden mb-12 shadow-inner">
-          <button className="px-8 py-2 bg-[#572e18] text-white font-bold text-lg" disabled>
-            PUBLIC
-          </button>
-          <button className="px-8 py-2 text-black font-bold text-lg bg-transparent">
-            PRIVATE (CODE ONLY)
-          </button>
+          
         </div>
 
         {/* Players List (Horizontal) */}
