@@ -118,8 +118,10 @@ export function useGameSync({
   useEffect(() => {
     if (!socket) return;
     const onRoleSwap = (data: { newRole: "driver" | "navigator" }) => {
+      setShowSwapAlert(true);
       setTimeout(() => {
         setRole(data.newRole);
+        setShowSwapAlert(false);
         setExecutionError(null); // เคลียร์ error
         if (workspaceRef.current) {
           workspaceRef.current.clear();
@@ -131,5 +133,5 @@ export function useGameSync({
     return () => {
       socket.off("role_swap", onRoleSwap);
     };
-  }, [socket, setRole]);
+  }, [socket, setRole, setShowSwapAlert, workspaceRef, availableQuotaRef, setBlocksLeft, setExecutionError]);
 }
