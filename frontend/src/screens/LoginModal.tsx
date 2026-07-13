@@ -12,13 +12,12 @@ export default function LoginModal() {
   const setStoreUsername = useSocketStore((state) => state.setUsername);
 
   const handleLogin = () => {
-    // Mock authentication
-    if ((username === 'player1' && password === '1234') || 
-        (username === 'player2' && password === '1234')) {
+    // Allow any username for testing, but keep the simple password '1234'
+    if (username.trim() !== '' && password === '1234') {
       setStoreUsername(username);
       setScreen('select');
     } else {
-      setError('Invalid username or password');
+      setError('Invalid password (use 1234) or empty username');
     }
   };
 
@@ -43,7 +42,7 @@ export default function LoginModal() {
         onClick={(e) => e.stopPropagation()}
       >
         <button
-          className="absolute top-12 left-16 text-black text-4xl font-bold hover:text-orange-700 transition-colors flex items-center gap-2 z-10 drop-shadow-sm font-pixel"
+          className="absolute top-12 left-24 md:left-28 text-black text-4xl font-bold hover:text-orange-700 transition-colors flex items-center gap-2 z-10 drop-shadow-sm font-pixel"
           onClick={() => setScreen('landing')}
         >
           <span>&#8592;</span>
@@ -53,7 +52,7 @@ export default function LoginModal() {
           <InputField label="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
           <InputField label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           
-          {error && <p className="text-red-500 text-center text-sm">{error}</p>}
+          {error && <p className="text-red-600 font-bold bg-red-100 border-2 border-red-500 rounded-lg p-2 text-center text-lg md:text-xl shadow-sm">{error}</p>}
 
           <div className="flex justify-center gap-6 mt-6">
             <PixelButton variant="wood" className="rounded-xl px-10 py-3 text-xl" onClick={() => setError('Sign up not available yet')}>

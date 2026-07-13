@@ -1,14 +1,20 @@
-import "./App.css";
 import LandingPage from "./screens/LandingPage";
 import LoginModal from "./screens/LoginModal";
 import SelectPlayScreen from "./screens/SelectPlayScreen";
 import CreateRoomScreen from "./screens/CreateRoomScreen";
 import JoinRoomScreen from "./screens/JoinRoomScreen";
+import { useEffect } from "react";
 import GameScreen from "./screens/GameScreen";
 import { useSocketStore } from "./store/useSocketStore";
 
 export default function App() {
-  const { currentScreen, setScreen } = useSocketStore();
+  const { currentScreen, setScreen, socket, roomCode, reconnect } = useSocketStore();
+
+  useEffect(() => {
+    if (!socket && roomCode) {
+      reconnect();
+    }
+  }, [socket, roomCode, reconnect]);
 
   switch (currentScreen) {
     case 'landing':

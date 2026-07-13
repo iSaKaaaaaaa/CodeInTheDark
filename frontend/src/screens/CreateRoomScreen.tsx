@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useSocketStore } from "../store/useSocketStore";
 import PixelButton from "../components/PixelButton";
+import TopRightMenu from "../components/TopRightMenu";
 
 export default function CreateRoomScreen() {
   const { username, roomCode, role, players, leaveRoom, createRoom, startGame } = useSocketStore();
@@ -25,19 +26,8 @@ export default function CreateRoomScreen() {
       className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center font-pixel cursor-default"
       style={{ backgroundImage: "url('/land-waitroom.png')" }}
     >
-      {/* Top Right Username Badge */}
-      <div className="absolute top-6 right-6 flex items-center gap-4">
-        <button className="w-10 h-10 bg-amber-800/80 hover:bg-amber-700 border-2 border-black rounded-full flex items-center justify-center text-white text-xl">
-          <span role="img" aria-label="sound">🔊</span>
-        </button>
-        <div className="bg-amber-800/80 border-2 border-black rounded-full px-4 py-2 flex items-center gap-2 text-white shadow-lg">
-          <span className="font-bold tracking-wider">{username || "PLAYER"}</span>
-          <span role="img" aria-label="user" className="bg-white text-amber-900 rounded-full w-6 h-6 flex items-center justify-center text-xs">👤</span>
-        </div>
-        <button className="w-10 h-10 bg-amber-800/80 hover:bg-amber-700 border-2 border-black rounded-full flex items-center justify-center text-white text-xl" onClick={leaveRoom}>
-          <span role="img" aria-label="exit">🚪</span>
-        </button>
-      </div>
+      {/* Top Right Username Badge & Logout */}
+      <TopRightMenu />
 
       {/* Scroll Container */}
       <div
@@ -50,8 +40,9 @@ export default function CreateRoomScreen() {
         }}
       >
         <button
-          className="absolute top-10 left-12 md:top-14 md:left-14 text-black text-4xl font-bold hover:text-orange-700 transition-colors flex items-center gap-2 z-10 drop-shadow-sm font-pixel"
+          className="absolute top-8 left-[5%] md:top-12 md:left-[8%] w-12 h-12 bg-amber-800/80 hover:bg-amber-700 border-2 border-black rounded-full flex items-center justify-center text-white text-2xl shadow-md transition-transform hover:scale-105 active:scale-95 z-10"
           onClick={leaveRoom}
+          title="Back"
         >
           <span>&#8592;</span>
         </button>
@@ -71,12 +62,7 @@ export default function CreateRoomScreen() {
 
         {/* Visibility Toggle (Mock) */}
         <div className="flex bg-[#dcb98a] border-2 border-[#572e18] rounded-full overflow-hidden mb-12 shadow-inner">
-          <button className="px-8 py-2 bg-[#572e18] text-white font-bold text-lg" disabled>
-            PUBLIC
-          </button>
-          <button className="px-8 py-2 text-black font-bold text-lg bg-transparent">
-            PRIVATE (CODE ONLY)
-          </button>
+          
         </div>
 
         {/* Players List (Horizontal) */}
@@ -102,28 +88,20 @@ export default function CreateRoomScreen() {
           </div>
         </div>
 
-        {/* Chat Box & Play Button */}
-        <div className="w-full flex justify-between items-end px-12 mt-auto">
-          <div className="flex flex-col gap-2 w-1/2">
-            <span className="text-lg font-bold text-amber-900 tracking-wider">CHAT BOX</span>
-            <input 
-              type="text" 
-              placeholder="Enter the message" 
-              className="bg-[#f4deb3] border-2 border-amber-900 rounded-xl px-4 py-3 outline-none text-black placeholder:text-black/40 text-lg w-full"
-            />
-          </div>
+        
+        <div className="w-full flex justify-end items-end px-12 mt-auto">
           
           {role === 'driver' ? (
             <PixelButton 
               variant="orange" 
-              className="px-16 py-4 text-3xl rounded-xl"
+              className="px-12 py-3 text-2xl rounded-xl"
               onClick={startGame}
               disabled={players.length < 2} // Optional: Disable play if alone
             >
               Play
             </PixelButton>
           ) : (
-            <div className="px-16 py-4 text-2xl rounded-xl bg-amber-800 border-4 border-[#3d1f0f] text-white font-bold opacity-80 cursor-not-allowed text-center">
+            <div className="px-12 py-3 text-xl rounded-xl bg-amber-800 border-4 border-[#3d1f0f] text-white font-bold opacity-80 cursor-not-allowed text-center">
               Waiting for Host...
             </div>
           )}

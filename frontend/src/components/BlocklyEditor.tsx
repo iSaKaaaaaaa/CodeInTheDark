@@ -3,16 +3,16 @@ import * as Blockly from "blockly";
 import { registerBlocks } from "../blockly/blocks";
 import { toolbox } from "../blockly/toolbox";
 
-// กำหนดธีมสไตล์อียิปต์โบราณ/พิกเซล ให้กลมกลืนกับม้วนกระดาษปาปิรัสและไม้
+// กำหนดธีมสไตล์อียิปต์โบราณ/พิกเซล ให้โปร่งใส
 const egyptianTheme = Blockly.Theme.defineTheme("egyptian", {
   name: "egyptian",
   base: Blockly.Themes.Classic,
   blockStyles: {},
   categoryStyles: {},
   componentStyles: {
-    workspaceBackgroundColour: "#fef3c7", // bg-amber-100
-    toolboxBackgroundColour: "#d97706", // bg-amber-600
-    flyoutBackgroundColour: "#fef3c7", // bg-amber-100
+    workspaceBackgroundColour: "transparent",
+    toolboxBackgroundColour: "transparent",
+    flyoutBackgroundColour: "transparent",
     scrollbarColour: "#78350f", // bg-amber-900
     scrollbarOpacity: 0.4,
     insertionMarkerColour: "#f97316", // orange-500
@@ -39,8 +39,8 @@ export default function BlocklyEditor({ onReady, readOnly = false }: Props) {
       theme: egyptianTheme,
       grid: {
         spacing: 20,
-        length: 3,
-        colour: "#f59e0b", // เส้นสีส้ม/ทอง
+        length: 0,
+        colour: "transparent",
         snap: true,
       },
       trashcan: !readOnly, // ซ่อนถังขยะถ้า readOnly
