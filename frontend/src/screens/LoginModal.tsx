@@ -12,13 +12,12 @@ export default function LoginModal() {
   const setStoreUsername = useSocketStore((state) => state.setUsername);
 
   const handleLogin = () => {
-    // Mock authentication
-    if ((username === 'player1' && password === '1234') || 
-        (username === 'player2' && password === '1234')) {
+    // Allow any username for testing, but keep the simple password '1234'
+    if (username.trim() !== '' && password === '1234') {
       setStoreUsername(username);
       setScreen('select');
     } else {
-      setError('Invalid username or password');
+      setError('Invalid password (use 1234) or empty username');
     }
   };
 
