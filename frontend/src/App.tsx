@@ -1,4 +1,3 @@
-import "./App.css";
 import LandingPage from "./screens/LandingPage";
 import LoginModal from "./screens/LoginModal";
 import SelectPlayScreen from "./screens/SelectPlayScreen";
