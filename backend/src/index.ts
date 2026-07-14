@@ -6,13 +6,18 @@ import routes from "./routes";
 import { registerSocketHandlers } from "./socketHandlers";
 
 const app = express();
-app.use(cors());
+app.use(cors({ origin: true, credentials: true }));
 app.use(routes);
 
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: "*" },
+  cors: {
+    origin: true,
+    credentials: true,
+  },
+  transports: ["websocket", "polling"],
+  allowEIO3: true,
 });
 
 registerSocketHandlers(io);

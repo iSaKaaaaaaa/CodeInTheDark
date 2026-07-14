@@ -18,10 +18,17 @@ export default function ChatBox() {
       setMessages((prev) => [...prev, msg]);
     };
 
+    // รีเซ็ต chat เมื่อมีการสุ่มแมพใหม่และเริ่มเกม
+    const handleStartGame = () => {
+      setMessages([]);
+    };
+
     socket.on("chat_message", handleMessage);
+    socket.on("start_game", handleStartGame);
 
     return () => {
       socket.off("chat_message", handleMessage);
+      socket.off("start_game", handleStartGame);
     };
   }, [socket]);
 
