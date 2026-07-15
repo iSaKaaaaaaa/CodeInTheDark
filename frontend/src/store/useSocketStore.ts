@@ -65,7 +65,7 @@ export const useSocketStore = create<SocketState>()(
     }
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
-    const socket = io(backendUrl);
+    const socket = io(backendUrl, { transports: ['websocket', 'polling'] });
     socket.on('connect', () => {
       console.log('Host connected to socket server with id:', socket.id);
       socket.emit('join_room', { roomCode: generatedCode, role: 'driver', username: get().username });
@@ -83,6 +83,11 @@ export const useSocketStore = create<SocketState>()(
       set({ currentScreen: 'create' });
     });
 
+    socket.on('user_left', () => {
+      alert("Your partner has left the room. Returning to lobby.");
+      set({ currentScreen: 'create' });
+    });
+
     set({ socket, roomCode: generatedCode, role: 'driver', currentScreen: 'create', players: [] });
   },
 
@@ -93,8 +98,8 @@ export const useSocketStore = create<SocketState>()(
     }
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
-    const socket = io(backendUrl);
-    
+    const socket = io(backendUrl, { transports: ['websocket', 'polling'] });
+
     socket.on('connect', () => {
       console.log('Client connected to socket server with id:', socket.id);
       socket.emit('join_room', { roomCode, role: 'navigator', username: get().username });
@@ -117,13 +122,23 @@ export const useSocketStore = create<SocketState>()(
       set({ currentScreen: 'create' });
     });
 
+    socket.on('user_left', () => {
+      alert("Your partner has left the room. Returning to lobby.");
+      set({ currentScreen: 'create' });
+    });
+
     set({ socket, roomCode, role: 'navigator', currentScreen: 'create', players: [] });
   },
 
   startGame: () => {
-    const { socket, roomCode } = get();
+    const { socket, roomCode, selectedMapIndex: prevMapIndex } = get();
     if (socket && roomCode) {
-      const mapIndex = Math.floor(Math.random() * 3);
+      let mapIndex = Math.floor(Math.random() * 3);
+      // ถ้าสุ่มได้แมพเดิม ให้บวก 1 แล้ว mod 3 (รับประกันว่าจะเปลี่ยนแมพ)
+      if (mapIndex === prevMapIndex) {
+        mapIndex = (mapIndex + 1) % 3;
+      }
+
       socket.emit('start_game', mapIndex);
       socket.emit('sync_game_state', { selectedMapIndex: mapIndex });
       set({ currentScreen: 'game', selectedMapIndex: mapIndex, dungeonTimeLeft: 300, swapTimeLeft: 120 });
@@ -154,7 +169,7 @@ export const useSocketStore = create<SocketState>()(
       get().socket?.disconnect();
     }
     const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
-    const socket = io(backendUrl);
+    const socket = io(backendUrl, { transports: ['websocket', 'polling'] });
 
     socket.on('connect', () => {
       socket.emit('join_room', { roomCode, role, username });
@@ -176,7 +191,7 @@ export const useSocketStore = create<SocketState>()(
     if (!username || !roomCode || !role || socket) return;
 
     const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
-    const newSocket = io(backendUrl);
+    const newSocket = io(backendUrl, { transports: ['websocket', 'polling'] });
     newSocket.on('connect', () => {
       newSocket.emit('join_room', { roomCode, role, username });
     });
@@ -187,6 +202,11 @@ export const useSocketStore = create<SocketState>()(
 
     newSocket.on('start_game', (mapIndex: number) => {
       set({ currentScreen: 'game', selectedMapIndex: mapIndex !== undefined ? mapIndex : 0 });
+    });
+
+    newSocket.on('user_left', () => {
+      alert("Your partner has left the room. Returning to lobby.");
+      set({ currentScreen: 'create' });
     });
 
     newSocket.on('join_error', () => {
