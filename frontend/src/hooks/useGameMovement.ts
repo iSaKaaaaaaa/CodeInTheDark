@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import * as Blockly from "blockly";
-import { useSocketStore } from "../store/useSocketStore";
+import { Socket } from "socket.io-client";
 
 interface MapData {
   walls: { x: number; y: number }[];
@@ -12,7 +12,7 @@ interface MapData {
 }
 
 interface UseGameMovementOptions {
-  socket: ReturnType<typeof useSocketStore>["socket"];
+  socket: Socket | null;
   role: "driver" | "navigator" | null;
   workspaceRef: React.MutableRefObject<Blockly.WorkspaceSvg | null>;
   availableQuotaRef: React.MutableRefObject<number>;
