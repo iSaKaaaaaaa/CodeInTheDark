@@ -1,8 +1,8 @@
-import { useEffect, useRef } from "react";
-import { useSocketStore } from "../store/useSocketStore";
+import { useEffect } from "react";
+import { Socket } from "socket.io-client";
 
 interface UseGameTimerOptions {
-  socket: ReturnType<typeof useSocketStore>["socket"];
+  socket: Socket | null;
   role: "driver" | "navigator" | null;
   setRole: (role: "driver" | "navigator") => void;
   tutorialStepRef: React.MutableRefObject<number>;

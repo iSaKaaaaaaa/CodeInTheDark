@@ -1,12 +1,12 @@
 import { useRef, useState, useEffect } from "react";
-import { useSocketStore } from "../store/useSocketStore";
+import { Socket } from "socket.io-client";
 
 interface UseTutorialOptions {
-  socket: ReturnType<typeof useSocketStore>["socket"];
+  socket: Socket | null;
   role: "driver" | "navigator" | null;
 }
 
-export function useTutorial({ socket, role }: UseTutorialOptions) {
+export function useTutorial({ socket }: UseTutorialOptions) {
   const [tutorialStep, setTutorialStep] = useState(() => {
     return localStorage.getItem("tutorialCompleted") === "true" ? 99 : 1;
   });

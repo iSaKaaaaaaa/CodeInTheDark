@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import * as Blockly from "blockly";
-import { useSocketStore } from "../store/useSocketStore";
+import { Socket } from "socket.io-client";
 
 interface UseGameSyncOptions {
-  socket: ReturnType<typeof useSocketStore>["socket"];
+  socket: Socket | null;
   role: "driver" | "navigator" | null;
   setRole: (role: "driver" | "navigator") => void;
   workspaceRef: React.MutableRefObject<Blockly.WorkspaceSvg | null>;
