@@ -2,14 +2,14 @@
 
 ยินดีต้อนรับสู่โปรเจกต์ **Code in the Dark: Asymmetric Co-op Puzzle Game**! ที่สร้างด้วย React, Vite, Phaser (สำหรับระบบเกม) และ Node.js + Socket.IO สำหรับฝั่งเซิร์ฟเวอร์
 
-## 🛠 เทคโนโลยีที่ใช้
+## เทคโนโลยีที่ใช้
 
 - **Frontend**: React (Vite), TypeScript, TailwindCSS, Phaser, Zustand, Socket.IO Client
 - **Backend**: Node.js, Express, Socket.IO, TypeScript
 
 ---
 
-## ⚙️ สิ่งที่ต้องมีก่อนติดตั้ง
+## สิ่งที่ต้องมีก่อนติดตั้ง
 
 โปรดตรวจสอบให้แน่ใจว่าในเครื่องของคุณติดตั้งโปรแกรมเหล่านี้แล้ว:
 
@@ -18,7 +18,7 @@
 
 ---
 
-## 🚀 วิธีการติดตั้ง (Installation)
+## วิธีการติดตั้ง (Installation)
 
 1. **โคลนโปรเจกต์ลงเครื่อง:**
 
@@ -42,7 +42,7 @@
 
 ---
 
-## 🌍 การตั้งค่า Environment Variables (ตัวแปรระบบ)
+## การตั้งค่า Environment Variables (ตัวแปรระบบ)
 
 คุณจำเป็นต้องสร้างไฟล์ `.env` สำหรับเชื่อมต่อ Frontend ไปยัง Backend
 
@@ -66,7 +66,7 @@ _(หากคุณต้องการเทสออนไลน์ หร�
 
 ---
 
-## 💻 การรันโปรเจกต์ในเครื่อง (Local Development)
+## การรันโปรเจกต์ในเครื่อง (Local Development)
 
 เราได้เตรียมคำสั่งลัดให้คุณสามารถรันทั้ง Frontend และ Backend ได้พร้อมกันจากโฟลเดอร์ `frontend` เลย!
 
@@ -84,7 +84,7 @@ _(ระบบจะรัน Frontend ที่พอร์ต `5173` และ
 
 ---
 
-## 🌐 วิธีเปิดเซิร์ฟเวอร์เล่นกับเพื่อนผ่าน VS Code Port Forwarding
+## วิธีเปิดเซิร์ฟเวอร์เล่นกับเพื่อนผ่าน VS Code Port Forwarding
 
 ถ้าอยากลองเล่นกับเพื่อนโดยที่ยังไม่ต้อง Deploy ขึ้นเซิร์ฟเวอร์จริง สามารถใช้ **VS Code Port Forwarding** ได้เลย:
 
@@ -102,7 +102,7 @@ _(ระบบจะรัน Frontend ที่พอร์ต `5173` และ
 
 ---
 
-## 📦 การ Build ระบบ (Production)
+## การ Build ระบบ (Production)
 
 ถ้าต้องการรันระบบแบบพร้อมใช้งานจริง (แบบที่ถูก Build แล้ว):
 
@@ -120,7 +120,7 @@ _(ระบบจะรัน Frontend ที่พอร์ต `5173` และ
 
 ---
 
-## ☁️ การนำขึ้นระบบเซิร์ฟเวอร์จริง (Deployment)
+## การนำขึ้นระบบเซิร์ฟเวอร์จริง (Deployment)
 
 - **สำหรับ Backend (เช่น Render, Railway):**
   ตั้งค่า Root Directory เป็น `backend` ใช้คำสั่ง `npm install && npm run build` สำหรับการ Build และ `npm run start` สำหรับรัน
@@ -129,7 +129,7 @@ _(ระบบจะรัน Frontend ที่พอร์ต `5173` และ
 
 ---
 
-## 🎮 วิธีการเล่นเกม
+## วิธีการเล่นเกม
 
 1. **Player 1** ทำการสร้างห้อง (Create Room) แล้วส่งรหัสห้อง (Room Code) ให้เพื่อน
 2. **Player 2** กรอกรหัสเพื่อเข้าห้อง (Join Room)
