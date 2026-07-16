@@ -69,6 +69,7 @@ export const useSocketStore = create<SocketState>()(
     socket.on('connect', () => {
       console.log('Host connected to socket server with id:', socket.id);
       socket.emit('join_room', { roomCode: generatedCode, role: 'driver', username: get().username });
+      set({ currentScreen: 'create' });
     });
 
     socket.on('room_users', (users) => {
@@ -88,7 +89,8 @@ export const useSocketStore = create<SocketState>()(
       set({ currentScreen: 'create' });
     });
 
-    set({ socket, roomCode: generatedCode, role: 'driver', currentScreen: 'create', players: [] });
+    // Don't set currentScreen here, wait for connection
+    set({ socket, roomCode: generatedCode, role: 'driver', players: [] });
   },
 
   joinRoom: (roomCode) => {
@@ -103,6 +105,7 @@ export const useSocketStore = create<SocketState>()(
     socket.on('connect', () => {
       console.log('Client connected to socket server with id:', socket.id);
       socket.emit('join_room', { roomCode, role: 'navigator', username: get().username });
+      set({ currentScreen: 'create' });
     });
 
     socket.on('join_error', (msg) => {
@@ -127,7 +130,8 @@ export const useSocketStore = create<SocketState>()(
       set({ currentScreen: 'create' });
     });
 
-    set({ socket, roomCode, role: 'navigator', currentScreen: 'create', players: [] });
+    // Don't set currentScreen here, wait for connection
+    set({ socket, roomCode, role: 'navigator', players: [] });
   },
 
   startGame: () => {
@@ -168,7 +172,6 @@ export const useSocketStore = create<SocketState>()(
     if (get().socket) {
       get().socket?.disconnect();
     }
-
     const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
     const socket = io(backendUrl, { transports: ['websocket', 'polling'] });
 
