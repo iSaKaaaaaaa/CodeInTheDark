@@ -1,16 +1,15 @@
-# Code in the Dark (Multiplayer Game)
+# Code in the Dark: Asymmetric Co-op Puzzle Game
 
-ยินดีต้อนรับสู่โปรเจกต์ **Code in the Dark**! เกมเขียนโค้ดแนว Multiplayer แบบ Real-time ที่พัฒนาด้วย React, Vite, Phaser (สำหรับระบบการเล่น) และ Node.js + Socket.IO สำหรับฝั่งเซิร์ฟเวอร์ระบบเกม
+ยินดีต้อนรับสู่โปรเจกต์ **Code in the Dark: Asymmetric Co-op Puzzle Game**! ซึ่งเป็นเกมแนวไขปริศนาแบบร่วมมือกันที่ผู้เล่นแต่ละฝ่ายได้รับข้อมูลไม่เท่ากัน ที่พัฒนาด้วย React, Vite, Phaser (สำหรับระบบการเล่น) และ Node.js + Socket.IO สำหรับฝั่งเซิร์ฟเวอร์ระบบเกม
 
 ## เทคโนโลยีที่ใช้
 
 - **Frontend**: React (Vite), TypeScript, TailwindCSS, Phaser, Zustand, Socket.IO Client
 - **Backend**: Node.js, Express, Socket.IO, TypeScript
-- **Deployment**: Frontend (Vercel) / Backend (Fly.io - Singapore Region 🇸🇬)
 
 ---
 
-## สิ่งที่ต้องมีก่อนติดตั้ง (สำหรับผู้พัฒนา/กรรมการ)
+## สิ่งที่ต้องมีก่อนติดตั้ง
 
 โปรดตรวจสอบให้แน่ใจว่าในเครื่องของคุณติดตั้งโปรแกรมเหล่านี้แล้ว:
 
