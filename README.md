@@ -1,4 +1,4 @@
-# Code in the Dark (Multiplayer Game)
+# Code in the Dark: Asymmetric Co-op Puzzle Game
 
 ยินดีต้อนรับสู่โปรเจกต์ **Code in the Dark: Asymmetric Co-op Puzzle Game**! ที่สร้างด้วย React, Vite, Phaser (สำหรับระบบเกม) และ Node.js + Socket.IO สำหรับฝั่งเซิร์ฟเวอร์
 
