@@ -6,11 +6,10 @@
 
 - **Frontend**: React (Vite), TypeScript, TailwindCSS, Phaser, Zustand, Socket.IO Client
 - **Backend**: Node.js, Express, Socket.IO, TypeScript
-- **Deployment**: Frontend (Vercel) / Backend (Fly.io - Singapore Region 🇸🇬)
 
 ---
 
-## สิ่งที่ต้องมีก่อนติดตั้ง (สำหรับผู้พัฒนา/กรรมการ)
+## สิ่งที่ต้องมีก่อนติดตั้ง
 
 โปรดตรวจสอบให้แน่ใจว่าในเครื่องของคุณติดตั้งโปรแกรมเหล่านี้แล้ว:
 
