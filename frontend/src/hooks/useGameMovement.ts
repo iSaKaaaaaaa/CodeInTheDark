@@ -297,6 +297,10 @@ export function useGameMovement({
         dungeonTimeLeft: 300, swapTimeLeft: 120, reset: true,
       });
       socket.emit("sync_blockly", "<xml></xml>");
+
+      // Driver เองก็ต้องเคลียร์ chat (เพราะ sync_game_state ส่งไปให้คนอื่นเท่านั้น)
+      // ใช้ emit event กลับมาหาตัวเอง
+      socket.emit("reset_chat");
     }
   }, [role, socket, START.x, START.y, maxBlocks]);
 

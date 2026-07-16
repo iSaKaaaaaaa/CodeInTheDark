@@ -92,6 +92,14 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
+    // รีเซ็ต chat ทั้งห้อง (รวมตัวส่งเอง)
+    socket.on("reset_chat", () => {
+      const user = getUser(socket.id);
+      if (user) {
+        io.to(user.roomCode).emit("reset_chat");
+      }
+    });
+
     socket.on("return_to_lobby", () => {
       const user = getUser(socket.id);
       if (user) {
