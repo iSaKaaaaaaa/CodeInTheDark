@@ -18,17 +18,40 @@ export default function ChatBox() {
       setMessages((prev) => [...prev, msg]);
     };
 
-    // รีเซ็ต chat เมื่อมีการสุ่มแมพใหม่และเริ่มเกม
+    // รีเซ็ต chat เมื่อเริ่มเกมใหม่ (จากหน้า lobby)
     const handleStartGame = () => {
+      setMessages([]);
+    };
+
+    // รีเซ็ต chat เมื่อกด Restart / Next (Navigator ได้รับ reset: true จาก Driver)
+    const handleSyncState = (state: any) => {
+      if (state.reset) {
+        setMessages([]);
+      }
+    };
+
+    // รีเซ็ต chat เมื่อกด Restart / Next (ทั้ง Driver และ Navigator ได้รับ)
+    const handleResetChat = () => {
+      setMessages([]);
+    };
+
+    // รีเซ็ต chat เมื่อกลับ lobby
+    const handleReturnToLobby = () => {
       setMessages([]);
     };
 
     socket.on("chat_message", handleMessage);
     socket.on("start_game", handleStartGame);
+    socket.on("sync_game_state", handleSyncState);
+    socket.on("reset_chat", handleResetChat);
+    socket.on("return_to_lobby", handleReturnToLobby);
 
     return () => {
       socket.off("chat_message", handleMessage);
       socket.off("start_game", handleStartGame);
+      socket.off("sync_game_state", handleSyncState);
+      socket.off("reset_chat", handleResetChat);
+      socket.off("return_to_lobby", handleReturnToLobby);
     };
   }, [socket]);
 
