@@ -1,15 +1,18 @@
 # Code in the Dark (Multiplayer Game)
 
-ยินดีต้อนรับสู่โปรเจกต์ **Code in the Dark**! เกมเขียนโค้ดแบบ Multiplayer แบบ Real-time ที่สร้างด้วย React, Vite, Phaser (สำหรับระบบเกม) และ Node.js + Socket.IO สำหรับฝั่งเซิร์ฟเวอร์
+ยินดีต้อนรับสู่โปรเจกต์ **Code in the Dark: Asymmetric Co-op Puzzle Game**! ที่สร้างด้วย React, Vite, Phaser (สำหรับระบบเกม) และ Node.js + Socket.IO สำหรับฝั่งเซิร์ฟเวอร์
 
 ## 🛠 เทคโนโลยีที่ใช้
+
 - **Frontend**: React (Vite), TypeScript, TailwindCSS, Phaser, Zustand, Socket.IO Client
 - **Backend**: Node.js, Express, Socket.IO, TypeScript
 
 ---
 
 ## ⚙️ สิ่งที่ต้องมีก่อนติดตั้ง
+
 โปรดตรวจสอบให้แน่ใจว่าในเครื่องของคุณติดตั้งโปรแกรมเหล่านี้แล้ว:
+
 - [Node.js](https://nodejs.org/) (แนะนำเวอร์ชัน 16 ขึ้นไป)
 - [Git](https://git-scm.com/)
 
@@ -18,12 +21,14 @@
 ## 🚀 วิธีการติดตั้ง (Installation)
 
 1. **โคลนโปรเจกต์ลงเครื่อง:**
+
    ```bash
    git clone https://github.com/iSaKaaaaaaa/CodeInTheDark.git
    cd CodeInTheDark
    ```
 
 2. **ติดตั้ง Dependencies สำหรับ Frontend:**
+
    ```bash
    cd frontend
    npm install
@@ -42,17 +47,22 @@
 คุณจำเป็นต้องสร้างไฟล์ `.env` สำหรับเชื่อมต่อ Frontend ไปยัง Backend
 
 ### ฝั่ง Backend (`backend/.env`)
+
 สร้างไฟล์ `.env` ในโฟลเดอร์ `backend`:
+
 ```env
 PORT=3000
 ```
 
 ### ฝั่ง Frontend (`frontend/.env`)
+
 สร้างไฟล์ `.env` ในโฟลเดอร์ `frontend`:
+
 ```env
 VITE_BACKEND_URL=http://localhost:3000
 ```
-*(หากคุณต้องการเทสออนไลน์ หรือนำขึ้นเซิร์ฟเวอร์จริง ให้เปลี่ยน URL นี้เป็นโดเมนของ Backend ของคุณ)*
+
+_(หากคุณต้องการเทสออนไลน์ หรือนำขึ้นเซิร์ฟเวอร์จริง ให้เปลี่ยน URL นี้เป็นโดเมนของ Backend ของคุณ)_
 
 ---
 
@@ -70,7 +80,7 @@ VITE_BACKEND_URL=http://localhost:3000
    ```
 3. เปิดเบราว์เซอร์ไปที่: `http://localhost:5173`
 
-*(ระบบจะรัน Frontend ที่พอร์ต `5173` และ Backend ที่พอร์ต `3000`)*
+_(ระบบจะรัน Frontend ที่พอร์ต `5173` และ Backend ที่พอร์ต `3000`)_
 
 ---
 
@@ -106,7 +116,7 @@ VITE_BACKEND_URL=http://localhost:3000
    cd frontend
    npm run start:all
    ```
-*(คำสั่งนี้จะไปรัน `vite preview` พอร์ต `5173` และฝั่งเซิร์ฟเวอร์ด้วย `node dist/index.js`)*
+   _(คำสั่งนี้จะไปรัน `vite preview` พอร์ต `5173` และฝั่งเซิร์ฟเวอร์ด้วย `node dist/index.js`)_
 
 ---
 
@@ -120,7 +130,8 @@ VITE_BACKEND_URL=http://localhost:3000
 ---
 
 ## 🎮 วิธีการเล่นเกม
+
 1. **Player 1** ทำการสร้างห้อง (Create Room) แล้วส่งรหัสห้อง (Room Code) ให้เพื่อน
 2. **Player 2** กรอกรหัสเพื่อเข้าห้อง (Join Room)
-3. เมื่อเข้าเกม ผู้เล่นจะถูกสุ่มบทบาท (Role) และบทบาทอาจจะมีการสลับไปมา (Swap) ระหว่างที่เล่น!
-4. ร่วมมือกันเขียนโค้ดและเอาชีวิตรอดให้ได้!
+3. เมื่อเข้าเกม ผู้เล่นที่สร้างห้อง (Host) จะได้รับบทบาท (Role) Driver และบทบาทอาจจะมีการสลับไปมา (Swap) ระหว่างที่เล่น!
+4. สื่อสารแลกเปลี่ยนข้อมูลกันจากข้อมูลที่ตนเองได้รับและไปถึงเส้นชัยให้ได้!
