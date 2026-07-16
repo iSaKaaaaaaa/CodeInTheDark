@@ -4,6 +4,16 @@ import { io, Socket } from 'socket.io-client';
 
 export type ScreenState = 'landing' | 'login' | 'select' | 'create' | 'join' | 'game';
 
+const getBackendUrl = () => {
+  if (import.meta.env.VITE_BACKEND_URL) {
+    return import.meta.env.VITE_BACKEND_URL;
+  }
+  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+    return 'http://localhost:3000';
+  }
+  return 'https://codeinthedark-backend.fly.dev';
+};
+
 interface SocketState {
   socket: Socket | null;
   username: string;
@@ -64,7 +74,7 @@ export const useSocketStore = create<SocketState>()(
       get().socket?.disconnect();
     }
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+    const backendUrl = getBackendUrl();
     const socket = io(backendUrl, { transports: ['websocket', 'polling'] });
     socket.on('connect', () => {
       console.log('Host connected to socket server with id:', socket.id);
@@ -99,7 +109,7 @@ export const useSocketStore = create<SocketState>()(
       get().socket?.disconnect();
     }
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+    const backendUrl = getBackendUrl();
     const socket = io(backendUrl, { transports: ['websocket', 'polling'] });
 
     socket.on('connect', () => {
@@ -172,7 +182,7 @@ export const useSocketStore = create<SocketState>()(
     if (get().socket) {
       get().socket?.disconnect();
     }
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+    const backendUrl = getBackendUrl();
     const socket = io(backendUrl, { transports: ['websocket', 'polling'] });
 
     socket.on('connect', () => {
@@ -194,7 +204,7 @@ export const useSocketStore = create<SocketState>()(
     const { username, roomCode, role, socket } = get();
     if (!username || !roomCode || !role || socket) return;
 
-    const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3000';
+    const backendUrl = getBackendUrl();
     const newSocket = io(backendUrl, { transports: ['websocket', 'polling'] });
     newSocket.on('connect', () => {
       newSocket.emit('join_room', { roomCode, role, username });
