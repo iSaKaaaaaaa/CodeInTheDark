@@ -3,12 +3,13 @@ import LoginModal from "./screens/LoginModal";
 import SelectPlayScreen from "./screens/SelectPlayScreen";
 import CreateRoomScreen from "./screens/CreateRoomScreen";
 import JoinRoomScreen from "./screens/JoinRoomScreen";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import GameScreen from "./screens/GameScreen";
 import { useSocketStore } from "./store/useSocketStore";
 
 export default function App() {
-  const { currentScreen, setScreen, socket, roomCode, reconnect } = useSocketStore();
+  const { currentScreen, setScreen, socket, roomCode, reconnect, isMuted } = useSocketStore();
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
     if (!socket && roomCode) {
@@ -16,29 +17,63 @@ export default function App() {
     }
   }, [socket, roomCode, reconnect]);
 
-  switch (currentScreen) {
-    case 'landing':
-      return (
-        <LandingPage
-          onStart={() => setScreen('login')}
-        />
-      );
-    case 'login':
-      return (
-        <div className="relative">
-          <LandingPage onStart={() => {}} contentHidden={true} />
-          <LoginModal />
-        </div>
-      );
-    case 'select':
-      return <SelectPlayScreen />;
-    case 'create':
-      return <CreateRoomScreen />;
-    case 'join':
-      return <JoinRoomScreen />;
-    case 'game':
-      return <GameScreen />;
-    default:
-      return <LandingPage onStart={() => setScreen('login')} />;
-  }
+  useEffect(() => {
+    // Set background music volume to 10%
+    if (audioRef.current) {
+      audioRef.current.volume = 0.1;
+      
+      if (currentScreen === 'game') {
+        if (audioRef.current.currentTime === 0) {
+          audioRef.current.currentTime = 10;
+        }
+        audioRef.current.muted = isMuted;
+        audioRef.current.play().catch(e => console.log('Audio play failed:', e));
+      } else {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
+      }
+    }
+  }, [currentScreen, isMuted]);
+
+  const handleAudioEnded = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 10;
+      audioRef.current.play().catch(e => console.log('Audio loop play failed:', e));
+    }
+  };
+
+  const renderScreen = () => {
+    switch (currentScreen) {
+      case 'landing':
+        return (
+          <LandingPage
+            onStart={() => setScreen('login')}
+          />
+        );
+      case 'login':
+        return (
+          <div className="relative">
+            <LandingPage onStart={() => {}} contentHidden={true} />
+            <LoginModal />
+          </div>
+        );
+      case 'select':
+        return <SelectPlayScreen />;
+      case 'create':
+        return <CreateRoomScreen />;
+      case 'join':
+        return <JoinRoomScreen />;
+      case 'game':
+        return <GameScreen />;
+      default:
+        return <LandingPage onStart={() => setScreen('login')} />;
+    }
+  };
+
+  return (
+    <>
+      <audio ref={audioRef} src="/sounds/bgsound.mp3" onEnded={handleAudioEnded} />
+      {renderScreen()}
+    </>
+  );
 }
