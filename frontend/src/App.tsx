@@ -8,7 +8,7 @@ import GameScreen from "./screens/GameScreen";
 import { useSocketStore } from "./store/useSocketStore";
 
 export default function App() {
-  const { currentScreen, setScreen, socket, roomCode, reconnect } = useSocketStore();
+  const { currentScreen, setScreen, socket, roomCode, reconnect, isMuted } = useSocketStore();
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
@@ -21,26 +21,26 @@ export default function App() {
     // Set background music volume to 10%
     if (audioRef.current) {
       audioRef.current.volume = 0.1;
-    }
-
-    const handleInteraction = () => {
-      if (audioRef.current && audioRef.current.paused) {
+      
+      if (currentScreen === 'game') {
+        if (audioRef.current.currentTime === 0) {
+          audioRef.current.currentTime = 10;
+        }
+        audioRef.current.muted = isMuted;
         audioRef.current.play().catch(e => console.log('Audio play failed:', e));
+      } else {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
       }
-      // Remove listeners once audio starts playing
-      document.removeEventListener('click', handleInteraction);
-      document.removeEventListener('keydown', handleInteraction);
-    };
+    }
+  }, [currentScreen, isMuted]);
 
-    // Browsers block autoplay until user interaction, so we listen for clicks or key presses
-    document.addEventListener('click', handleInteraction);
-    document.addEventListener('keydown', handleInteraction);
-
-    return () => {
-      document.removeEventListener('click', handleInteraction);
-      document.removeEventListener('keydown', handleInteraction);
-    };
-  }, []);
+  const handleAudioEnded = () => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = 10;
+      audioRef.current.play().catch(e => console.log('Audio loop play failed:', e));
+    }
+  };
 
   const renderScreen = () => {
     switch (currentScreen) {
@@ -72,7 +72,7 @@ export default function App() {
 
   return (
     <>
-      <audio ref={audioRef} src="/sounds/bgsound.mp3" autoPlay loop />
+      <audio ref={audioRef} src="/sounds/bgsound.mp3" onEnded={handleAudioEnded} />
       {renderScreen()}
     </>
   );

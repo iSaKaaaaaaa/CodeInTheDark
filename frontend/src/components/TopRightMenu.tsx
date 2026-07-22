@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSocketStore } from "../store/useSocketStore";
 
 export default function TopRightMenu() {
-  const { username, disconnect, currentScreen, leaveStage } = useSocketStore();
+  const { username, disconnect, currentScreen, leaveStage, isMuted, toggleMute } = useSocketStore();
   const [showConfirm, setShowConfirm] = useState(false);
 
   const isGame = currentScreen === 'game';
@@ -20,21 +20,32 @@ export default function TopRightMenu() {
     <>
       <div className={`fixed z-50 flex ${isGame ? 'flex-col items-end gap-3 top-32 right-4 md:right-8' : 'items-center gap-4 top-6 right-6'}`}>
         <button 
-          className="w-12 h-12 bg-amber-800/80 hover:bg-amber-700 border-2 border-black rounded-full flex items-center justify-center text-white text-2xl shadow-md transition-transform hover:scale-105 active:scale-95"
-          title="Toggle Sound"
+          onClick={toggleMute}
+          className={`w-12 h-12 ${isMuted ? 'bg-gray-600 hover:bg-gray-500' : 'bg-amber-800/80 hover:bg-amber-700'} border-2 border-black rounded-full flex items-center justify-center text-white text-2xl shadow-md transition-transform hover:scale-105 active:scale-95`}
+          title={isMuted ? "Unmute Sound" : "Mute Sound"}
         >
-          <span role="img" aria-label="sound">🔊</span>
+          <span role="img" aria-label="sound">{isMuted ? "🔇" : "🔊"}</span>
         </button>
         <div className="bg-amber-800/80 border-2 border-black rounded-full px-4 py-2 flex items-center gap-2 text-white shadow-md">
           <span className="font-bold tracking-wider">{username || "PLAYER"}</span>
           <span role="img" aria-label="user" className="bg-white text-amber-900 rounded-full w-6 h-6 flex items-center justify-center text-xs">👤</span>
         </div>
         <button 
-          className="w-12 h-12 bg-amber-900/90 hover:bg-red-500 border-2 border-black rounded-full flex items-center justify-center text-white text-2xl shadow-md transition-transform hover:scale-105 active:scale-95" 
+          className="h-12 px-5 bg-amber-800/80 hover:bg-amber-700 border-2 border-black rounded-full flex items-center justify-center gap-2 text-white font-black tracking-wider text-lg shadow-md transition-transform hover:scale-105 active:scale-95" 
           onClick={() => setShowConfirm(true)}
           title={isGame ? "Leave Stage" : "Log Out"}
         >
-          <span role="img" aria-label="leave">{isGame ? "🔙" : "🚪"}</span>
+          {isGame ? (
+            <>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+              BACK
+            </>
+          ) : (
+            <>
+              LOGOUT
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+            </>
+          )}
         </button>
       </div>
 

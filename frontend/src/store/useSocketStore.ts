@@ -25,6 +25,7 @@ interface SocketState {
   dungeonTimeLeft: number;
   swapTimeLeft: number;
   joinError: string | null;
+  isMuted: boolean;
   
   
   setScreen: (screen: ScreenState) => void;
@@ -43,6 +44,7 @@ interface SocketState {
   setDungeonTimeLeft: (time: number | ((prev: number) => number)) => void;
   setSwapTimeLeft: (time: number | ((prev: number) => number)) => void;
   setJoinError: (error: string | null) => void;
+  toggleMute: () => void;
 }
 
 export const useSocketStore = create<SocketState>()(
@@ -58,6 +60,7 @@ export const useSocketStore = create<SocketState>()(
   dungeonTimeLeft: 300,
   swapTimeLeft: 120,
   joinError: null,
+  isMuted: false,
 
   setSelectedMapIndex: (index) => set({ selectedMapIndex: index }),
   setScreen: (screen) => set({ currentScreen: screen }),
@@ -65,6 +68,7 @@ export const useSocketStore = create<SocketState>()(
   setDungeonTimeLeft: (time) => set((state) => ({ dungeonTimeLeft: typeof time === 'function' ? time(state.dungeonTimeLeft) : time })),
   setSwapTimeLeft: (time) => set((state) => ({ swapTimeLeft: typeof time === 'function' ? time(state.swapTimeLeft) : time })),
   setJoinError: (error) => set({ joinError: error }),
+  toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
 
   createRoom: () => {
     // Generate 6-digit room code
@@ -242,6 +246,7 @@ export const useSocketStore = create<SocketState>()(
         selectedMapIndex: state.selectedMapIndex,
         dungeonTimeLeft: state.dungeonTimeLeft,
         swapTimeLeft: state.swapTimeLeft,
+        isMuted: state.isMuted,
       }),
     }
   )
