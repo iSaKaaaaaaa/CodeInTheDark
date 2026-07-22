@@ -35,13 +35,13 @@ export default function GameBoard({
     : undefined;
 
   return (
-    <div className="flex-1 bg-amber-900/40 rounded-xl border-4 border-black p-4 relative backdrop-blur-sm flex items-center justify-center">
-      <div className="w-full max-w-[520px] relative pt-10 pl-10 flex items-center justify-center">
+    <div className="flex-1 relative w-full h-full flex items-center justify-center">
+      <div className="w-full max-w-[600px] relative pt-10 pl-10 flex items-center justify-center">
         
         {/* แถบตัวอักษรบอกพิกัดด้านบน (A-M) */}
         <div className="absolute top-0 left-10 right-0 h-10 flex items-start justify-center">
           {/* ขยับซ้ายขวาให้ตรงกับ 13 ช่องด้านใน (86.666% คือ 13/15 ของกระดาน) */}
-          <div className="w-[86.666%] h-8 bg-[#d2a356] border-4 border-[#572e18] text-black font-bold rounded-lg flex justify-around items-center shadow-md font-pixel z-10">
+          <div className="w-[86.666%] h-8 bg-[#d2a356] border-4 border-[#572e18] text-black font-bold rounded-lg flex justify-around items-center shadow-md font-sans z-10">
             {COL_LABELS.map((lbl, idx) => (
               <span key={idx} className="flex-1 text-center text-sm md:text-base leading-none">
                 {lbl}
@@ -52,9 +52,9 @@ export default function GameBoard({
 
         {/* แถบตัวเลขบอกพิกัดด้านซ้าย (1-13) */}
         <div className="absolute left-0 top-10 bottom-0 w-10 flex items-center justify-end pr-2">
-          <div className="h-[86.666%] w-8 bg-[#d2a356] border-4 border-[#572e18] text-black font-bold rounded-lg flex flex-col justify-around items-center shadow-md font-pixel z-10">
+          <div className="h-[86.666%] w-8 bg-[#d2a356] border-4 border-[#572e18] text-black font-bold rounded-lg flex flex-col justify-around items-center shadow-md font-sans z-10">
             {ROW_LABELS.map((lbl, idx) => (
-              <span key={idx} className="flex-1 flex items-center justify-center text-xs md:text-sm leading-none">
+              <span key={idx} className="flex-1 flex items-center justify-center text-sm md:text-base leading-none">
                 {lbl}
               </span>
             ))}
