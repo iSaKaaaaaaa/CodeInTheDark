@@ -74,17 +74,22 @@ export default function ChatBox() {
 
   return (
     <div className="h-56 bg-black/80 rounded-xl border-4 border-black p-3 flex flex-col shadow-2xl">
-      <span className="text-white font-bold text-xl mb-2 tracking-wider">
+      <span className="text-white font-bold text-3xl mb-2 tracking-wider">
         CHAT BOX
       </span>
 
       <div className="flex-1 overflow-y-auto mb-2 flex flex-col gap-1">
-        {messages.map((msg, index) => (
-          <div key={index} className="text-white text-sm">
-            <span className="text-orange-500 font-bold">{msg.sender}: </span>
-            {msg.text}
-          </div>
-        ))}
+        {messages.map((msg, index) => {
+          const isMe = msg.sender === username;
+          return (
+            <div key={index} className="text-white text-xl font-sans">
+              <span className={`font-bold ${isMe ? 'text-sky-400' : 'text-orange-500'}`}>
+                {msg.sender}{isMe && " (You)"}:{" "}
+              </span>
+              {msg.text}
+            </div>
+          );
+        })}
         <div ref={messagesEndRef} />
       </div>
 
@@ -94,7 +99,7 @@ export default function ChatBox() {
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Enter the message"
-        className="bg-black/50 border-2 border-gray-700 rounded-lg p-2 text-white outline-none focus:border-orange-500 transition-colors font-pixel"
+        className="bg-black/50 border-2 border-gray-700 rounded-lg p-3 text-white text-xl outline-none focus:border-orange-500 transition-colors font-sans"
       />
     </div>
   );
