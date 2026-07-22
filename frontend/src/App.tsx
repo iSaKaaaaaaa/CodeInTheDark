@@ -22,6 +22,24 @@ export default function App() {
     if (audioRef.current) {
       audioRef.current.volume = 0.1;
     }
+
+    const handleInteraction = () => {
+      if (audioRef.current && audioRef.current.paused) {
+        audioRef.current.play().catch(e => console.log('Audio play failed:', e));
+      }
+      // Remove listeners once audio starts playing
+      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('keydown', handleInteraction);
+    };
+
+    // Browsers block autoplay until user interaction, so we listen for clicks or key presses
+    document.addEventListener('click', handleInteraction);
+    document.addEventListener('keydown', handleInteraction);
+
+    return () => {
+      document.removeEventListener('click', handleInteraction);
+      document.removeEventListener('keydown', handleInteraction);
+    };
   }, []);
 
   const renderScreen = () => {
