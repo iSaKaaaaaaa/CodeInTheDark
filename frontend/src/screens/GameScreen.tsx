@@ -1,7 +1,7 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import * as Blockly from "blockly";
 import { useSocketStore } from "../store/useSocketStore";
-import { getMapData } from "../data/maps";
+
 import { MAX_BLOCKS } from "../constants/game";
 
 import { useTutorial } from "../hooks/useTutorial";
@@ -16,10 +16,13 @@ import TopRightMenu from "../components/TopRightMenu";
 import BlockCodePanel from "../components/driver/BlockCodePanel";
 
 export default function GameScreen() {
-  const { socket, role, setRole, selectedMapIndex, setSelectedMapIndex, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft, players, leaveStage } = useSocketStore();
+  const { socket, role, setRole, mapData: serverMapData, startGame, selectedMapIndex, setSelectedMapIndex, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft, players, leaveStage } = useSocketStore();
 
   // --- Map Data ---
-  const mapData = getMapData(selectedMapIndex);
+  if (!serverMapData) {
+    return <div className="min-h-screen flex items-center justify-center text-white bg-black font-pixel text-2xl">Generating Map...</div>;
+  }
+  const mapData = serverMapData;
   const { walls: WALLS, start: START, goal: GOAL } = mapData;
 
   // --- Game State ---
@@ -96,13 +99,13 @@ export default function GameScreen() {
   });
 
   // --- Map change reset ---
-  const prevMapIndexRef = useRef(selectedMapIndex);
+  const prevMapDataRef = useRef(mapData);
   useEffect(() => {
-    if (prevMapIndexRef.current !== selectedMapIndex) {
-      prevMapIndexRef.current = selectedMapIndex;
+    if (prevMapDataRef.current !== mapData) {
+      prevMapDataRef.current = mapData;
       resetGameToNewStart();
     }
-  }, [selectedMapIndex, resetGameToNewStart]);
+  }, [mapData, resetGameToNewStart]);
 
   // --- Workspace Ready ---
   const handleWorkspaceReady = useCallback(
@@ -336,7 +339,7 @@ export default function GameScreen() {
                   {role === "driver" ? (
                     <>
                       <button className="bg-transparent border-[3px] border-[#B28B29] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-8 text-xl md:text-2xl rounded-full hover:bg-white/20 active:scale-95 transition-all shadow-md" onClick={resetGameToNewStart}>RESTART</button>
-                      <button className="bg-[#ea580c] border-[3px] border-[#c2410c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full hover:bg-[#c2410c] active:scale-95 transition-all shadow-[0_4px_0_#9a3412] active:shadow-none active:translate-y-1" onClick={resetGameToNewStart}>NEXT</button>
+                      <button className="bg-[#ea580c] border-[3px] border-[#c2410c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full hover:bg-[#c2410c] active:scale-95 transition-all shadow-[0_4px_0_#9a3412] active:shadow-none active:translate-y-1" onClick={startGame}>NEXT</button>
                     </>
                   ) : (
                     <div className="bg-[#ea580c]/50 border-[3px] border-[#c2410c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full shadow-md flex items-center">WAITING FOR DRIVER...</div>

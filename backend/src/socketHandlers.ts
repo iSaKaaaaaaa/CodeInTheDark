@@ -7,6 +7,9 @@ import {
 import {
   initChatLog, addChatEntry, saveChatLog, deleteChatLog,
 } from "./chatLog";
+import { generateMap, GeneratedMap } from "./utils/mapGenerator";
+
+const roomMaps = new Map<string, GeneratedMap>();
 
 export function registerSocketHandlers(io: Server) {
   io.on("connection", (socket: Socket) => {
@@ -28,6 +31,10 @@ export function registerSocketHandlers(io: Server) {
 
       const usersInRoom = getUserListForRoom(roomCode);
       io.to(roomCode).emit("room_users", usersInRoom);
+
+      if (roomMaps.has(roomCode)) {
+        socket.emit("start_game", roomMaps.get(roomCode));
+      }
     });
 
     socket.on("chat_message", ({ text, sender }) => {
@@ -43,10 +50,12 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
-    socket.on("start_game", (mapIndex) => {
+    socket.on("start_game", () => {
       const user = getUser(socket.id);
       if (user) {
-        socket.to(user.roomCode).emit("start_game", mapIndex);
+        const mapData = generateMap(15, 15);
+        roomMaps.set(user.roomCode, mapData);
+        io.to(user.roomCode).emit("start_game", mapData);
       }
     });
 
@@ -104,6 +113,7 @@ export function registerSocketHandlers(io: Server) {
       const user = getUser(socket.id);
       if (user) {
         saveChatLog(user.roomCode, getPlayerNamesInRoom(user.roomCode));
+        roomMaps.delete(user.roomCode);
         io.to(user.roomCode).emit("return_to_lobby");
       }
     });
@@ -115,6 +125,7 @@ export function registerSocketHandlers(io: Server) {
         if (isRoomEmpty(user.roomCode)) {
           saveChatLog(user.roomCode, []);
           deleteChatLog(user.roomCode);
+          roomMaps.delete(user.roomCode);
         } else {
           socket.to(user.roomCode).emit("user_left", { username: user.username, role: user.role });
           const usersInRoom = getUserListForRoom(user.roomCode);
