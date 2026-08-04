@@ -1,7 +1,7 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import * as Blockly from "blockly";
 import { useSocketStore } from "../store/useSocketStore";
-import { getMapData } from "../data/maps";
+
 import { MAX_BLOCKS } from "../constants/game";
 
 import { useTutorial } from "../hooks/useTutorial";
@@ -16,10 +16,13 @@ import TopRightMenu from "../components/TopRightMenu";
 import BlockCodePanel from "../components/driver/BlockCodePanel";
 
 export default function GameScreen() {
-  const { socket, role, setRole, selectedMapIndex, setSelectedMapIndex, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft, players, leaveStage } = useSocketStore();
+  const { socket, role, setRole, mapData: serverMapData, selectedMapIndex, setSelectedMapIndex, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft, players, leaveStage } = useSocketStore();
 
   // --- Map Data ---
-  const mapData = getMapData(selectedMapIndex);
+  if (!serverMapData) {
+    return <div className="min-h-screen flex items-center justify-center text-white bg-black font-pixel text-2xl">Generating Map...</div>;
+  }
+  const mapData = serverMapData;
   const { walls: WALLS, start: START, goal: GOAL } = mapData;
 
   // --- Game State ---

@@ -22,6 +22,15 @@ interface SocketState {
   currentScreen: ScreenState;
   players: { username: string; role: string }[];
   selectedMapIndex: number;
+  mapData: {
+    map: string[];
+    walls: { x: number; y: number }[];
+    traps: { x: number; y: number }[];
+    rocks: { x: number; y: number }[];
+    spikes: { x: number; y: number }[];
+    start: { x: number; y: number };
+    goal: { x: number; y: number };
+  } | null;
   dungeonTimeLeft: number;
   swapTimeLeft: number;
   joinError: string | null;
@@ -57,6 +66,7 @@ export const useSocketStore = create<SocketState>()(
   currentScreen: 'landing',
   players: [],
   selectedMapIndex: 0,
+  mapData: null,
   dungeonTimeLeft: 300,
   swapTimeLeft: 120,
   joinError: null,
@@ -90,8 +100,8 @@ export const useSocketStore = create<SocketState>()(
       set({ players: users });
     });
 
-    socket.on('start_game', (mapIndex: number) => {
-      set({ currentScreen: 'game', selectedMapIndex: mapIndex !== undefined ? mapIndex : 0 });
+    socket.on('start_game', (mapData: any) => {
+      set({ currentScreen: 'game', mapData });
     });
 
     socket.on('return_to_lobby', () => {
@@ -131,8 +141,8 @@ export const useSocketStore = create<SocketState>()(
       set({ players: users });
     });
 
-    socket.on('start_game', (mapIndex: number) => {
-      set({ currentScreen: 'game', selectedMapIndex: mapIndex !== undefined ? mapIndex : 0 });
+    socket.on('start_game', (mapData: any) => {
+      set({ currentScreen: 'game', mapData });
     });
 
     socket.on('return_to_lobby', () => {
@@ -149,17 +159,10 @@ export const useSocketStore = create<SocketState>()(
   },
 
   startGame: () => {
-    const { socket, roomCode, selectedMapIndex: prevMapIndex } = get();
+    const { socket, roomCode } = get();
     if (socket && roomCode) {
-      let mapIndex = Math.floor(Math.random() * 3);
-      // ถ้าสุ่มได้แมพเดิม ให้บวก 1 แล้ว mod 3 (รับประกันว่าจะเปลี่ยนแมพ)
-      if (mapIndex === prevMapIndex) {
-        mapIndex = (mapIndex + 1) % 3;
-      }
-
-      socket.emit('start_game', mapIndex);
-      socket.emit('sync_game_state', { selectedMapIndex: mapIndex });
-      set({ currentScreen: 'game', selectedMapIndex: mapIndex, dungeonTimeLeft: 300, swapTimeLeft: 120 });
+      socket.emit('start_game');
+      // Wait for server to reply with start_game and mapData
     }
   },
 
@@ -218,8 +221,8 @@ export const useSocketStore = create<SocketState>()(
       set({ players: users });
     });
 
-    newSocket.on('start_game', (mapIndex: number) => {
-      set({ currentScreen: 'game', selectedMapIndex: mapIndex !== undefined ? mapIndex : 0 });
+    newSocket.on('start_game', (mapData: any) => {
+      set({ currentScreen: 'game', mapData });
     });
 
     newSocket.on('user_left', () => {
@@ -244,6 +247,7 @@ export const useSocketStore = create<SocketState>()(
         role: state.role,
         currentScreen: state.currentScreen,
         selectedMapIndex: state.selectedMapIndex,
+        mapData: state.mapData,
         dungeonTimeLeft: state.dungeonTimeLeft,
         swapTimeLeft: state.swapTimeLeft,
         isMuted: state.isMuted,
