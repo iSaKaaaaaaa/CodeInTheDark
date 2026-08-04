@@ -27,43 +27,79 @@ class SeededRandom {
   }
 }
 
-function chooseStartGoal(
+function chooseStartNode(
   logicalWidth: number,
   logicalHeight: number,
   rng: SeededRandom
-): { start: { x: number; y: number }; goal: { x: number; y: number } } {
-  const borderNodes: [number, number][] = [];
+): { startPhysical: { x: number; y: number }; startLogical: [number, number] } {
+  const borderEdges: { logical: [number, number]; physical: [number, number] }[] = [];
+  
   for (let y = 0; y < logicalHeight; y++) {
-    for (let x = 0; x < logicalWidth; x++) {
-      if (x === 0 || x === logicalWidth - 1 || y === 0 || y === logicalHeight - 1) {
-        borderNodes.push([x, y]);
-      }
-    }
+    borderEdges.push({ logical: [0, y], physical: [0, y * 2 + 1] });
+    borderEdges.push({ logical: [logicalWidth - 1, y], physical: [logicalWidth * 2, y * 2 + 1] });
+  }
+  for (let x = 0; x < logicalWidth; x++) {
+    borderEdges.push({ logical: [x, 0], physical: [x * 2 + 1, 0] });
+    borderEdges.push({ logical: [x, logicalHeight - 1], physical: [x * 2 + 1, logicalHeight * 2] });
   }
 
-  const startLogical = rng.choice(borderNodes);
-
-  const allNodes: [number, number][] = [];
-  for (let y = 0; y < logicalHeight; y++) {
-    for (let x = 0; x < logicalWidth; x++) {
-      if (!(x === startLogical[0] && y === startLogical[1])) {
-        allNodes.push([x, y]);
-      }
-    }
-  }
-
-  const minDist = Math.max(2, Math.floor((logicalWidth + logicalHeight) / 3));
-  const farCandidates = allNodes.filter(([gx, gy]) => {
-    const dist = Math.abs(gx - startLogical[0]) + Math.abs(gy - startLogical[1]);
-    return dist >= minDist;
-  });
-
-  const goalLogical = rng.choice(farCandidates.length > 0 ? farCandidates : allNodes);
+  const chosenStart = rng.choice(borderEdges);
 
   return {
-    start: { x: startLogical[0] * 2, y: startLogical[1] * 2 },
-    goal: { x: goalLogical[0] * 2, y: goalLogical[1] * 2 },
+    startPhysical: { x: chosenStart.physical[0], y: chosenStart.physical[1] },
+    startLogical: chosenStart.logical,
   };
+}
+
+function findGoalByDistance(
+  startLogical: [number, number],
+  adjacency: Map<string, Set<string>>,
+  rng: SeededRandom,
+  minDist: number,
+  maxDist: number
+): { x: number; y: number } {
+  const toKey = (cell: [number, number]) => `${cell[0]},${cell[1]}`;
+  const fromKey = (key: string) => key.split(",").map(Number) as [number, number];
+
+  const distances = new Map<string, number>();
+  const queue: [string, number][] = [[toKey(startLogical), 0]];
+  distances.set(toKey(startLogical), 0);
+
+  while (queue.length > 0) {
+    const [currKey, dist] = queue.shift()!;
+    const neighbors = adjacency.get(currKey);
+    if (neighbors) {
+      for (const nKey of neighbors) {
+        if (!distances.has(nKey)) {
+          distances.set(nKey, dist + 1);
+          queue.push([nKey, dist + 1]);
+        }
+      }
+    }
+  }
+
+  const validCandidates: [number, number][] = [];
+  let maxDistance = 0;
+  let furthestNode: [number, number] | null = null;
+
+  for (const [key, dist] of distances.entries()) {
+    if (dist >= minDist && dist <= maxDist) {
+      validCandidates.push(fromKey(key));
+    }
+    if (dist > maxDistance) {
+      maxDistance = dist;
+      furthestNode = fromKey(key);
+    }
+  }
+
+  if (validCandidates.length > 0) {
+    const chosen = rng.choice(validCandidates);
+    return { x: chosen[0] * 2 + 1, y: chosen[1] * 2 + 1 };
+  } else if (furthestNode) {
+    return { x: furthestNode[0] * 2 + 1, y: furthestNode[1] * 2 + 1 };
+  } else {
+    return { x: startLogical[0] * 2 + 1, y: startLogical[1] * 2 + 1 };
+  }
 }
 
 function generateGrowingTree(
@@ -133,12 +169,11 @@ export function generateMap(
   const resolvedSeed = seed !== undefined ? seed : Math.floor(Math.random() * 1000000);
   const rng = new SeededRandom(resolvedSeed);
 
-  const logicalWidth = Math.floor((physicalWidth + 1) / 2);
-  const logicalHeight = Math.floor((physicalHeight + 1) / 2);
+  const logicalWidth = Math.floor((physicalWidth - 1) / 2);
+  const logicalHeight = Math.floor((physicalHeight - 1) / 2);
 
-  const { start, goal } = chooseStartGoal(logicalWidth, logicalHeight, rng);
+  const { startPhysical, startLogical } = chooseStartNode(logicalWidth, logicalHeight, rng);
 
-  const startLogical: [number, number] = [start.x / 2, start.y / 2];
   const newestProbability = 0.65;
 
   const logicalAdjacency = generateGrowingTree(
@@ -149,19 +184,23 @@ export function generateMap(
     newestProbability
   );
 
+  const goalPhysical = findGoalByDistance(startLogical, logicalAdjacency, rng, 12, 15);
+
   const walkable = new Set<string>();
   const toKey = (x: number, y: number) => `${x},${y}`;
 
-  walkable.add(toKey(startLogical[0] * 2, startLogical[1] * 2));
+  walkable.add(toKey(startPhysical.x, startPhysical.y));
+  walkable.add(toKey(startLogical[0] * 2 + 1, startLogical[1] * 2 + 1));
 
   for (const [key, neighbors] of logicalAdjacency.entries()) {
     const [cx, cy] = key.split(",").map(Number);
-    walkable.add(toKey(cx * 2, cy * 2));
+    const px = cx * 2 + 1;
+    const py = cy * 2 + 1;
+    walkable.add(toKey(px, py));
     for (const neighborKey of neighbors) {
       const [nx, ny] = neighborKey.split(",").map(Number);
-      walkable.add(toKey(cx * 2, cy * 2));
-      walkable.add(toKey(nx * 2, ny * 2));
-      walkable.add(toKey(cx + nx, cy + ny));
+      walkable.add(toKey(nx * 2 + 1, ny * 2 + 1));
+      walkable.add(toKey(cx + nx + 1, cy + ny + 1));
     }
   }
 
@@ -171,9 +210,9 @@ export function generateMap(
   for (let y = 0; y < physicalHeight; y++) {
     let rowStr = "";
     for (let x = 0; x < physicalWidth; x++) {
-      if (x === start.x && y === start.y) {
+      if (x === startPhysical.x && y === startPhysical.y) {
         rowStr += "P";
-      } else if (x === goal.x && y === goal.y) {
+      } else if (x === goalPhysical.x && y === goalPhysical.y) {
         rowStr += "G";
       } else if (walkable.has(toKey(x, y))) {
         rowStr += ".";
@@ -191,7 +230,7 @@ export function generateMap(
     traps: [],
     rocks: [],
     spikes: [],
-    start,
-    goal,
+    start: startPhysical,
+    goal: goalPhysical,
   };
 }

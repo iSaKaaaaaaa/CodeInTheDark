@@ -101,7 +101,7 @@ export const useSocketStore = create<SocketState>()(
     });
 
     socket.on('start_game', (mapData: any) => {
-      set({ currentScreen: 'game', mapData });
+      set({ currentScreen: 'game', mapData, dungeonTimeLeft: 300, swapTimeLeft: 120 });
     });
 
     socket.on('return_to_lobby', () => {
@@ -142,7 +142,7 @@ export const useSocketStore = create<SocketState>()(
     });
 
     socket.on('start_game', (mapData: any) => {
-      set({ currentScreen: 'game', mapData });
+      set({ currentScreen: 'game', mapData, dungeonTimeLeft: 300, swapTimeLeft: 120 });
     });
 
     socket.on('return_to_lobby', () => {
@@ -222,7 +222,7 @@ export const useSocketStore = create<SocketState>()(
     });
 
     newSocket.on('start_game', (mapData: any) => {
-      set({ currentScreen: 'game', mapData });
+      set({ currentScreen: 'game', mapData, dungeonTimeLeft: 300, swapTimeLeft: 120 });
     });
 
     newSocket.on('user_left', () => {
