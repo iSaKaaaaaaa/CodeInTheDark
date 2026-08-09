@@ -59,16 +59,26 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
-    socket.on("end_game", ({ result }: { result: string }) => {
+    socket.on("end_game", (data: { result: string; timeUsed?: number; blocksUsed?: number }) => {
       const user = getUser(socket.id);
       if (user) {
         const entry: ChatLogEntry = {
           sender: "[SYSTEM]",
-          text: `Game ended: ${result}`,
+          text: `Game ended: ${data.result}`,
           timestamp: new Date().toISOString(),
         };
         addChatEntry(user.roomCode, entry);
-        saveChatLog(user.roomCode, getPlayerNamesInRoom(user.roomCode));
+
+        let gameMetrics;
+        if (data.timeUsed !== undefined && data.blocksUsed !== undefined) {
+          gameMetrics = {
+            result: data.result,
+            timeUsed: data.timeUsed,
+            blocksUsed: data.blocksUsed,
+          };
+        }
+
+        saveChatLog(user.roomCode, getPlayerNamesInRoom(user.roomCode), gameMetrics, roomMaps.get(user.roomCode));
         io.to(user.roomCode).emit("chat_log_saved");
       }
     });
@@ -112,7 +122,7 @@ export function registerSocketHandlers(io: Server) {
     socket.on("return_to_lobby", () => {
       const user = getUser(socket.id);
       if (user) {
-        saveChatLog(user.roomCode, getPlayerNamesInRoom(user.roomCode));
+        saveChatLog(user.roomCode, getPlayerNamesInRoom(user.roomCode), undefined, roomMaps.get(user.roomCode));
         roomMaps.delete(user.roomCode);
         io.to(user.roomCode).emit("return_to_lobby");
       }
@@ -123,7 +133,7 @@ export function registerSocketHandlers(io: Server) {
       const user = removeUserFromRoom(socket.id);
       if (user) {
         if (isRoomEmpty(user.roomCode)) {
-          saveChatLog(user.roomCode, []);
+          saveChatLog(user.roomCode, [], undefined, roomMaps.get(user.roomCode));
           deleteChatLog(user.roomCode);
           roomMaps.delete(user.roomCode);
         } else {

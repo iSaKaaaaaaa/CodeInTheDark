@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import { ChatLogEntry, ChatLogData } from "./types";
+import { GeneratedMap } from "./utils/mapGenerator";
 
 const LOGS_DIR = path.join(__dirname, "..", "logs");
 
@@ -19,22 +20,40 @@ export function initChatLog(roomCode: string) {
 }
 
 export function addChatEntry(roomCode: string, entry: ChatLogEntry) {
+  if (!chatLogs.has(roomCode)) {
+    chatLogs.set(roomCode, []);
+  }
   chatLogs.get(roomCode)?.push(entry);
 }
 
 export function saveChatLog(
   roomCode: string,
-  playerNames: string[]
+  playerNames: string[],
+  gameMetrics?: {
+    result: string;
+    timeUsed: number;
+    blocksUsed: number;
+  },
+  mapData?: GeneratedMap
 ) {
   const logs = chatLogs.get(roomCode);
   if (!logs || logs.length === 0) return;
 
+  const playerMessages = logs.filter((log) => log.sender !== "[SYSTEM]");
+  const chatCharCount = playerMessages.reduce((sum, log) => sum + (log.text ? log.text.replace(/\s/g, "").length : 0), 0);
+
   const logData: ChatLogData = {
     roomCode,
     players: playerNames,
+    mapData: mapData && mapData.map ? { map: mapData.map } : undefined,
     startedAt: logs[0]?.timestamp || new Date().toISOString(),
     endedAt: new Date().toISOString(),
-    messageCount: logs.length,
+    gameMetrics: gameMetrics ? {
+      result: gameMetrics.result,
+      "timeUsed(seconds)": gameMetrics.timeUsed,
+      "blocksUsed(blocks)": gameMetrics.blocksUsed,
+      chatCharCount,
+    } : undefined,
     messages: logs,
   };
 
@@ -44,6 +63,8 @@ export function saveChatLog(
 
   fs.writeFileSync(filePath, JSON.stringify(logData, null, 2), "utf-8");
   console.log(`Chat log saved: ${fileName} (${logs.length} messages)`);
+
+  chatLogs.delete(roomCode);
 }
 
 export function deleteChatLog(roomCode: string) {

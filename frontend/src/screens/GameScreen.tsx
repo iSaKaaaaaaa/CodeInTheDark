@@ -16,7 +16,8 @@ import TopRightMenu from "../components/TopRightMenu";
 import BlockCodePanel from "../components/driver/BlockCodePanel";
 
 export default function GameScreen() {
-  const { socket, role, setRole, mapData: serverMapData, startGame, selectedMapIndex, setSelectedMapIndex, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft, players, leaveStage } = useSocketStore();
+  const { username, socket, role, setRole, mapData: serverMapData, startGame, selectedMapIndex, setSelectedMapIndex, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft, players, leaveStage } = useSocketStore();
+  const isHost = players.length > 0 ? players[0].username === username : role === 'driver';
 
   // --- Map Data ---
   if (!serverMapData) {
@@ -336,13 +337,13 @@ export default function GameScreen() {
                 </div>
                 <div className="absolute bottom-[20%] flex gap-4 md:gap-6 w-full justify-center px-8">
                   <button className="bg-[#78716c] border-[3px] border-[#44403c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full hover:bg-[#57534e] active:scale-95 transition-all shadow-[0_4px_0_#44403c] active:shadow-none active:translate-y-1" onClick={leaveStage}>QUIT</button>
-                  {role === "driver" ? (
+                  {isHost ? (
                     <>
                       <button className="bg-transparent border-[3px] border-[#B28B29] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-8 text-xl md:text-2xl rounded-full hover:bg-white/20 active:scale-95 transition-all shadow-md" onClick={resetGameToNewStart}>RESTART</button>
                       <button className="bg-[#ea580c] border-[3px] border-[#c2410c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full hover:bg-[#c2410c] active:scale-95 transition-all shadow-[0_4px_0_#9a3412] active:shadow-none active:translate-y-1" onClick={startGame}>NEXT</button>
                     </>
                   ) : (
-                    <div className="bg-[#ea580c]/50 border-[3px] border-[#c2410c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full shadow-md flex items-center">WAITING FOR DRIVER...</div>
+                    <div className="bg-[#ea580c]/50 border-[3px] border-[#c2410c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full shadow-md flex items-center">WAITING FOR HOST...</div>
                   )}
                 </div>
               </div>
@@ -367,10 +368,10 @@ export default function GameScreen() {
               </div>
               <div className="absolute bottom-[20%] flex gap-4 md:gap-8 w-full justify-center px-8">
                 <button className="bg-[#78716c] border-[3px] border-[#44403c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full hover:bg-[#57534e] active:scale-95 transition-all shadow-[0_4px_0_#44403c] active:shadow-none active:translate-y-1" onClick={leaveStage}>QUIT</button>
-                {role === "driver" ? (
+                {isHost ? (
                   <button className="bg-[#ea580c] border-[3px] border-[#c2410c] text-white font-pixel font-bold py-2 md:py-3 px-8 md:px-12 text-xl md:text-2xl rounded-full hover:bg-[#c2410c] active:scale-95 transition-all shadow-[0_4px_0_#9a3412] active:shadow-none active:translate-y-1" onClick={resetGameToNewStart}>RETRY</button>
                 ) : (
-                  <div className="bg-[#dc2626]/50 border-[3px] border-[#991b1b] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full shadow-md flex items-center">WAITING FOR DRIVER...</div>
+                  <div className="bg-[#dc2626]/50 border-[3px] border-[#991b1b] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full shadow-md flex items-center">WAITING FOR HOST...</div>
                 )}
               </div>
             </div>

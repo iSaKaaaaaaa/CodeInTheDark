@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import * as Blockly from "blockly";
 import { Socket } from "socket.io-client";
+import { DUNGEON_TIME } from "../constants/game";
 
 interface MapData {
   walls: { x: number; y: number }[];
@@ -215,9 +216,15 @@ export function useGameMovement({
 
       if (currentX === GOAL.x && currentY === GOAL.y) {
         setIsWin(true);
+        const nextQuota = availableQuotaRef.current - blocksToUse;
         if (socket) {
           socket.emit("game_win");
-          socket.emit("end_game", { result: "win" });
+          const timeUsed = Math.max(0, DUNGEON_TIME - dungeonTimeLeft);
+          socket.emit("end_game", {
+            result: "win",
+            timeUsed,
+            blocksUsed: maxBlocks - nextQuota
+          });
         }
         workspaceRef.current.highlightBlock(null);
         if (socket) socket.emit("highlight_block", null);
@@ -225,7 +232,6 @@ export function useGameMovement({
         await sleep(500);
         setIsWin(true);
 
-        const nextQuota = availableQuotaRef.current - blocksToUse;
         availableQuotaRef.current = nextQuota;
         setAvailableQuota(nextQuota);
         setBlocksLeft(nextQuota);
@@ -254,7 +260,12 @@ export function useGameMovement({
       setIsLose(true);
       setLoseReason("blocks");
       if (socket) {
-        socket.emit("end_game", { result: "lose_blocks" });
+        const timeUsed = Math.max(0, DUNGEON_TIME - dungeonTimeLeft);
+        socket.emit("end_game", {
+          result: "lose_blocks",
+          timeUsed,
+          blocksUsed: maxBlocks - nextQuota
+        });
       }
       emitGameState({
         playerX: currentX, playerY: currentY, direction: currentDirection,
