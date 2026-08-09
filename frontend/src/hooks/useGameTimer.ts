@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Socket } from "socket.io-client";
+import { DUNGEON_TIME, MAX_BLOCKS } from "../constants/game";
 
 interface UseGameTimerOptions {
   socket: Socket | null;
@@ -53,7 +54,12 @@ export function useGameTimer({
               isLose: true,
               loseReason: "time",
             });
-            socket.emit("end_game", { result: "lose_time" });
+            const blocksUsed = MAX_BLOCKS - availableQuotaRef.current;
+            socket.emit("end_game", {
+              result: "lose_time",
+              timeUsed: DUNGEON_TIME,
+              blocksUsed
+            });
           }
           return 0;
         }

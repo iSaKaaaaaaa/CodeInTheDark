@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { io, Socket } from 'socket.io-client';
+import { DUNGEON_TIME, SWAP_TIME } from '../constants/game';
 
 export type ScreenState = 'landing' | 'login' | 'select' | 'create' | 'join' | 'game';
 
@@ -67,8 +68,8 @@ export const useSocketStore = create<SocketState>()(
   players: [],
   selectedMapIndex: 0,
   mapData: null,
-  dungeonTimeLeft: 300,
-  swapTimeLeft: 120,
+  dungeonTimeLeft: DUNGEON_TIME,
+  swapTimeLeft: SWAP_TIME,
   joinError: null,
   isMuted: false,
 
@@ -101,7 +102,7 @@ export const useSocketStore = create<SocketState>()(
     });
 
     socket.on('start_game', (mapData: any) => {
-      set({ currentScreen: 'game', mapData, dungeonTimeLeft: 300, swapTimeLeft: 120 });
+      set({ currentScreen: 'game', mapData, dungeonTimeLeft: DUNGEON_TIME, swapTimeLeft: SWAP_TIME });
     });
 
     socket.on('return_to_lobby', () => {
@@ -142,7 +143,7 @@ export const useSocketStore = create<SocketState>()(
     });
 
     socket.on('start_game', (mapData: any) => {
-      set({ currentScreen: 'game', mapData, dungeonTimeLeft: 300, swapTimeLeft: 120 });
+      set({ currentScreen: 'game', mapData, dungeonTimeLeft: DUNGEON_TIME, swapTimeLeft: SWAP_TIME });
     });
 
     socket.on('return_to_lobby', () => {
@@ -222,7 +223,7 @@ export const useSocketStore = create<SocketState>()(
     });
 
     newSocket.on('start_game', (mapData: any) => {
-      set({ currentScreen: 'game', mapData, dungeonTimeLeft: 300, swapTimeLeft: 120 });
+      set({ currentScreen: 'game', mapData, dungeonTimeLeft: DUNGEON_TIME, swapTimeLeft: SWAP_TIME });
     });
 
     newSocket.on('user_left', () => {

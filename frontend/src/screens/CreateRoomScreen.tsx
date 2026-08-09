@@ -5,6 +5,7 @@ import TopRightMenu from "../components/TopRightMenu";
 
 export default function CreateRoomScreen() {
   const { username, roomCode, role, players, leaveRoom, createRoom, startGame } = useSocketStore();
+  const isHost = players.length > 0 ? players[0].username === username : role === 'driver';
 
   // Create room when the component mounts if not already created
   // Note: For joiners, roomCode will already exist, so createRoom won't fire.
@@ -83,7 +84,7 @@ export default function CreateRoomScreen() {
               {players.length > 1 ? players[1].username : "Waiting..."}
             </span>
             {players.length > 1 && (
-              <span className="ml-auto text-blue-700 font-bold tracking-widest text-xl">NAVIGATOR</span>
+              <span className="ml-auto text-blue-700 font-bold tracking-widest text-xl">GUEST</span>
             )}
           </div>
         </div>
@@ -91,7 +92,7 @@ export default function CreateRoomScreen() {
         
         <div className="w-full flex justify-end items-end px-12 mt-auto">
           
-          {role === 'driver' ? (
+          {isHost ? (
             <PixelButton 
               variant="orange" 
               className="px-12 py-3 text-2xl rounded-xl"
