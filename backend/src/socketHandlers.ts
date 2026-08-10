@@ -5,7 +5,7 @@ import {
   hasRoom, getPlayerNamesInRoom, getUserListForRoom, isRoomEmpty,
 } from "./roomManager";
 import {
-  initChatLog, addChatEntry, saveChatLog, deleteChatLog,
+  initChatLog, addChatEntry, saveChatLog, deleteChatLog, addRunAttempt
 } from "./chatLog";
 import { generateMap, GeneratedMap } from "./utils/mapGenerator";
 
@@ -56,6 +56,16 @@ export function registerSocketHandlers(io: Server) {
         const mapData = generateMap(15, 15);
         roomMaps.set(user.roomCode, mapData);
         io.to(user.roomCode).emit("start_game", mapData);
+      }
+    });
+
+    socket.on("run_attempt", (blocks: string[]) => {
+      const user = getUser(socket.id);
+      if (user) {
+        addRunAttempt(user.roomCode, {
+          timestamp: new Date().toISOString(),
+          blocks,
+        });
       }
     });
 

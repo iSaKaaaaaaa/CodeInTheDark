@@ -119,10 +119,16 @@ export function useGameMovement({
     const blocksToUse = workspaceRef.current.getAllBlocks(false).length;
 
     const commandBlocks: any[] = [];
+    const blockTypes: string[] = [];
     let block = topBlocks[0];
     while (block) {
       commandBlocks.push(block);
+      blockTypes.push(block.type);
       block = block.getNextBlock() as any;
+    }
+
+    if (socket && blockTypes.length > 0) {
+      socket.emit("run_attempt", blockTypes);
     }
 
     let currentX = playerX;

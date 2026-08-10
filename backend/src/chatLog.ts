@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { ChatLogEntry, ChatLogData } from "./types";
+import { ChatLogEntry, ChatLogData, RunAttempt } from "./types";
 import { GeneratedMap } from "./utils/mapGenerator";
 
 const LOGS_DIR = path.join(__dirname, "..", "logs");
@@ -12,11 +12,23 @@ if (!fs.existsSync(LOGS_DIR)) {
 
 // Map roomCode -> ChatLogEntry[]
 const chatLogs = new Map<string, ChatLogEntry[]>();
+// Map roomCode -> RunAttempt[]
+const runAttemptsMap = new Map<string, RunAttempt[]>();
 
 export function initChatLog(roomCode: string) {
   if (!chatLogs.has(roomCode)) {
     chatLogs.set(roomCode, []);
   }
+  if (!runAttemptsMap.has(roomCode)) {
+    runAttemptsMap.set(roomCode, []);
+  }
+}
+
+export function addRunAttempt(roomCode: string, attempt: RunAttempt) {
+  if (!runAttemptsMap.has(roomCode)) {
+    runAttemptsMap.set(roomCode, []);
+  }
+  runAttemptsMap.get(roomCode)?.push(attempt);
 }
 
 export function addChatEntry(roomCode: string, entry: ChatLogEntry) {
@@ -42,6 +54,8 @@ export function saveChatLog(
   const playerMessages = logs.filter((log) => log.sender !== "[SYSTEM]");
   const chatCharCount = playerMessages.reduce((sum, log) => sum + (log.text ? log.text.replace(/\s/g, "").length : 0), 0);
 
+  const attempts = runAttemptsMap.get(roomCode) || [];
+
   const logData: ChatLogData = {
     roomCode,
     players: playerNames,
@@ -54,6 +68,7 @@ export function saveChatLog(
       "blocksUsed(blocks)": gameMetrics.blocksUsed,
       chatCharCount,
     } : undefined,
+    runAttempts: attempts.length > 0 ? attempts : undefined,
     messages: logs,
   };
 
@@ -65,10 +80,12 @@ export function saveChatLog(
   console.log(`Chat log saved: ${fileName} (${logs.length} messages)`);
 
   chatLogs.delete(roomCode);
+  runAttemptsMap.delete(roomCode);
 }
 
 export function deleteChatLog(roomCode: string) {
   chatLogs.delete(roomCode);
+  runAttemptsMap.delete(roomCode);
 }
 
 export function getAllLogs() {
