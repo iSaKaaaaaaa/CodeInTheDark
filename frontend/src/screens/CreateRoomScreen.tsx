@@ -24,7 +24,7 @@ export default function CreateRoomScreen() {
   return (
     <div
       className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center font-pixel cursor-default"
-      style={{ backgroundImage: "url('/land-waitroom.png')" }}
+      style={{ backgroundImage: "url('/ui/land-waitroom.png')" }}
     >
       {/* Top Right Username Badge & Logout */}
       <TopRightMenu />
@@ -33,7 +33,7 @@ export default function CreateRoomScreen() {
       <div
         className="relative w-full max-w-[900px] h-[600px] md:max-w-[1000px] md:h-[650px] flex flex-col items-center pt-24 px-20 pb-16 z-10"
         style={{
-          backgroundImage: "url('/waitroom.png')",
+          backgroundImage: "url('/ui/waitroom.png')",
           backgroundSize: '130% 130%',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',

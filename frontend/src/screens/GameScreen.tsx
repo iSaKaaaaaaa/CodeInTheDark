@@ -158,7 +158,7 @@ export default function GameScreen() {
   return (
     <div
       className="w-full min-h-screen bg-cover bg-center flex flex-col font-pixel cursor-default relative overflow-hidden"
-      style={{ backgroundImage: "url('/ingame.png')" }}
+      style={{ backgroundImage: "url('/ui/ingame.png')" }}
       onClick={handleScreenClick}
     >
       <TopRightMenu />
@@ -326,7 +326,7 @@ export default function GameScreen() {
         return (
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm animate-in fade-in duration-300">
             <div className="relative inline-block max-w-[90vw]">
-              <img src="/win_bg.png" alt="Victory Background" className="w-[800px] max-w-full h-auto drop-shadow-[0_0_30px_rgba(217,119,6,0.6)]" />
+              <img src="/ui/win_bg.png" alt="Victory Background" className="w-[800px] max-w-full h-auto drop-shadow-[0_0_30px_rgba(217,119,6,0.6)]" />
               <div className="absolute inset-0 flex flex-col items-center">
                 <h2 className="absolute top-[10%] text-5xl md:text-7xl font-pixel font-bold text-white tracking-widest" style={{ textShadow: "-3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 6px 0px rgba(0,0,0,0.8)" }}>VICTORY</h2>
                 <div className="absolute top-[35%] flex items-end justify-center gap-6 md:gap-10">
@@ -354,7 +354,7 @@ export default function GameScreen() {
       {isLose && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="relative inline-block max-w-[90vw] grayscale-[0.2]">
-            <img src="/win_bg.png" alt="Defeat Background" className="w-[800px] max-w-full h-auto drop-shadow-[0_0_30px_rgba(220,38,38,0.6)]" />
+            <img src="/ui/win_bg.png" alt="Defeat Background" className="w-[800px] max-w-full h-auto drop-shadow-[0_0_30px_rgba(220,38,38,0.6)]" />
             <div className="absolute inset-0 flex flex-col items-center">
               <h2 className="absolute top-[10%] text-5xl md:text-7xl font-pixel font-bold text-red-500 tracking-widest" style={{ textShadow: "-3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 6px 0px rgba(0,0,0,0.8)" }}>DEFEAT</h2>
               <div className="absolute top-[40%] flex flex-col items-center justify-center w-full px-12">
