@@ -13,8 +13,16 @@ export interface UserInfo {
 export interface ChatLogData {
   roomCode: string;
   players: string[];
+  mapData?: {
+    map: string[];
+  };
   startedAt: string;
   endedAt: string;
-  messageCount: number;
+  gameMetrics?: {
+    result: string;
+    "timeUsed(seconds)": number;
+    "blocksUsed(blocks)": number;
+    chatCharCount: number;
+  };
   messages: ChatLogEntry[];
 }
