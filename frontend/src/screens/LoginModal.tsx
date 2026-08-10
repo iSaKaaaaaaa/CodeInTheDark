@@ -31,24 +31,24 @@ export default function LoginModal() {
       </h2>
 
       <div
-        className="relative w-full max-w-[1200px] h-[750px] md:max-w-[800px] md:h-[600px] flex flex-col items-center justify-center cursor-auto"
+        className="relative w-full max-w-[90vw] md:max-w-[800px] h-[80vh] md:h-[600px] flex flex-col items-center justify-center cursor-auto"
         // ม้วนกระดาษ
         style={{
-          backgroundImage: "url('/score.png')",
-          backgroundSize: '120% 115%',
+          backgroundImage: "url('/ui/score.png')",
+          backgroundSize: '100% 100%',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
         }}
         onClick={(e) => e.stopPropagation()}
       >
         <button
-          className="absolute top-12 left-24 md:left-28 text-black text-4xl font-bold hover:text-orange-700 transition-colors flex items-center gap-2 z-10 drop-shadow-sm font-pixel"
+          className="absolute top-[8%] left-[10%] md:top-12 md:left-28 text-black text-4xl font-bold hover:text-orange-700 transition-colors flex items-center gap-2 z-10 drop-shadow-sm font-pixel"
           onClick={() => setScreen('landing')}
         >
           <span>&#8592;</span>
         </button>
 
-        <div className="w-full px-20 md:px-32 py-8 flex flex-col gap-6 mt-6 font-pixel">
+        <div className="w-full px-12 sm:px-20 md:px-32 py-8 flex flex-col gap-4 md:gap-6 mt-6 font-pixel">
           <InputField label="Username" value={username} onChange={(e) => setUsername(e.target.value)} />
           <InputField label="Password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
           

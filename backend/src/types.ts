@@ -10,6 +10,11 @@ export interface UserInfo {
   username: string;
 }
 
+export interface RunAttempt {
+  timestamp: string;
+  blocks: string[];
+}
+
 export interface ChatLogData {
   roomCode: string;
   players: string[];
@@ -24,5 +29,6 @@ export interface ChatLogData {
     "blocksUsed(blocks)": number;
     chatCharCount: number;
   };
+  runAttempts?: RunAttempt[];
   messages: ChatLogEntry[];
 }

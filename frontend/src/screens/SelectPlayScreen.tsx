@@ -8,7 +8,7 @@ export default function SelectPlayScreen() {
   return (
     <div
       className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center font-pixel cursor-default"
-      style={{ backgroundImage: "url('/landing.png')" }}
+      style={{ backgroundImage: "url('/ui/landing.png')" }}
     >
       {/* Top Right Username Badge & Logout */}
       <TopRightMenu />
@@ -21,7 +21,7 @@ export default function SelectPlayScreen() {
       <div
         className="relative w-full max-w-[800px] h-[500px] flex items-center justify-center"
         style={{
-          backgroundImage: "url('/new-scroll.png')",
+          backgroundImage: "url('/ui/new-scroll.png')",
           backgroundSize: '100% 100%',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
