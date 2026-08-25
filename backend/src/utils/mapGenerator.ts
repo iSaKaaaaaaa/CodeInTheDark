@@ -161,6 +161,51 @@ function generateGrowingTree(
   return adjacency;
 }
 
+function findShortestPath(
+  start: { x: number; y: number },
+  goal: { x: number; y: number },
+  walkable: Set<string>
+): Set<string> {
+  const queue: { x: number; y: number; path: string[] }[] = [
+    { x: start.x, y: start.y, path: [`${start.x},${start.y}`] },
+  ];
+  const visited = new Set<string>();
+  visited.add(`${start.x},${start.y}`);
+
+  while (queue.length > 0) {
+    const { x, y, path } = queue.shift()!;
+    if (x === goal.x && y === goal.y) {
+      return new Set(path);
+    }
+
+    const dirs = [
+      [0, -1],
+      [1, 0],
+      [0, 1],
+      [-1, 0],
+    ];
+    for (const [dx, dy] of dirs) {
+      const nx = x + dx;
+      const ny = y + dy;
+      const key = `${nx},${ny}`;
+      if (walkable.has(key) && !visited.has(key)) {
+        visited.add(key);
+        queue.push({ x: nx, y: ny, path: [...path, key] });
+      }
+    }
+  }
+  return new Set();
+}
+
+function shuffle<T>(array: T[], rng: SeededRandom): T[] {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rng.next() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 export function generateMap(
   physicalWidth: number,
   physicalHeight: number,
@@ -204,17 +249,77 @@ export function generateMap(
     }
   }
 
+  // --- Obstacle Generation ---
+  const startKey = toKey(startPhysical.x, startPhysical.y);
+  const goalKey = toKey(goalPhysical.x, goalPhysical.y);
+  const pathSet = findShortestPath(startPhysical, goalPhysical, walkable);
+
+  // Exclude start neighbors to ensure safe starting area
+  const startNeighbors = new Set<string>();
+  const dirs = [
+    [0, -1],
+    [1, 0],
+    [0, 1],
+    [-1, 0],
+  ];
+  for (const [dx, dy] of dirs) {
+    startNeighbors.add(toKey(startPhysical.x + dx, startPhysical.y + dy));
+  }
+
+  const candidates = Array.from(walkable).filter((key) => {
+    return (
+      key !== startKey &&
+      key !== goalKey &&
+      !pathSet.has(key) &&
+      !startNeighbors.has(key)
+    );
+  });
+
+  const shuffledCandidates = shuffle(candidates, rng);
+
+  // Determine amount of obstacles dynamically based on available wrong paths
+  const numTraps = Math.min(3, Math.floor(shuffledCandidates.length / 3));
+  const numRocks = Math.min(3, Math.floor(shuffledCandidates.length / 3));
+  const numSpikes = Math.min(3, Math.floor(shuffledCandidates.length / 3));
+
+  const trapsKeys = shuffledCandidates.slice(0, numTraps);
+  const rocksKeys = shuffledCandidates.slice(numTraps, numTraps + numRocks);
+  const spikesKeys = shuffledCandidates.slice(
+    numTraps + numRocks,
+    numTraps + numRocks + numSpikes
+  );
+
+  const keyToCoord = (key: string) => {
+    const [x, y] = key.split(",").map(Number);
+    return { x, y };
+  };
+
+  const traps = trapsKeys.map(keyToCoord);
+  const rocks = rocksKeys.map(keyToCoord);
+  const spikes = spikesKeys.map(keyToCoord);
+
+  const trapsSet = new Set(trapsKeys);
+  const rocksSet = new Set(rocksKeys);
+  const spikesSet = new Set(spikesKeys);
+
   const walls: { x: number; y: number }[] = [];
   const mapRows: string[] = [];
 
   for (let y = 0; y < physicalHeight; y++) {
     let rowStr = "";
     for (let x = 0; x < physicalWidth; x++) {
+      const key = toKey(x, y);
       if (x === startPhysical.x && y === startPhysical.y) {
         rowStr += "P";
       } else if (x === goalPhysical.x && y === goalPhysical.y) {
         rowStr += "G";
-      } else if (walkable.has(toKey(x, y))) {
+      } else if (trapsSet.has(key)) {
+        rowStr += "T";
+      } else if (rocksSet.has(key)) {
+        rowStr += "R";
+      } else if (spikesSet.has(key)) {
+        rowStr += "S";
+      } else if (walkable.has(key)) {
         rowStr += ".";
       } else {
         rowStr += "#";
@@ -227,9 +332,9 @@ export function generateMap(
   return {
     map: mapRows,
     walls,
-    traps: [],
-    rocks: [],
-    spikes: [],
+    traps,
+    rocks,
+    spikes,
     start: startPhysical,
     goal: goalPhysical,
   };
