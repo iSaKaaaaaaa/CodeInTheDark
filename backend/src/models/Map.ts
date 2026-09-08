@@ -1,7 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export interface IMap extends Document {
-  _id: string; // The seed as string
+export interface IMap extends Document<string> {
   seed: number;
   timesPlayed: number;
   timesCleared: number;

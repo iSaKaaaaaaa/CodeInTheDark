@@ -13,6 +13,9 @@ export interface UserInfo {
 export interface RunAttempt {
   timestamp: string;
   blocks: string[];
+  attemptNumber?: number;
+  success?: boolean;
+  failReason?: string | null;
 }
 
 export interface ChatLogData {
