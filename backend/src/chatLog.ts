@@ -39,7 +39,7 @@ export async function saveChatLog(
   roomCode: string,
   playerNames: string[],
   gameMetrics?: {
-    result: string;
+    result: 'win' | 'lose';
     timeUsed: number;
     blocksUsed: number;
   },

@@ -5,7 +5,7 @@ export interface IGameSession extends Document {
   hostId: mongoose.Types.ObjectId;
   joinerId: mongoose.Types.ObjectId;
   mapSeed: string;
-  result: 'success' | 'failed';
+  result: 'win' | 'lose';
   timeUsedSeconds: number;
   blocksUsedCount: number;
   blockUsageLog: Record<string, number>;

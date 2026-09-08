@@ -82,7 +82,7 @@ export function registerSocketHandlers(io: Server) {
         let gameMetrics;
         if (data.timeUsed !== undefined && data.blocksUsed !== undefined) {
           gameMetrics = {
-            result: data.result,
+            result: data.result as 'win' | 'lose',
             timeUsed: data.timeUsed,
             blocksUsed: data.blocksUsed,
           };
