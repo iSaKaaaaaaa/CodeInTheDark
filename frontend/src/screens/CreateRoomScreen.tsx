@@ -5,6 +5,7 @@ import TopRightMenu from "../components/TopRightMenu";
 
 export default function CreateRoomScreen() {
   const { username, roomCode, role, players, leaveRoom, createRoom, startGame } = useSocketStore();
+  const isHost = players.length > 0 ? players[0].username === username : role === 'driver';
 
   // Create room when the component mounts if not already created
   // Note: For joiners, roomCode will already exist, so createRoom won't fire.
@@ -24,7 +25,7 @@ export default function CreateRoomScreen() {
   return (
     <div
       className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center font-pixel cursor-default"
-      style={{ backgroundImage: "url('/land-waitroom.png')" }}
+      style={{ backgroundImage: "url('/ui/land-waitroom.png')" }}
     >
       {/* Top Right Username Badge & Logout */}
       <TopRightMenu />
@@ -33,7 +34,7 @@ export default function CreateRoomScreen() {
       <div
         className="relative w-full max-w-[900px] h-[600px] md:max-w-[1000px] md:h-[650px] flex flex-col items-center pt-24 px-20 pb-16 z-10"
         style={{
-          backgroundImage: "url('/waitroom.png')",
+          backgroundImage: "url('/ui/waitroom.png')",
           backgroundSize: '130% 130%',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
@@ -83,7 +84,7 @@ export default function CreateRoomScreen() {
               {players.length > 1 ? players[1].username : "Waiting..."}
             </span>
             {players.length > 1 && (
-              <span className="ml-auto text-blue-700 font-bold tracking-widest text-xl">NAVIGATOR</span>
+              <span className="ml-auto text-blue-700 font-bold tracking-widest text-xl">GUEST</span>
             )}
           </div>
         </div>
@@ -91,7 +92,7 @@ export default function CreateRoomScreen() {
         
         <div className="w-full flex justify-end items-end px-12 mt-auto">
           
-          {role === 'driver' ? (
+          {isHost ? (
             <PixelButton 
               variant="orange" 
               className="px-12 py-3 text-2xl rounded-xl"

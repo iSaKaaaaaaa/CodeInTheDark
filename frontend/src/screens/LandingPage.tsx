@@ -9,7 +9,7 @@ export default function LandingPage({ onStart, contentHidden = false }: LandingP
     <div
       className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat cursor-pointer overflow-hidden font-pixel"
       // ฉากหน้าแรกสุดที่เป็นพระอาทิตย์ขึ้น
-      style={{ backgroundImage: "url('/landing.png')" }}
+      style={{ backgroundImage: "url('/ui/landing.png')" }}
       onClick={onStart}
     >
       {!contentHidden && (

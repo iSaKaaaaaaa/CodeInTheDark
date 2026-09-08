@@ -1,3 +1,10 @@
+const PLAYER_SPRITES: Record<string, string> = {
+  up: "/sprites/player_back.png",
+  down: "/sprites/player_front.png",
+  left: "/sprites/player_left.png",
+  right: "/sprites/player_right.png",
+};
+
 interface Props {
   playerX: number;
   playerY: number;
@@ -35,8 +42,11 @@ export default function GameBoard({
     : undefined;
 
   return (
-    <div className="flex-1 relative w-full h-full flex items-center justify-center">
-      <div className="w-full max-w-[600px] relative pt-10 pl-10 flex items-center justify-center">
+    <div className="flex-1 relative w-full h-full min-h-0 flex items-center justify-center p-2 md:p-4 overflow-hidden @container">
+      <div 
+        className="relative pt-8 pl-8 md:pt-10 md:pl-10 flex items-center justify-center w-full mx-auto"
+        style={{ maxWidth: 'calc(100cqmin - 3rem)' }}
+      >
         
         {/* แถบตัวอักษรบอกพิกัดด้านบน (A-M) */}
         <div className="absolute top-0 left-10 right-0 h-10 flex items-start justify-center">
@@ -81,6 +91,8 @@ export default function GameBoard({
               const isTrap = traps.some((trap) => trap.x === x && trap.y === y);
               const isRock = rocks.some((rock) => rock.x === x && rock.y === y);
               const isSpike = spikes.some((spike) => spike.x === x && spike.y === y);
+              
+              const isSideDirection = direction === "left" || direction === "right";
 
               return (
                 <div
@@ -88,25 +100,28 @@ export default function GameBoard({
                   className="border-b border-r border-[#572e18]/20 flex items-center justify-center bg-amber-50/20 relative"
                 >
                   {isPlayer ? (
-                    <img
-                      src="/player.png"
-                      alt="Player"
-                      className="w-[85%] h-[85%] object-contain z-10 drop-shadow-md transition-transform duration-200"
-                      style={{
-                        transform: `scale(3) ${direction === "left" ? "scaleX(-1)" : ""}`,
-                      }}
-                    />
+                    <div className="absolute inset-0 flex items-end justify-center z-10">
+                      <img
+                        src={PLAYER_SPRITES[direction] || "/sprites/player_back.png"}
+                        alt="Player"
+                        className={`max-w-none object-contain drop-shadow-md transition-all duration-200 origin-bottom ${isSideDirection ? 'w-[150%] h-[150%]' : 'w-[calc(250%-10px)] h-[calc(250%-10px)]'}`}
+                        style={{
+                          transform: isSideDirection ? "translateY(5%)" : "translateY(15%)",
+                          marginBottom: isSideDirection ? "-15%" : "-25%", // ผสมผสาน margin และ transform เพื่อดึงภาพลงมา
+                        }}
+                      />
+                    </div>
                   ) : (isGoal && role !== "navigator") ? (
                     <span className="drop-shadow-md animate-bounce z-10 text-2xl">🚩</span>
                   ) : (isTrap && role !== "navigator") ? (
-                    <img src="/hole.webp" alt="Trap" className="w-[100%] h-[100%] object-contain z-10 drop-shadow-md" title="Trap" />
+                    <img src="/sprites/hole.webp" alt="Trap" className="w-[100%] h-[100%] object-contain z-10 drop-shadow-md" title="Trap" />
                   ) : (isRock && role !== "navigator") ? (
-                    <img src="/rock.webp" alt="Rock" className="w-[100%] h-[100%] object-contain z-10 drop-shadow-md" title="Rock" />
+                    <img src="/sprites/rock.webp" alt="Rock" className="w-[100%] h-[100%] object-contain z-10 drop-shadow-md" title="Rock" />
                   ) : (isSpike && role !== "navigator") ? (
-                    <img src="/spike.webp" alt="Spike" className="w-[100%] h-[100%] object-contain z-10 drop-shadow-md" title="Spike" />
+                    <img src="/sprites/spike.webp" alt="Spike" className="w-[100%] h-[100%] object-contain z-10 drop-shadow-md" title="Spike" />
                   ) : isWall ? (
                     <img
-                      src="/wall.png"
+                      src="/sprites/wall.png"
                       alt="Wall"
                       className="w-full h-full object-cover z-10"
                     />

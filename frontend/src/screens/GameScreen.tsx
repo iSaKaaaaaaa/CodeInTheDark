@@ -1,7 +1,7 @@
 import { useRef, useState, useCallback, useEffect } from "react";
 import * as Blockly from "blockly";
 import { useSocketStore } from "../store/useSocketStore";
-import { getMapData } from "../data/maps";
+
 import { MAX_BLOCKS } from "../constants/game";
 
 import { useTutorial } from "../hooks/useTutorial";
@@ -16,10 +16,14 @@ import TopRightMenu from "../components/TopRightMenu";
 import BlockCodePanel from "../components/driver/BlockCodePanel";
 
 export default function GameScreen() {
-  const { socket, role, setRole, selectedMapIndex, setSelectedMapIndex, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft, players, leaveStage } = useSocketStore();
+  const { username, socket, role, setRole, mapData: serverMapData, startGame, selectedMapIndex, setSelectedMapIndex, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft, players, leaveStage } = useSocketStore();
+  const isHost = players.length > 0 ? players[0].username === username : role === 'driver';
 
   // --- Map Data ---
-  const mapData = getMapData(selectedMapIndex);
+  if (!serverMapData) {
+    return <div className="min-h-screen flex items-center justify-center text-white bg-black font-pixel text-2xl">Generating Map...</div>;
+  }
+  const mapData = serverMapData;
   const { walls: WALLS, start: START, goal: GOAL } = mapData;
 
   // --- Game State ---
@@ -96,13 +100,13 @@ export default function GameScreen() {
   });
 
   // --- Map change reset ---
-  const prevMapIndexRef = useRef(selectedMapIndex);
+  const prevMapDataRef = useRef(mapData);
   useEffect(() => {
-    if (prevMapIndexRef.current !== selectedMapIndex) {
-      prevMapIndexRef.current = selectedMapIndex;
+    if (prevMapDataRef.current !== mapData) {
+      prevMapDataRef.current = mapData;
       resetGameToNewStart();
     }
-  }, [selectedMapIndex, resetGameToNewStart]);
+  }, [mapData, resetGameToNewStart]);
 
   // --- Workspace Ready ---
   const handleWorkspaceReady = useCallback(
@@ -155,7 +159,7 @@ export default function GameScreen() {
   return (
     <div
       className="w-full min-h-screen bg-cover bg-center flex flex-col font-pixel cursor-default relative overflow-hidden"
-      style={{ backgroundImage: "url('/ingame.png')" }}
+      style={{ backgroundImage: "url('/ui/ingame.png')" }}
       onClick={handleScreenClick}
     >
       <TopRightMenu />
@@ -323,7 +327,7 @@ export default function GameScreen() {
         return (
           <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm animate-in fade-in duration-300">
             <div className="relative inline-block max-w-[90vw]">
-              <img src="/win_bg.png" alt="Victory Background" className="w-[800px] max-w-full h-auto drop-shadow-[0_0_30px_rgba(217,119,6,0.6)]" />
+              <img src="/ui/win_bg.png" alt="Victory Background" className="w-[800px] max-w-full h-auto drop-shadow-[0_0_30px_rgba(217,119,6,0.6)]" />
               <div className="absolute inset-0 flex flex-col items-center">
                 <h2 className="absolute top-[10%] text-5xl md:text-7xl font-pixel font-bold text-white tracking-widest" style={{ textShadow: "-3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 6px 0px rgba(0,0,0,0.8)" }}>VICTORY</h2>
                 <div className="absolute top-[35%] flex items-end justify-center gap-6 md:gap-10">
@@ -333,13 +337,13 @@ export default function GameScreen() {
                 </div>
                 <div className="absolute bottom-[20%] flex gap-4 md:gap-6 w-full justify-center px-8">
                   <button className="bg-[#78716c] border-[3px] border-[#44403c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full hover:bg-[#57534e] active:scale-95 transition-all shadow-[0_4px_0_#44403c] active:shadow-none active:translate-y-1" onClick={leaveStage}>QUIT</button>
-                  {role === "driver" ? (
+                  {isHost ? (
                     <>
                       <button className="bg-transparent border-[3px] border-[#B28B29] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-8 text-xl md:text-2xl rounded-full hover:bg-white/20 active:scale-95 transition-all shadow-md" onClick={resetGameToNewStart}>RESTART</button>
-                      <button className="bg-[#ea580c] border-[3px] border-[#c2410c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full hover:bg-[#c2410c] active:scale-95 transition-all shadow-[0_4px_0_#9a3412] active:shadow-none active:translate-y-1" onClick={resetGameToNewStart}>NEXT</button>
+                      <button className="bg-[#ea580c] border-[3px] border-[#c2410c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full hover:bg-[#c2410c] active:scale-95 transition-all shadow-[0_4px_0_#9a3412] active:shadow-none active:translate-y-1" onClick={startGame}>NEXT</button>
                     </>
                   ) : (
-                    <div className="bg-[#ea580c]/50 border-[3px] border-[#c2410c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full shadow-md flex items-center">WAITING FOR DRIVER...</div>
+                    <div className="bg-[#ea580c]/50 border-[3px] border-[#c2410c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full shadow-md flex items-center">WAITING FOR HOST...</div>
                   )}
                 </div>
               </div>
@@ -351,7 +355,7 @@ export default function GameScreen() {
       {isLose && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm animate-in fade-in duration-300">
           <div className="relative inline-block max-w-[90vw] grayscale-[0.2]">
-            <img src="/win_bg.png" alt="Defeat Background" className="w-[800px] max-w-full h-auto drop-shadow-[0_0_30px_rgba(220,38,38,0.6)]" />
+            <img src="/ui/win_bg.png" alt="Defeat Background" className="w-[800px] max-w-full h-auto drop-shadow-[0_0_30px_rgba(220,38,38,0.6)]" />
             <div className="absolute inset-0 flex flex-col items-center">
               <h2 className="absolute top-[10%] text-5xl md:text-7xl font-pixel font-bold text-red-500 tracking-widest" style={{ textShadow: "-3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 6px 0px rgba(0,0,0,0.8)" }}>DEFEAT</h2>
               <div className="absolute top-[40%] flex flex-col items-center justify-center w-full px-12">
@@ -364,10 +368,10 @@ export default function GameScreen() {
               </div>
               <div className="absolute bottom-[20%] flex gap-4 md:gap-8 w-full justify-center px-8">
                 <button className="bg-[#78716c] border-[3px] border-[#44403c] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full hover:bg-[#57534e] active:scale-95 transition-all shadow-[0_4px_0_#44403c] active:shadow-none active:translate-y-1" onClick={leaveStage}>QUIT</button>
-                {role === "driver" ? (
+                {isHost ? (
                   <button className="bg-[#ea580c] border-[3px] border-[#c2410c] text-white font-pixel font-bold py-2 md:py-3 px-8 md:px-12 text-xl md:text-2xl rounded-full hover:bg-[#c2410c] active:scale-95 transition-all shadow-[0_4px_0_#9a3412] active:shadow-none active:translate-y-1" onClick={resetGameToNewStart}>RETRY</button>
                 ) : (
-                  <div className="bg-[#dc2626]/50 border-[3px] border-[#991b1b] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full shadow-md flex items-center">WAITING FOR DRIVER...</div>
+                  <div className="bg-[#dc2626]/50 border-[3px] border-[#991b1b] text-white font-pixel font-bold py-2 md:py-3 px-6 md:px-10 text-xl md:text-2xl rounded-full shadow-md flex items-center">WAITING FOR HOST...</div>
                 )}
               </div>
             </div>

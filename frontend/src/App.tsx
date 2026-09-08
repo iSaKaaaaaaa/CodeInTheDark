@@ -1,5 +1,6 @@
 import LandingPage from "./screens/LandingPage";
 import LoginModal from "./screens/LoginModal";
+import SetUsernameModal from "./screens/SetUsernameModal";
 import SelectPlayScreen from "./screens/SelectPlayScreen";
 import CreateRoomScreen from "./screens/CreateRoomScreen";
 import JoinRoomScreen from "./screens/JoinRoomScreen";
@@ -55,6 +56,13 @@ export default function App() {
           <div className="relative">
             <LandingPage onStart={() => {}} contentHidden={true} />
             <LoginModal />
+          </div>
+        );
+      case 'set_username':
+        return (
+          <div className="relative">
+            <LandingPage onStart={() => {}} contentHidden={true} />
+            <SetUsernameModal />
           </div>
         );
       case 'select':

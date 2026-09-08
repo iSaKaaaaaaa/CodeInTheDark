@@ -5,8 +5,11 @@ import {
   hasRoom, getPlayerNamesInRoom, getUserListForRoom, isRoomEmpty,
 } from "./roomManager";
 import {
-  initChatLog, addChatEntry, saveChatLog, deleteChatLog,
+  initChatLog, addChatEntry, saveChatLog, deleteChatLog, addRunAttempt
 } from "./chatLog";
+import { generateMap, GeneratedMap } from "./utils/mapGenerator";
+
+const roomMaps = new Map<string, GeneratedMap>();
 
 export function registerSocketHandlers(io: Server) {
   io.on("connection", (socket: Socket) => {
@@ -28,6 +31,10 @@ export function registerSocketHandlers(io: Server) {
 
       const usersInRoom = getUserListForRoom(roomCode);
       io.to(roomCode).emit("room_users", usersInRoom);
+
+      if (roomMaps.has(roomCode)) {
+        socket.emit("start_game", roomMaps.get(roomCode));
+      }
     });
 
     socket.on("chat_message", ({ text, sender }) => {
@@ -43,23 +50,45 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
-    socket.on("start_game", (mapIndex) => {
+    socket.on("start_game", () => {
       const user = getUser(socket.id);
       if (user) {
-        socket.to(user.roomCode).emit("start_game", mapIndex);
+        const mapData = generateMap(15, 15);
+        roomMaps.set(user.roomCode, mapData);
+        io.to(user.roomCode).emit("start_game", mapData);
       }
     });
 
-    socket.on("end_game", ({ result }: { result: string }) => {
+    socket.on("run_attempt", (blocks: string[]) => {
+      const user = getUser(socket.id);
+      if (user) {
+        addRunAttempt(user.roomCode, {
+          timestamp: new Date().toISOString(),
+          blocks,
+        });
+      }
+    });
+
+    socket.on("end_game", (data: { result: string; timeUsed?: number; blocksUsed?: number }) => {
       const user = getUser(socket.id);
       if (user) {
         const entry: ChatLogEntry = {
           sender: "[SYSTEM]",
-          text: `Game ended: ${result}`,
+          text: `Game ended: ${data.result}`,
           timestamp: new Date().toISOString(),
         };
         addChatEntry(user.roomCode, entry);
-        saveChatLog(user.roomCode, getPlayerNamesInRoom(user.roomCode));
+
+        let gameMetrics;
+        if (data.timeUsed !== undefined && data.blocksUsed !== undefined) {
+          gameMetrics = {
+            result: data.result,
+            timeUsed: data.timeUsed,
+            blocksUsed: data.blocksUsed,
+          };
+        }
+
+        saveChatLog(user.roomCode, getPlayerNamesInRoom(user.roomCode), gameMetrics, roomMaps.get(user.roomCode));
         io.to(user.roomCode).emit("chat_log_saved");
       }
     });
@@ -103,7 +132,8 @@ export function registerSocketHandlers(io: Server) {
     socket.on("return_to_lobby", () => {
       const user = getUser(socket.id);
       if (user) {
-        saveChatLog(user.roomCode, getPlayerNamesInRoom(user.roomCode));
+        saveChatLog(user.roomCode, getPlayerNamesInRoom(user.roomCode), undefined, roomMaps.get(user.roomCode));
+        roomMaps.delete(user.roomCode);
         io.to(user.roomCode).emit("return_to_lobby");
       }
     });
@@ -113,8 +143,9 @@ export function registerSocketHandlers(io: Server) {
       const user = removeUserFromRoom(socket.id);
       if (user) {
         if (isRoomEmpty(user.roomCode)) {
-          saveChatLog(user.roomCode, []);
+          saveChatLog(user.roomCode, [], undefined, roomMaps.get(user.roomCode));
           deleteChatLog(user.roomCode);
+          roomMaps.delete(user.roomCode);
         } else {
           socket.to(user.roomCode).emit("user_left", { username: user.username, role: user.role });
           const usersInRoom = getUserListForRoom(user.roomCode);
