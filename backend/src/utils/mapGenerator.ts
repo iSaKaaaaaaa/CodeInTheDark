@@ -1,6 +1,7 @@
 import { UserInfo } from "../types";
 
 export interface GeneratedMap {
+  seed: number;
   map: string[];
   walls: { x: number; y: number }[];
   traps: { x: number; y: number }[];
@@ -330,6 +331,7 @@ export function generateMap(
   }
 
   return {
+    seed: resolvedSeed,
     map: mapRows,
     walls,
     traps,

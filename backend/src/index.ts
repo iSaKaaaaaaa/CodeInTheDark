@@ -2,11 +2,20 @@ import express from "express";
 import http from "http";
 import { Server } from "socket.io";
 import cors from "cors";
+import dotenv from "dotenv";
+import { connectDB } from "./config/db";
 import routes from "./routes";
+import authRoutes from "./routes/auth";
 import { registerSocketHandlers } from "./socketHandlers";
+
+dotenv.config();
+connectDB();
 
 const app = express();
 app.use(cors({ origin: true, credentials: true }));
+app.use(express.json());
+
+app.use("/api/auth", authRoutes);
 app.use(routes);
 
 const server = http.createServer(app);

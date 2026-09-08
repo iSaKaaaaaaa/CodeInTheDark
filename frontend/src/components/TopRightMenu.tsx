@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useSocketStore } from "../store/useSocketStore";
 
 export default function TopRightMenu() {
-  const { username, disconnect, currentScreen, leaveStage, isMuted, toggleMute } = useSocketStore();
+  const { username, avatarUrl, coins, disconnect, currentScreen, leaveStage, isMuted, toggleMute } = useSocketStore();
   const [showConfirm, setShowConfirm] = useState(false);
 
   const isGame = currentScreen === 'game';
@@ -18,10 +18,15 @@ export default function TopRightMenu() {
 
   return (
     <>
-      <div className={`fixed z-50 flex flex-col items-end gap-3 ${isGame ? 'top-6 right-4 md:right-8' : 'top-6 right-6'}`}>
-        <div className="bg-amber-800/80 border-2 border-black rounded-full px-4 py-2 flex items-center gap-2 text-white shadow-md">
+      <div className={`fixed z-50 flex flex-col items-end gap-3 ${isGame ? 'top-6 right-4 md:right-8' : 'top-6 right-6'} font-pixel`}>
+        <div className="bg-amber-800/80 border-2 border-black rounded-full px-4 py-2 flex items-center gap-3 text-white shadow-md">
+          {avatarUrl ? (
+            <img src={avatarUrl} alt="Avatar" className="w-8 h-8 rounded-full border border-black" />
+          ) : (
+            <span role="img" aria-label="user" className="bg-white text-amber-900 rounded-full w-8 h-8 flex items-center justify-center text-xs">👤</span>
+          )}
           <span className="font-bold tracking-wider">{username || "PLAYER"}</span>
-          <span role="img" aria-label="user" className="bg-white text-amber-900 rounded-full w-6 h-6 flex items-center justify-center text-xs">👤</span>
+          <span className="text-yellow-400 font-bold ml-2">🪙 {coins}</span>
         </div>
         <button 
           onClick={toggleMute}

@@ -3,21 +3,38 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { io, Socket } from 'socket.io-client';
 import { DUNGEON_TIME, SWAP_TIME } from '../constants/game';
 
-export type ScreenState = 'landing' | 'login' | 'select' | 'create' | 'join' | 'game';
+import axios from 'axios';
+
+export type ScreenState = 'landing' | 'login' | 'set_username' | 'select' | 'create' | 'join' | 'game';
 
 const getBackendUrl = () => {
   if (import.meta.env.VITE_BACKEND_URL) {
     return import.meta.env.VITE_BACKEND_URL;
   }
-  if (typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-    return 'http://localhost:3000';
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:3000';
+    }
+    
+    // Auto-detect VS Code / Github Codespaces port forwarding
+    // e.g., something-5173.use.devtunnels.ms -> something-3000.use.devtunnels.ms
+    if (hostname.includes('-5173') || hostname.includes('-5174') || hostname.includes('-5175')) {
+      return `https://${hostname.replace(/-517[3-5]/, '-3000')}`;
+    }
   }
+  
   return 'https://codeinthedark-backend.fly.dev';
 };
 
 interface SocketState {
   socket: Socket | null;
+  userId: string | null;
   username: string;
+  email: string | null;
+  avatarUrl: string | null;
+  coins: number;
   roomCode: string;
   role: 'driver' | 'navigator' | null;
   currentScreen: ScreenState;
@@ -37,11 +54,12 @@ interface SocketState {
   joinError: string | null;
   isMuted: boolean;
   
-  
   setScreen: (screen: ScreenState) => void;
   setUsername: (username: string) => void;
   setRole: (role: 'driver' | 'navigator') => void;
   
+  loginWithGoogle: (credential: string) => Promise<void>;
+  submitUsername: (username: string) => Promise<void>;
   createRoom: () => void;
   joinRoom: (roomCode: string) => void;
   leaveRoom: () => void;
@@ -61,7 +79,11 @@ export const useSocketStore = create<SocketState>()(
   persist(
     (set, get) => ({
   socket: null,
+  userId: null,
   username: '',
+  email: null,
+  avatarUrl: null,
+  coins: 0,
   roomCode: '',
   role: null,
   currentScreen: 'landing',
@@ -80,6 +102,49 @@ export const useSocketStore = create<SocketState>()(
   setSwapTimeLeft: (time) => set((state) => ({ swapTimeLeft: typeof time === 'function' ? time(state.swapTimeLeft) : time })),
   setJoinError: (error) => set({ joinError: error }),
   toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
+
+  loginWithGoogle: async (credential: string) => {
+    try {
+      const backendUrl = getBackendUrl();
+      const response = await axios.post(`${backendUrl}/api/auth/google`, { credential });
+      const user = response.data;
+      
+      set({
+        userId: user._id,
+        username: user.username || '', // Note: we now use the real username, or empty if new
+        email: user.email,
+        avatarUrl: user.avatarUrl || null,
+        coins: user.coins || 0,
+        currentScreen: user.username ? 'select' : 'set_username'
+      });
+    } catch (error) {
+      console.error('Google login failed:', error);
+      throw error;
+    }
+  },
+
+  submitUsername: async (username: string) => {
+    try {
+      const { userId } = get();
+      if (!userId) throw new Error('Not logged in');
+      
+      const backendUrl = getBackendUrl();
+      const response = await axios.post(`${backendUrl}/api/auth/username`, { userId, username });
+      
+      if (response.data.success) {
+        set({
+          username: response.data.username,
+          currentScreen: 'select'
+        });
+      }
+    } catch (error: any) {
+      console.error('Submit username failed:', error);
+      if (error.response?.data?.error) {
+        throw new Error(error.response.data.error);
+      }
+      throw error;
+    }
+  },
 
   createRoom: () => {
     // Generate 6-digit room code
@@ -243,7 +308,11 @@ export const useSocketStore = create<SocketState>()(
       name: 'codeinthedark-storage',
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
+        userId: state.userId,
         username: state.username,
+        email: state.email,
+        avatarUrl: state.avatarUrl,
+        coins: state.coins,
         roomCode: state.roomCode,
         role: state.role,
         currentScreen: state.currentScreen,
