@@ -16,7 +16,7 @@ import TopRightMenu from "../components/TopRightMenu";
 import BlockCodePanel from "../components/driver/BlockCodePanel";
 
 export default function GameScreen() {
-  const { username, socket, role, setRole, mapData: serverMapData, startGame, selectedMapIndex, setSelectedMapIndex, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft, players, leaveStage } = useSocketStore();
+  const { username, socket, role, setRole, mapData: serverMapData, startGame, setSelectedMapIndex, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft, players, leaveStage } = useSocketStore();
   const isHost = players.length > 0 ? players[0].username === username : role === 'driver';
 
   // --- Map Data ---
