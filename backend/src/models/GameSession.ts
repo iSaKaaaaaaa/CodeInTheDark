@@ -6,6 +6,7 @@ export interface IGameSession extends Document {
   joinerId: mongoose.Types.ObjectId;
   mapSeed: string;
   result: 'win' | 'lose';
+  failReason?: string;
   timeUsedSeconds: number;
   blocksUsedCount: number;
   blockUsageLog: Record<string, number>;
@@ -20,6 +21,7 @@ const GameSessionSchema = new Schema<IGameSession>({
   joinerId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
   mapSeed: { type: String, ref: 'Map', required: true },
   result: { type: String, enum: ['win', 'lose'], required: true },
+  failReason: { type: String, default: null },
   timeUsedSeconds: { type: Number, required: true },
   blocksUsedCount: { type: Number, required: true },
   blockUsageLog: { type: Schema.Types.Mixed, required: true },

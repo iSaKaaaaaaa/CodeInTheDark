@@ -2,10 +2,10 @@ import { Server, Socket } from "socket.io";
 import { ChatLogEntry } from "./types";
 import {
   addUserToRoom, removeUserFromRoom, getUser,
-  hasRoom, getPlayerNamesInRoom, getUserListForRoom, isRoomEmpty,
+  hasRoom, getPlayerNamesInRoom, getUserListForRoom, isRoomEmpty, getRoomUsers
 } from "./roomManager";
 import {
-  initChatLog, addChatEntry, saveChatLog, deleteChatLog, addRunAttempt
+  initChatLog, addChatEntry, saveChatLog, deleteChatLog, addRunAttempt, reinitChatLog, getRunAttemptCount
 } from "./chatLog";
 import { generateMap, GeneratedMap } from "./utils/mapGenerator";
 
@@ -59,17 +59,20 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
-    socket.on("run_attempt", (blocks: string[]) => {
+    socket.on("run_result", (data: { blocks: string[]; success: boolean; failReason: string | null }) => {
       const user = getUser(socket.id);
       if (user) {
         addRunAttempt(user.roomCode, {
           timestamp: new Date().toISOString(),
-          blocks,
+          blocks: data.blocks,
+          attemptNumber: getRunAttemptCount(user.roomCode) + 1,
+          success: data.success,
+          failReason: data.failReason,
         });
       }
     });
 
-    socket.on("end_game", (data: { result: string; timeUsed?: number; blocksUsed?: number }) => {
+    socket.on("end_game", async (data: { result: string; timeUsed?: number; blocksUsed?: number }) => {
       const user = getUser(socket.id);
       if (user) {
         const entry: ChatLogEntry = {
@@ -79,16 +82,39 @@ export function registerSocketHandlers(io: Server) {
         };
         addChatEntry(user.roomCode, entry);
 
+        // Normalize result: anything not 'win' becomes 'lose'
+        const normalizedResult: 'win' | 'lose' = data.result === 'win' ? 'win' : 'lose';
+        
+        // Extract fail reason from result string
+        let failReason: string | undefined;
+        if (data.result === 'lose_time') failReason = 'time';
+        else if (data.result === 'lose_blocks') failReason = 'blocks';
+
         let gameMetrics;
         if (data.timeUsed !== undefined && data.blocksUsed !== undefined) {
           gameMetrics = {
-            result: data.result as 'win' | 'lose',
+            result: normalizedResult,
             timeUsed: data.timeUsed,
             blocksUsed: data.blocksUsed,
+            failReason,
           };
         }
 
-        saveChatLog(user.roomCode, getPlayerNamesInRoom(user.roomCode), gameMetrics, roomMaps.get(user.roomCode));
+        const updatedCoins = await saveChatLog(user.roomCode, getPlayerNamesInRoom(user.roomCode), gameMetrics, roomMaps.get(user.roomCode));
+        
+        // Emit updated coins to each player in the room
+        if (updatedCoins) {
+          const roomUserIds = getRoomUsers(user.roomCode);
+          if (roomUserIds) {
+            for (const socketId of roomUserIds) {
+              const u = getUser(socketId);
+              if (u && updatedCoins.has(u.username)) {
+                io.to(socketId).emit("coins_updated", { coins: updatedCoins.get(u.username) });
+              }
+            }
+          }
+        }
+
         io.to(user.roomCode).emit("chat_log_saved");
       }
     });
@@ -138,6 +164,33 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
+    socket.on("reset_game", () => {
+      const user = getUser(socket.id);
+      if (user) {
+        reinitChatLog(user.roomCode);
+      }
+    });
+
+    socket.on("obstacle_hit", ({ type, x, y, playerName }: { type: string; x: number; y: number; playerName: string }) => {
+      const user = getUser(socket.id);
+      if (user) {
+        const messages: Record<string, string> = {
+          wall: `${playerName} hit a wall at (${x},${y}) → Program Stop`,
+          rock: `${playerName} hit a rock at (${x},${y}) → Program Stop`,
+          spike: `${playerName} hit a spike at (${x},${y}) → Bounced back 1 spaces`,
+          trap: `${playerName} fell in a trap at (${x},${y}) → Back to start`,
+        };
+        const text = messages[type] || `${playerName} hit an obstacle at (${x},${y})`;
+        const entry: ChatLogEntry = {
+          sender: "[SYSTEM]",
+          text,
+          timestamp: new Date().toISOString(),
+        };
+        addChatEntry(user.roomCode, entry);
+        io.to(user.roomCode).emit("chat_message", { sender: "[SYSTEM]", text });
+      }
+    });
+
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.id);
       const user = removeUserFromRoom(socket.id);
@@ -147,9 +200,22 @@ export function registerSocketHandlers(io: Server) {
           deleteChatLog(user.roomCode);
           roomMaps.delete(user.roomCode);
         } else {
-          socket.to(user.roomCode).emit("user_left", { username: user.username, role: user.role });
-          const usersInRoom = getUserListForRoom(user.roomCode);
-          io.to(user.roomCode).emit("room_users", usersInRoom);
+          // Partner is still in the room — destroy room since game requires 2 players
+          io.to(user.roomCode).emit("room_destroyed", { reason: "Your partner has disconnected." });
+          
+          // Clean up room resources
+          const remainingUsers = getRoomUsers(user.roomCode);
+          if (remainingUsers) {
+            for (const socketId of remainingUsers) {
+              const s = io.sockets.sockets.get(socketId);
+              if (s) {
+                s.leave(user.roomCode);
+                removeUserFromRoom(socketId);
+              }
+            }
+          }
+          deleteChatLog(user.roomCode);
+          roomMaps.delete(user.roomCode);
         }
       }
     });

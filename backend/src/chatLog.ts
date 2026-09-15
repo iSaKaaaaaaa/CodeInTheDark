@@ -42,9 +42,10 @@ export async function saveChatLog(
     result: 'win' | 'lose';
     timeUsed: number;
     blocksUsed: number;
+    failReason?: string;
   },
   mapData?: GeneratedMap
-) {
+): Promise<Map<string, number> | null> {
   const logs = chatLogs.get(roomCode) || [];
   const attempts = runAttemptsMap.get(roomCode) || [];
 
@@ -52,8 +53,10 @@ export async function saveChatLog(
   if (!gameMetrics || !mapData || !mapData.seed) {
     chatLogs.delete(roomCode);
     runAttemptsMap.delete(roomCode);
-    return;
+    return null;
   }
+
+  const updatedCoins = new Map<string, number>();
 
   try {
     const session = await mongoose.startSession();
@@ -97,6 +100,7 @@ export async function saveChatLog(
         joinerId,
         mapSeed: String(mapData.seed),
         result: gameMetrics.result,
+        failReason: gameMetrics.failReason || undefined,
         timeUsedSeconds: gameMetrics.timeUsed,
         blocksUsedCount: gameMetrics.blocksUsed,
         blockUsageLog,
@@ -141,6 +145,11 @@ export async function saveChatLog(
 
         await user.save({ session });
 
+        // Store updated coins
+        if (user.username) {
+          updatedCoins.set(user.username, user.coins);
+        }
+
         await EconomyLog.create([{
           userId: user._id,
           amount: reward,
@@ -152,8 +161,10 @@ export async function saveChatLog(
     });
     session.endSession();
     console.log(`Saved GameSession for room ${roomCode} successfully!`);
+    return updatedCoins;
   } catch (err) {
     console.error("Failed to save game session to MongoDB:", err);
+    return null;
   } finally {
     chatLogs.delete(roomCode);
     runAttemptsMap.delete(roomCode);
@@ -163,6 +174,15 @@ export async function saveChatLog(
 export function deleteChatLog(roomCode: string) {
   chatLogs.delete(roomCode);
   runAttemptsMap.delete(roomCode);
+}
+
+export function reinitChatLog(roomCode: string) {
+  chatLogs.set(roomCode, []);
+  runAttemptsMap.set(roomCode, []);
+}
+
+export function getRunAttemptCount(roomCode: string): number {
+  return runAttemptsMap.get(roomCode)?.length || 0;
 }
 
 export async function getAllLogs() {

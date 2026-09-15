@@ -47,9 +47,11 @@ export function useGameSync({
 }: UseGameSyncOptions) {
   // Navigator Sync Logic
   useEffect(() => {
-    if (!socket || role !== "navigator") return;
+    if (!socket) return;
 
     const onSync = (state: any) => {
+      // Driver ignores syncs EXCEPT when it's a reset
+      if (role === "driver" && !state.reset) return;
       if (state.playerX !== undefined) setPlayerX(state.playerX);
       if (state.playerY !== undefined) setPlayerY(state.playerY);
       if (state.direction !== undefined) setDirection(state.direction);
@@ -81,6 +83,21 @@ export function useGameSync({
       }
 
       if (state.reset) {
+        // Full reset for Navigator when Host resets the game
+        if (state.playerX !== undefined) setPlayerX(state.playerX);
+        if (state.playerY !== undefined) setPlayerY(state.playerY);
+        if (state.direction !== undefined) setDirection(state.direction);
+        setIsWin(false);
+        setIsLose(false);
+        setLoseReason(null);
+        setExecutionError(null);
+        if (state.dungeonTimeLeft !== undefined) setDungeonTimeLeft(state.dungeonTimeLeft);
+        if (state.swapTimeLeft !== undefined) setSwapTimeLeft(state.swapTimeLeft);
+        if (state.availableQuota !== undefined) {
+          setAvailableQuota(state.availableQuota);
+          availableQuotaRef.current = state.availableQuota;
+        }
+        if (state.blocksLeft !== undefined) setBlocksLeft(state.blocksLeft);
         setPanelKey((prev) => prev + 1);
       }
     };

@@ -80,7 +80,18 @@ export default function ChatBox() {
 
       <div className="flex-1 overflow-y-auto mb-2 flex flex-col gap-1">
         {messages.map((msg, index) => {
+          const isSystem = msg.sender === "[SYSTEM]";
           const isMe = msg.sender === username;
+          
+          if (isSystem) {
+            return (
+              <div key={index} className="text-yellow-400 text-lg font-sans italic py-0.5">
+                <span className="font-bold">⚠ </span>
+                {msg.text}
+              </div>
+            );
+          }
+          
           return (
             <div key={index} className="text-white text-xl font-sans">
               <span className={`font-bold ${isMe ? 'text-sky-400' : 'text-orange-500'}`}>

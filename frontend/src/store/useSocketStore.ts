@@ -174,9 +174,14 @@ export const useSocketStore = create<SocketState>()(
       set({ currentScreen: 'create' });
     });
 
-    socket.on('user_left', () => {
-      alert("Your partner has left the room. Returning to lobby.");
-      set({ currentScreen: 'create' });
+    socket.on('room_destroyed', (data: { reason: string }) => {
+      socket.disconnect();
+      set({ socket: null, roomCode: '', role: null, players: [], currentScreen: 'select', mapData: null });
+      alert(data.reason || "Your partner has disconnected.");
+    });
+
+    socket.on('coins_updated', (data: { coins: number }) => {
+      set({ coins: data.coins });
     });
 
     // Don't set currentScreen here, wait for connection
@@ -215,9 +220,14 @@ export const useSocketStore = create<SocketState>()(
       set({ currentScreen: 'create' });
     });
 
-    socket.on('user_left', () => {
-      alert("Your partner has left the room. Returning to lobby.");
-      set({ currentScreen: 'create' });
+    socket.on('room_destroyed', (data: { reason: string }) => {
+      socket.disconnect();
+      set({ socket: null, roomCode: '', role: null, players: [], currentScreen: 'select', mapData: null });
+      alert(data.reason || "Your partner has disconnected.");
+    });
+
+    socket.on('coins_updated', (data: { coins: number }) => {
+      set({ coins: data.coins });
     });
 
     // Don't set currentScreen here, wait for connection
@@ -291,9 +301,14 @@ export const useSocketStore = create<SocketState>()(
       set({ currentScreen: 'game', mapData, dungeonTimeLeft: DUNGEON_TIME, swapTimeLeft: SWAP_TIME });
     });
 
-    newSocket.on('user_left', () => {
-      alert("Your partner has left the room. Returning to lobby.");
-      set({ currentScreen: 'create' });
+    newSocket.on('room_destroyed', (data: { reason: string }) => {
+      newSocket.disconnect();
+      set({ socket: null, roomCode: '', role: null, players: [], currentScreen: 'select', mapData: null });
+      alert(data.reason || "Your partner has disconnected.");
+    });
+
+    newSocket.on('coins_updated', (data: { coins: number }) => {
+      set({ coins: data.coins });
     });
 
     newSocket.on('join_error', () => {

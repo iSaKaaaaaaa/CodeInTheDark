@@ -15,6 +15,8 @@ interface MapData {
 interface UseGameMovementOptions {
   socket: Socket | null;
   role: "driver" | "navigator" | null;
+  isHost: boolean;
+  username: string;
   workspaceRef: React.MutableRefObject<Blockly.WorkspaceSvg | null>;
   availableQuotaRef: React.MutableRefObject<number>;
   mapData: MapData;
@@ -50,6 +52,8 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 export function useGameMovement({
   socket,
   role,
+  isHost,
+  username,
   workspaceRef,
   availableQuotaRef,
   mapData,
@@ -127,13 +131,15 @@ export function useGameMovement({
       block = block.getNextBlock() as any;
     }
 
-    if (socket && blockTypes.length > 0) {
-      socket.emit("run_attempt", blockTypes);
-    }
+    let runSuccess = false;
+    let runFailReason: string | null = null;
 
     let currentX = playerX;
     let currentY = playerY;
     let currentDirection = direction;
+    
+    // บันทึกประวัติการเดิน (ตำแหน่งเริ่มต้น)
+    const pathHistory: {x: number, y: number}[] = [{ x: currentX, y: currentY }];
 
     for (const cmdBlock of commandBlocks) {
       workspaceRef.current.highlightBlock(cmdBlock.id);
@@ -151,24 +157,29 @@ export function useGameMovement({
       nextX = Math.max(0, Math.min(14, nextX));
       nextY = Math.max(0, Math.min(14, nextY));
 
-      let bounceX = currentX;
-      let bounceY = currentY;
-
       if (!isWall(nextX, nextY) && !isRock(nextX, nextY)) {
         currentX = nextX;
         currentY = nextY;
         setPlayerX(currentX);
         setPlayerY(currentY);
       } else if (isWall(nextX, nextY)) {
+        runFailReason = "hit_wall";
         setExecutionError("Hit The Wall");
-        emitGameState({ executionError: "Hit The Wall" });
+        if (socket) {
+          socket.emit("obstacle_hit", { type: "wall", x: nextX, y: nextY, playerName: username });
+        }
+        emitGameState({ playerX: currentX, playerY: currentY, direction: currentDirection, executionError: "Hit The Wall" });
         workspaceRef.current.highlightBlock(null);
         if (socket) socket.emit("highlight_block", null);
         await sleep(350);
         break;
       } else if (isRock(nextX, nextY)) {
+        runFailReason = "hit_rock";
         setExecutionError("Hit The Rock");
-        emitGameState({ executionError: "Hit The Rock" });
+        if (socket) {
+          socket.emit("obstacle_hit", { type: "rock", x: nextX, y: nextY, playerName: username });
+        }
+        emitGameState({ playerX: currentX, playerY: currentY, direction: currentDirection, executionError: "Hit The Rock" });
         workspaceRef.current.highlightBlock(null);
         if (socket) socket.emit("highlight_block", null);
         await sleep(350);
@@ -178,17 +189,23 @@ export function useGameMovement({
       setDirection(currentDirection);
 
       if (isSpike(currentX, currentY)) {
+        runFailReason = "hit_spike";
         setExecutionError("Hit The Spike");
+        if (socket) {
+          socket.emit("obstacle_hit", { type: "spike", x: currentX, y: currentY, playerName: username });
+        }
         emitGameState({ playerX: currentX, playerY: currentY, direction: currentDirection, executionError: "Hit The Spike" });
         await sleep(350);
 
-        if (currentDirection === "up") bounceY = currentY + 1;
-        if (currentDirection === "down") bounceY = currentY - 1;
-        if (currentDirection === "left") bounceX = currentX + 1;
-        if (currentDirection === "right") bounceX = currentX - 1;
+        // ดึงประวัติถอยหลังไป 2 ก้าว
+        // - pathHistory.length - 1 คือจุดก่อนเหยียบหนาม
+        // - pathHistory.length - 2 คือจุดก่อนหน้านั้น
+        const targetIndex = Math.max(0, pathHistory.length - 2);
+        const bounceTarget = pathHistory[targetIndex];
 
-        currentX = bounceX;
-        currentY = bounceY;
+        currentX = bounceTarget.x;
+        currentY = bounceTarget.y;
+
         setPlayerX(currentX);
         setPlayerY(currentY);
         setDirection(currentDirection);
@@ -200,7 +217,11 @@ export function useGameMovement({
       }
 
       if (isTrap(currentX, currentY)) {
+        runFailReason = "fell_in_trap";
         setExecutionError("Fall In Trap");
+        if (socket) {
+          socket.emit("obstacle_hit", { type: "trap", x: currentX, y: currentY, playerName: username });
+        }
         emitGameState({ playerX: currentX, playerY: currentY, direction: currentDirection, executionError: "Fall In Trap" });
         await sleep(350);
 
@@ -218,12 +239,18 @@ export function useGameMovement({
       }
 
       emitGameState({ playerX: currentX, playerY: currentY, direction: currentDirection });
+      
+      // บันทึกตำแหน่งที่ปลอดภัยลงในประวัติ
+      pathHistory.push({ x: currentX, y: currentY });
+      
       await sleep(350);
 
       if (currentX === GOAL.x && currentY === GOAL.y) {
+        runSuccess = true;
         setIsWin(true);
         const nextQuota = availableQuotaRef.current - blocksToUse;
         if (socket) {
+          socket.emit("run_result", { blocks: blockTypes, success: true, failReason: null });
           socket.emit("game_win");
           const timeUsed = Math.max(0, DUNGEON_TIME - dungeonTimeLeft);
           socket.emit("end_game", {
@@ -262,6 +289,10 @@ export function useGameMovement({
     setBlocksLeft(nextQuota);
     workspaceRef.current.clear();
 
+    if (socket && blockTypes.length > 0 && !runSuccess) {
+      socket.emit("run_result", { blocks: blockTypes, success: false, failReason: runFailReason });
+    }
+
     if (nextQuota <= 0) {
       setIsLose(true);
       setLoseReason("blocks");
@@ -286,7 +317,7 @@ export function useGameMovement({
   };
 
   const resetGameToNewStart = useCallback(() => {
-    if (role !== "driver") return;
+    if (!isHost) return;
     setPlayerX(START.x);
     setPlayerY(START.y);
     setDirection("up");
@@ -318,8 +349,9 @@ export function useGameMovement({
       // Driver เองก็ต้องเคลียร์ chat (เพราะ sync_game_state ส่งไปให้คนอื่นเท่านั้น)
       // ใช้ emit event กลับมาหาตัวเอง
       socket.emit("reset_chat");
+      socket.emit("reset_game");
     }
-  }, [role, socket, START.x, START.y, maxBlocks]);
+  }, [isHost, socket, START.x, START.y, maxBlocks]);
 
   return { runProgram, resetGameToNewStart, emitGameState };
 }

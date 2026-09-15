@@ -58,13 +58,6 @@ export default function GameScreen() {
     }
   }, [availableQuota]);
 
-  // --- Disconnect Detection ---
-  useEffect(() => {
-    if (players.length === 1) {
-      alert("Your partner has disconnected. Returning to lobby.");
-      leaveStage();
-    }
-  }, [players.length, leaveStage]);
 
   // --- Tutorial ---
   const {
@@ -90,7 +83,7 @@ export default function GameScreen() {
 
   // --- Movement ---
   const { runProgram, resetGameToNewStart, emitGameState } = useGameMovement({
-    socket, role, workspaceRef, availableQuotaRef, mapData,
+    socket, role, isHost, username, workspaceRef, availableQuotaRef, mapData,
     playerX, playerY, direction, blocksLeft, availableQuota,
     dungeonTimeLeft, swapTimeLeft, showSwapAlert, isWin, isLose, loseReason,
     executionError, maxBlocks: MAX_BLOCKS,
