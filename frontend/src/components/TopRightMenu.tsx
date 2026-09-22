@@ -18,60 +18,77 @@ export default function TopRightMenu() {
 
   return (
     <>
-      <div className={`fixed z-50 flex flex-col items-end gap-3 ${isGame ? 'top-6 right-4 md:right-8' : 'top-6 right-6'} font-pixel`}>
-        <div className="bg-amber-800/80 border-2 border-black rounded-full px-4 py-2 flex items-center gap-3 text-white shadow-md">
+      <div className={`fixed z-50 flex flex-col items-end gap-2 sm:gap-3 ${isGame ? 'top-6 right-4 md:right-8' : 'top-6 right-6'} font-pixel`}>
+        {/* User Badge (Primary Anchor) */}
+        <div className="bg-[#b45309] border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#382503] shadow-[0_4px_0px_#2a1b12] rounded-md px-4 py-2 sm:px-5 sm:py-3 flex items-center gap-3 text-[#fffbeb]">
           {avatarUrl ? (
-            <img src={avatarUrl} alt="Avatar" className="w-8 h-8 rounded-full border border-black" />
+            <img src={avatarUrl} alt="Avatar" className="w-8 h-8 sm:w-10 sm:h-10 rounded-sm border-2 border-[#382503]" />
           ) : (
-            <span role="img" aria-label="user" className="bg-white text-amber-900 rounded-full w-8 h-8 flex items-center justify-center text-xs">👤</span>
+            <span role="img" aria-label="user" className="bg-[#fef3c7] text-[#5c2e0b] rounded-sm w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-sm sm:text-base border-2 border-[#382503] font-bold">👤</span>
           )}
-          <span className="font-bold tracking-wider">{username || "PLAYER"}</span>
-          <span className="text-yellow-400 font-bold ml-2">🪙 {coins}</span>
+          <span className="font-bold tracking-wider drop-shadow-md text-lg sm:text-xl">{username || "PLAYER"}</span>
+          <div className="bg-[#5c2e0b] px-3 py-1 sm:px-4 sm:py-1.5 rounded border-2 border-[#382503] flex items-center gap-1 sm:gap-2 shadow-inner ml-2">
+            <span className="text-yellow-400 font-bold text-lg sm:text-xl">🪙</span>
+            <span className="text-yellow-400 font-bold text-lg sm:text-xl">{coins}</span>
+          </div>
         </div>
-        <button 
-          onClick={toggleMute}
-          className={`w-12 h-12 ${isMuted ? 'bg-gray-600 hover:bg-gray-500' : 'bg-amber-800/80 hover:bg-amber-700'} border-2 border-black rounded-full flex items-center justify-center text-white text-2xl shadow-md transition-transform hover:scale-105 active:scale-95`}
-          title={isMuted ? "Unmute Sound" : "Mute Sound"}
-        >
-          <span role="img" aria-label="sound">{isMuted ? "🔇" : "🔊"}</span>
-        </button>
-        <button 
-          className="w-12 h-12 bg-red-800 hover:bg-red-700 border-2 border-black rounded-full flex items-center justify-center text-white text-2xl shadow-md transition-transform hover:scale-105 active:scale-95" 
-          onClick={() => setShowConfirm(true)}
-          title={isGame ? "Leave Stage" : "Log Out"}
-        >
-          {isGame ? (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-          ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
-          )}
-        </button>
+
+        {/* System Utilities (Secondary Stacked) */}
+        <div className="flex gap-2 sm:gap-3">
+          {/* Mute Button */}
+          <button 
+            onClick={toggleMute}
+            className={`w-10 h-10 sm:w-12 sm:h-12 ${isMuted ? 'bg-[#5c2e0b]' : 'bg-[#b45309] hover:bg-[#d97706]'} border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#382503] rounded-md flex items-center justify-center text-white text-lg sm:text-xl shadow-[0_4px_0px_#2a1b12] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75`}
+            title={isMuted ? "Unmute Sound" : "Mute Sound"}
+          >
+            <span role="img" aria-label="sound" className="drop-shadow-md relative z-10">{isMuted ? "🔇" : "🔊"}</span>
+            <span className="absolute inset-0 border-t-2 border-l-2 border-white/20 rounded-sm pointer-events-none" />
+          </button>
+          
+          {/* Logout Button */}
+          <button 
+            className="w-10 h-10 sm:w-12 sm:h-12 bg-[#991b1b] hover:bg-[#b91c1c] border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#450a0a] rounded-md flex items-center justify-center text-white text-lg sm:text-xl shadow-[0_4px_0px_#450a0a] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 relative overflow-hidden" 
+            onClick={() => setShowConfirm(true)}
+            title={isGame ? "Leave Stage" : "Log Out"}
+          >
+            <span className="absolute inset-0 border-t-2 border-l-2 border-white/20 rounded-sm pointer-events-none" />
+            <div className="drop-shadow-md relative z-10 flex items-center justify-center scale-90">
+              {isGame ? (
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+              )}
+            </div>
+          </button>
+        </div>
       </div>
 
       {showConfirm && (
         <div className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center backdrop-blur-sm">
-          <div className="bg-[#3d1f0f] border-[6px] border-[#1a0b05] rounded-3xl p-2 shadow-[0_15px_0_rgba(0,0,0,0.8),0_25px_50px_rgba(0,0,0,0.9)] max-w-sm w-full mx-4 animate-in fade-in zoom-in duration-200 font-pixel">
-            <div className="bg-[#f4deb3] border-[4px] border-[#5c2e16] rounded-2xl p-8 relative overflow-hidden flex flex-col items-center gap-6">
+          <div className="bg-[#3d1f0f] border-[6px] border-[#1a0b05] rounded-xl p-2 shadow-[0_15px_0_rgba(0,0,0,0.8),0_25px_50px_rgba(0,0,0,0.9)] max-w-sm w-full mx-4 animate-in fade-in zoom-in duration-200 font-pixel">
+            <div className="bg-[#fef3c7] border-[4px] border-[#5c2e16] rounded-lg p-8 relative overflow-hidden flex flex-col items-center gap-6">
               <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_#3d1f0f_1.5px,_transparent_1.5px)] bg-[size:12px_12px]" />
-              <div className="relative z-10 w-full flex flex-col items-center gap-6">
-                <h3 className="text-4xl text-red-800 font-black text-center drop-shadow-sm">
+              <div className="relative z-10 w-full flex flex-col items-center gap-4">
+                <h3 className="text-3xl text-red-800 font-black text-center drop-shadow-sm uppercase tracking-wider">
                   {isGame ? "Leave Stage" : "Confirm Logout"}
                 </h3>
-                <p className="text-center text-xl text-black/80 font-semibold">
+                <p className="text-center text-lg text-[#5c2e0b] font-bold">
                   {isGame ? "Are you sure you want to return to the waiting room?" : "Are you sure you want to log out?"}
                 </p>
-                <div className="flex gap-4 w-full mt-2">
+                <div className="flex gap-4 w-full mt-4">
                   <button 
                     onClick={() => setShowConfirm(false)}
-                    className="flex-1 py-3 bg-[#78716c] border-[3px] border-[#44403c] text-white font-bold text-xl rounded-full hover:bg-[#57534e] active:scale-95 transition-all shadow-[0_4px_0_#44403c] active:shadow-none active:translate-y-1"
+                    className="flex-1 py-3 bg-[#78716c] hover:bg-[#57534e] text-white font-bold text-xl rounded-xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#292524] shadow-[0_4px_0px_#1c1917] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 uppercase tracking-widest relative overflow-hidden"
                   >
-                    Cancel
+                    <span className="absolute inset-0 border-t-2 border-l-2 border-white/20 rounded-lg pointer-events-none" />
+                    <span className="relative z-10 drop-shadow-md">Cancel</span>
                   </button>
                   <button 
                     onClick={handleAction}
-                    className="flex-1 py-3 bg-[#ea580c] border-[3px] border-[#c2410c] text-white font-bold text-xl rounded-full hover:bg-[#c2410c] active:scale-95 transition-all shadow-[0_4px_0_#9a3412] active:shadow-none active:translate-y-1"
+                    className="flex-1 py-3 bg-[#991b1b] hover:bg-[#b91c1c] text-white font-bold text-xl rounded-xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#450a0a] shadow-[0_4px_0px_#2a0606] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 uppercase tracking-widest relative overflow-hidden"
                   >
-                    {isGame ? "Leave" : "Log Out"}
+                    <span className="absolute inset-0 border-t-2 border-l-2 border-white/20 rounded-lg pointer-events-none" />
+                    <span className="relative z-10 drop-shadow-md">{isGame ? "Leave" : "Log Out"}</span>
                   </button>
                 </div>
               </div>
