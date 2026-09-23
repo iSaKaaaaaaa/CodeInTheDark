@@ -7,24 +7,49 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 router.post('/google', async (req, res) => {
   try {
-    const { credential } = req.body;
+    const { credential, accessToken } = req.body;
 
-    if (!credential) {
-      return res.status(400).json({ error: 'No credential provided' });
+    if (!credential && !accessToken) {
+      return res.status(400).json({ error: 'No credential or access token provided' });
     }
 
-    // Verify the ID token
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
+    let googleId: string;
+    let email: string;
+    let name: string | undefined;
+    let picture: string | undefined;
 
-    const payload = ticket.getPayload();
-    if (!payload) {
-      return res.status(400).json({ error: 'Invalid Google token' });
+    if (credential) {
+      // Verify the ID token
+      const ticket = await client.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+
+      const payload = ticket.getPayload();
+      if (!payload) {
+        return res.status(400).json({ error: 'Invalid Google token' });
+      }
+
+      googleId = payload.sub;
+      email = payload.email || '';
+      name = payload.name;
+      picture = payload.picture;
+    } else {
+      // Verify via Google userinfo endpoint using accessToken
+      const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      if (!userInfoRes.ok) {
+        return res.status(400).json({ error: 'Invalid Google access token' });
+      }
+
+      const payload = await userInfoRes.json();
+      googleId = payload.sub;
+      email = payload.email || '';
+      name = payload.name;
+      picture = payload.picture;
     }
-
-    const { sub: googleId, email, name, picture } = payload;
 
     if (!email || !googleId) {
       return res.status(400).json({ error: 'Email or Google ID not found in token' });

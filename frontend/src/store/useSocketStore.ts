@@ -58,7 +58,7 @@ interface SocketState {
   setUsername: (username: string) => void;
   setRole: (role: 'driver' | 'navigator') => void;
   
-  loginWithGoogle: (credential: string) => Promise<void>;
+  loginWithGoogle: (payload: string | { credential?: string; accessToken?: string }) => Promise<void>;
   submitUsername: (username: string) => Promise<void>;
   createRoom: () => void;
   joinRoom: (roomCode: string) => void;
@@ -103,10 +103,11 @@ export const useSocketStore = create<SocketState>()(
   setJoinError: (error) => set({ joinError: error }),
   toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
 
-  loginWithGoogle: async (credential: string) => {
+  loginWithGoogle: async (payload: string | { credential?: string; accessToken?: string }) => {
     try {
       const backendUrl = getBackendUrl();
-      const response = await axios.post(`${backendUrl}/api/auth/google`, { credential });
+      const body = typeof payload === 'string' ? { credential: payload } : payload;
+      const response = await axios.post(`${backendUrl}/api/auth/google`, body);
       const user = response.data;
       
       set({
