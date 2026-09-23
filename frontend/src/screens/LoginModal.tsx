@@ -67,7 +67,7 @@ export default function LoginModal() {
           {/* Custom Google Login Button with brown text, Google logo, and pixel theme */}
           <button
             onClick={() => googleLogin()}
-            className="flex items-center justify-center gap-3 bg-[#492B0A] hover:bg-[#9E6023] text-[#EEEAE8] font-pixel font-bold text-lg sm:text-xl md:text-2xl px-6 py-3.5 rounded-xl border-b-4 border-r-4 border-[#5c2e0b] shadow-lg hover:brightness-105 active:border-b-0 active:border-r-0 active:translate-y-1 transition-all duration-100 mt-2 md:mt-4 cursor-pointer"
+            className="flex items-center justify-center gap-3 bg-[#5c2e0b] hover:bg-[#9E6023] text-[#EEEAE8] font-pixel font-bold text-lg sm:text-xl md:text-2xl px-6 py-3.5 rounded-xl border-b-4 border-r-4 border-[#5c2e0b] shadow-lg hover:brightness-105 active:border-b-0 active:border-r-0 active:translate-y-1 transition-all duration-100 mt-2 md:mt-4 cursor-pointer"
           >
             <svg className="w-6 h-6 sm:w-7 sm:h-7 shrink-0" viewBox="0 0 24 24">
               <path
