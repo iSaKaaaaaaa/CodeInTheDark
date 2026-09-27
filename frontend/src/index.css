@@ -40,9 +40,15 @@ body {
 }
 
 /* ลบเส้นขอบสไตล์โมเดิร์นของตัวเลือกลากวาง */
-.blocklySvg {
+.blocklySvg,
+.blocklyInjectionDiv {
   border: none !important;
+  outline: none !important;
   background-color: transparent !important;
+}
+
+.blocklyMainBackground {
+  stroke: none !important;
 }
 
 /* ซ่อนปุ่มซูมดั้งเดิมเพื่อความคลีน (ถ้าต้องการ) */

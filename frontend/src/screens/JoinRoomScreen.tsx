@@ -1,92 +1,272 @@
 import { useState } from "react";
 import { useSocketStore } from "../store/useSocketStore";
-import PixelButton from "../components/PixelButton";
 import TopRightMenu from "../components/TopRightMenu";
 
+// Mock public rooms — replace with real data when backend supports it
+const MOCK_PUBLIC_ROOMS = [
+  { code: '482917', host: 'Pharaoh_X', players: 1 },
+  { code: '731058', host: 'SandWalker', players: 1 },
+  { code: '295634', host: 'DarkCoder', players: 1 },
+];
+
 export default function JoinRoomScreen() {
-  const { leaveRoom, joinRoom, joinError } = useSocketStore();
+  const { setScreen, joinRoom, joinError } = useSocketStore();
   const [inputCode, setInputCode] = useState('');
+  const [tab, setTab] = useState<'code' | 'public'>('code');
 
   const handleJoinPrivate = () => {
     if (inputCode.trim().length === 6) {
       joinRoom(inputCode.trim());
-    } else {
-      alert("Please enter a valid 6-digit room code.");
     }
   };
 
-
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      handleJoinPrivate();
+    }
+  };
 
   return (
     <div
-      className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center font-pixel cursor-default"
+      className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center font-pixel cursor-default p-4"
       style={{ backgroundImage: "url('/ui/land-waitroom.png')" }}
     >
-      {/* Top Right Username Badge & Logout */}
+      {/* Overlays */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#7c2d12]/30 via-transparent to-[#450a0a]/50 pointer-events-none" />
+      <div className="absolute inset-0 bg-black/15 pointer-events-none" />
+
       <TopRightMenu />
 
-      {/* Scroll Container */}
-      <div
-        className="relative w-full max-w-[900px] h-[600px] md:max-w-[1000px] md:h-[650px] flex flex-col items-center pt-24 px-20 pb-16 z-10"
-        style={{
-          backgroundImage: "url('/ui/waitroom.png')",
-          backgroundSize: '130% 130%',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-        }}
+      {/* Title */}
+      <h2
+        className="text-[#fde68a] text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-3 md:mb-5 uppercase text-center relative z-10 font-bold tracking-widest"
+        style={{ textShadow: "4px 4px 0px #2a1b12, -2px -2px 0px #2a1b12, 2px -2px 0px #2a1b12, -2px 2px 0px #2a1b12, 0 6px 10px rgba(0,0,0,0.8)" }}
       >
-        <button
-          className="absolute top-8 left-[5%] md:top-12 md:left-[8%] w-12 h-12 bg-amber-800/80 hover:bg-amber-700 border-2 border-black rounded-full flex items-center justify-center text-white text-2xl shadow-md transition-transform hover:scale-105 active:scale-95 z-10"
-          onClick={leaveRoom}
-          title="Back"
+        Join Room
+      </h2>
+
+      {/* Main Panel */}
+      <div className="relative w-[min(92vw,520px)] mx-auto z-10">
+        {/* Outer glow */}
+        <div className="absolute -inset-4 bg-[#f59e0b]/10 rounded-3xl blur-2xl pointer-events-none" />
+
+        {/* Wooden frame — top */}
+        <div
+          className="relative z-10 mx-3 h-5 sm:h-6 rounded-t-md"
+          style={{
+            background: 'linear-gradient(180deg, #8B5E3C 0%, #6B3F1F 40%, #5C2E18 100%)',
+            borderTop: '2px solid #A97B50',
+            borderLeft: '2px solid #7A4E2D',
+            borderRight: '2px solid #4A2510',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15)',
+          }}
         >
-          <span>&#8592;</span>
-        </button>
+          <div className="absolute inset-0 opacity-20" style={{
+            backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(0,0,0,0.15) 8px, rgba(0,0,0,0.15) 9px)',
+          }} />
+          {[0, 1].map(i => (
+            <div key={i} className={`absolute top-1/2 -translate-y-1/2 ${i === 0 ? 'left-3' : 'right-3'} w-2 h-2 rounded-full bg-[#C4A265] border border-[#8B6F3A] shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]`} />
+          ))}
+        </div>
 
-        {/* Private Join Section */}
-        <div className="w-full flex flex-col items-center gap-2 mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-black uppercase">JOIN ROOM CODE</h2>
-          
-          {joinError && (
-            <p className="text-xl text-red-800 font-bold mb-2">{joinError}</p>
-          )}
+        {/* Parchment body */}
+        <div
+          className="relative z-10 mx-1.5 px-5 sm:px-8 md:px-10 py-6 sm:py-8"
+          style={{
+            background: 'linear-gradient(170deg, #F5E6C8 0%, #EDD9A3 30%, #E8D08E 60%, #DBBF78 100%)',
+            borderLeft: '3px solid #B8944F',
+            borderRight: '3px solid #9A7A3D',
+            boxShadow: `
+              inset 0 0 30px rgba(139, 99, 49, 0.15),
+              inset 0 0 60px rgba(139, 99, 49, 0.08),
+              4px 0 8px rgba(0,0,0,0.2),
+              -4px 0 8px rgba(0,0,0,0.2),
+              0 4px 12px rgba(0,0,0,0.3)
+            `,
+          }}
+        >
+          {/* Parchment texture */}
+          <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{
+            backgroundImage: `
+              radial-gradient(ellipse at 20% 50%, rgba(101,67,33,1) 0%, transparent 50%),
+              radial-gradient(ellipse at 80% 20%, rgba(101,67,33,1) 0%, transparent 40%),
+              radial-gradient(ellipse at 50% 80%, rgba(101,67,33,1) 0%, transparent 45%)
+            `,
+          }} />
+          <div className="absolute inset-0 pointer-events-none" style={{
+            boxShadow: 'inset 0 0 40px rgba(101,67,33,0.12)',
+          }} />
 
-          <div className="flex gap-4">
-            <input 
-              type="text" 
-              maxLength={6}
-              value={inputCode}
-              onChange={(e) => setInputCode(e.target.value.replace(/\\D/g, ''))} // numbers only
-              className="w-48 bg-[#f4deb3] border-4 border-[#3d1f0f] rounded-lg px-4 py-2 text-center text-2xl font-bold tracking-widest text-black outline-none shadow-inner"
-              placeholder="000000"
-            />
-            <PixelButton variant="orange" className="px-8 rounded-xl text-xl" onClick={handleJoinPrivate}>
-              Join
-            </PixelButton>
+          {/* Back button */}
+          <button
+            className="absolute top-2 left-3 text-[#8B5E3C] hover:text-[#C4553A] active:translate-y-0.5 transition-all duration-75 text-xl sm:text-2xl font-bold leading-none"
+            onClick={() => setScreen('select')}
+            title="Back"
+            style={{ textShadow: '1px 1px 0 rgba(0,0,0,0.15)' }}
+          >
+            ←
+          </button>
+
+          <div className="flex flex-col items-center gap-4 sm:gap-5">
+            {/* Tab Switcher */}
+            <div className="flex items-center gap-1 p-0.5 rounded-lg border-2 border-[#5c2e0b]/30" style={{
+              background: 'linear-gradient(135deg, rgba(244,222,179,0.5) 0%, rgba(222,194,140,0.5) 100%)',
+            }}>
+              <button
+                onClick={() => setTab('code')}
+                className={`px-4 sm:px-5 py-1.5 rounded-md text-sm sm:text-base font-bold uppercase tracking-wider transition-all duration-150 ${
+                  tab === 'code'
+                    ? 'bg-[#5c2e0b] text-[#fde68a] shadow-md'
+                    : 'text-[#8b6840] hover:text-[#5c2e0b]'
+                }`}
+              >
+                🔑 Enter Code
+              </button>
+              <button
+                onClick={() => setTab('public')}
+                className={`px-4 sm:px-5 py-1.5 rounded-md text-sm sm:text-base font-bold uppercase tracking-wider transition-all duration-150 ${
+                  tab === 'public'
+                    ? 'bg-[#5c2e0b] text-[#fde68a] shadow-md'
+                    : 'text-[#8b6840] hover:text-[#5c2e0b]'
+                }`}
+              >
+                🌐 Public
+              </button>
+            </div>
+
+            {/* Divider */}
+            <div className="w-full flex items-center gap-3">
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#B8944F] to-transparent opacity-50" />
+              <div className="w-1.5 h-1.5 rotate-45 bg-[#B8944F] opacity-60" />
+              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#B8944F] to-transparent opacity-50" />
+            </div>
+
+            {/* Tab Content */}
+            {tab === 'code' ? (
+              /* === Enter Code Tab === */
+              <div className="w-full flex flex-col items-center gap-4">
+                <div className="flex flex-col items-center gap-1">
+                  <p
+                    className="text-lg sm:text-xl md:text-2xl text-[#5c2e0b] font-bold uppercase tracking-widest"
+                    style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.3)' }}
+                  >
+                    Private Room
+                  </p>
+                  <p className="text-xs sm:text-sm text-[#8b6840]">
+                    Ask the host for their 6-digit code
+                  </p>
+                </div>
+
+                <input
+                  type="text"
+                  maxLength={6}
+                  value={inputCode}
+                  onChange={(e) => setInputCode(e.target.value.replace(/\D/g, ''))}
+                  onKeyDown={handleKeyDown}
+                  className="w-full max-w-[280px] bg-[#fef3c7] p-2.5 sm:p-3 rounded-xl border-[3px] border-[#5c2e0b] text-[#382503] font-pixel text-2xl sm:text-3xl md:text-4xl font-bold text-center tracking-[0.3em] outline-none focus:bg-white focus:border-[#b45309] focus:ring-4 focus:ring-[#f59e0b]/30 shadow-inner transition-colors placeholder:text-[#8b4513]/40 placeholder:tracking-[0.2em]"
+                  placeholder="000000"
+                  autoFocus
+                />
+
+                {joinError && (
+                  <div className="w-full bg-[#7f1d1d]/90 text-[#fef2f2] border-2 border-[#b91c1c] px-3 py-2 rounded-xl text-center text-sm sm:text-base font-bold shadow-md font-pixel">
+                    ⚠️ {joinError}
+                  </div>
+                )}
+
+                <button
+                  onClick={handleJoinPrivate}
+                  disabled={inputCode.trim().length !== 6}
+                  className="bg-[#b45309] hover:bg-[#d97706] disabled:bg-[#8B6F3A] disabled:opacity-50 disabled:cursor-not-allowed text-[#fffbeb] font-bold text-xl sm:text-2xl px-10 sm:px-14 py-2.5 sm:py-3 rounded-xl border-b-[4px] border-r-[4px] border-t-[3px] border-l-[3px] border-[#382503] shadow-[0_4px_0px_#2a1b12] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 uppercase tracking-widest relative overflow-hidden"
+                >
+                  <span className="absolute inset-0 border-t-[3px] border-l-[3px] border-white/15 rounded-lg pointer-events-none" />
+                  <span className="relative z-10">Join</span>
+                </button>
+              </div>
+            ) : (
+              /* === Public Lobby Tab === */
+              <div className="w-full flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <p
+                    className="text-lg sm:text-xl text-[#5c2e0b] font-bold uppercase tracking-widest"
+                    style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.3)' }}
+                  >
+                    Open Rooms
+                  </p>
+                  <button className="text-xs sm:text-sm font-bold text-[#8b6840] hover:text-[#5c2e0b] uppercase tracking-wider transition-colors">
+                    ↻ Refresh
+                  </button>
+                </div>
+
+                {/* Room List */}
+                <div className="w-full flex flex-col gap-2 max-h-[240px] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#B8944F transparent' }}>
+                  {MOCK_PUBLIC_ROOMS.map((room) => (
+                    <div
+                      key={room.code}
+                      className="w-full flex items-center justify-between px-4 sm:px-5 py-3 sm:py-3.5 rounded-xl border-2 border-[#5c2e0b]/30 hover:border-[#b45309] transition-all cursor-pointer group"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(244,222,179,0.7) 0%, rgba(222,194,140,0.7) 100%)',
+                        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.08)',
+                      }}
+                      onClick={() => joinRoom(room.code)}
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#b45309] border-2 border-[#5c2e0b] flex items-center justify-center text-white text-sm sm:text-base font-bold shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)]">
+                          {room.host.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-base sm:text-lg font-bold text-[#382503] uppercase tracking-wider">
+                            {room.host}'s Room
+                          </span>
+                          <span className="text-xs text-[#8b6840]">
+                            {room.players}/2 players
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-sm sm:text-base font-bold text-[#b45309] group-hover:text-[#d97706] uppercase tracking-wider transition-colors">
+                        Join →
+                      </span>
+                    </div>
+                  ))}
+
+                  {MOCK_PUBLIC_ROOMS.length === 0 && (
+                    <div className="w-full flex flex-col items-center py-6 gap-2">
+                      <span className="text-base sm:text-lg text-[#B8944F] font-bold uppercase tracking-wider">
+                        No rooms available
+                      </span>
+                      <span className="text-xs sm:text-sm text-[#B8944F]/70">
+                        Create your own or try a code
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="w-full h-1 bg-[#572e18]/30 my-2 rounded-full"></div>
-
-        {/* Public Lobby Section */}
-        <div className="w-full flex flex-col mt-2 flex-grow overflow-hidden">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl md:text-2xl font-bold text-black uppercase">PUBLIC LOBBY</h2>
-            <button className="text-sm font-bold bg-[#572e18] text-white px-3 py-1 rounded-full flex items-center gap-1 hover:bg-[#3d1f0f]">
-              <span>↻</span> Refresh
-            </button>
-          </div>
-          
-
-
-            
-            
-            
-            
-          </div>
+        {/* Wooden frame — bottom */}
+        <div
+          className="relative z-10 mx-3 h-5 sm:h-6 rounded-b-md"
+          style={{
+            background: 'linear-gradient(0deg, #8B5E3C 0%, #6B3F1F 40%, #5C2E18 100%)',
+            borderBottom: '2px solid #4A2510',
+            borderLeft: '2px solid #7A4E2D',
+            borderRight: '2px solid #4A2510',
+            boxShadow: '0 4px 8px rgba(0,0,0,0.4), inset 0 -1px 0 rgba(255,255,255,0.1)',
+          }}
+        >
+          <div className="absolute inset-0 opacity-20" style={{
+            backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(0,0,0,0.15) 8px, rgba(0,0,0,0.15) 9px)',
+          }} />
+          {[0, 1].map(i => (
+            <div key={i} className={`absolute top-1/2 -translate-y-1/2 ${i === 0 ? 'left-3' : 'right-3'} w-2 h-2 rounded-full bg-[#C4A265] border border-[#8B6F3A] shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]`} />
+          ))}
         </div>
+
+        {/* Drop shadow */}
+        <div className="absolute -bottom-2 left-8 right-8 h-4 bg-black/20 rounded-full blur-md -z-10" />
       </div>
-
+    </div>
   );
 }

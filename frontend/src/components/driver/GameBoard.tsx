@@ -42,37 +42,43 @@ export default function GameBoard({
     : undefined;
 
   return (
-    <div className="flex-1 relative w-full h-full min-h-0 flex items-center justify-center p-2 md:p-4 overflow-hidden @container">
-      <div 
-        className="relative pt-8 pl-8 md:pt-10 md:pl-10 flex items-center justify-center w-full mx-auto"
-        style={{ maxWidth: 'calc(100cqmin - 3rem)' }}
-      >
-        
-        {/* แถบตัวอักษรบอกพิกัดด้านบน (A-M) */}
-        <div className="absolute top-0 left-10 right-0 h-10 flex items-start justify-center">
-          {/* ขยับซ้ายขวาให้ตรงกับ 13 ช่องด้านใน (86.666% คือ 13/15 ของกระดาน) */}
-          <div className="w-[86.666%] h-8 bg-[#d2a356] border-4 border-[#572e18] text-black font-bold rounded-lg flex justify-around items-center shadow-md font-sans z-10">
-            {COL_LABELS.map((lbl, idx) => (
-              <span key={idx} className="flex-1 text-center text-sm md:text-base leading-none">
-                {lbl}
-              </span>
-            ))}
+    <div className="flex-1 relative w-full h-full min-h-0 flex items-center justify-center p-2 overflow-hidden">
+      {/* Wrapper นี้ควบคุมขนาดให้พอดีกับความสูงหรือความกว้างของหน้าจอ โดยคง aspect-ratio ไว้ */}
+      <div className="relative flex items-center justify-center w-full h-full p-2">
+        {/* ใช้ height เป็น 100% ของ flex container และให้ width หดตาม aspect-ratio (max-width จำกัดเพื่อไม่ให้ล้น) */}
+        <div
+          className="relative flex-col items-center justify-center h-full max-h-full max-w-full"
+          style={{
+            aspectRatio: '1 / 1',
+            paddingTop: '2.5rem', // เผื่อที่ให้ Header
+            paddingLeft: '2.5rem', // เผื่อที่ให้ Sidebar
+          }}
+        >
+          {/* แถบตัวอักษรบอกพิกัดด้านบน (A-M) */}
+          <div className="absolute top-0 left-[2.5rem] right-0 h-[2.5rem] flex items-center justify-center">
+            {/* ขยับซ้ายขวาให้ตรงกับ 13 ช่องด้านใน (86.666% คือ 13/15 ของกระดาน) */}
+            <div className="w-[86.666%] h-8 bg-[#d2a356] border-4 border-[#572e18] text-black font-bold rounded-lg flex justify-around items-center shadow-md font-sans z-10">
+              {COL_LABELS.map((lbl, idx) => (
+                <span key={idx} className="flex-1 text-center text-xs md:text-sm leading-none">
+                  {lbl}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* แถบตัวเลขบอกพิกัดด้านซ้าย (1-13) */}
-        <div className="absolute left-0 top-10 bottom-0 w-10 flex items-center justify-end pr-2">
-          <div className="h-[86.666%] w-8 bg-[#d2a356] border-4 border-[#572e18] text-black font-bold rounded-lg flex flex-col justify-around items-center shadow-md font-sans z-10">
-            {ROW_LABELS.map((lbl, idx) => (
-              <span key={idx} className="flex-1 flex items-center justify-center text-sm md:text-base leading-none">
-                {lbl}
-              </span>
-            ))}
+          {/* แถบตัวเลขบอกพิกัดด้านซ้าย (1-13) */}
+          <div className="absolute left-0 top-[2.5rem] bottom-0 w-[2.5rem] flex items-center justify-end pr-2">
+            <div className="h-[86.666%] w-8 bg-[#d2a356] border-4 border-[#572e18] text-black font-bold rounded-lg flex flex-col justify-around items-center shadow-md font-sans z-10">
+              {ROW_LABELS.map((lbl, idx) => (
+                <span key={idx} className="flex-1 flex items-center justify-center text-xs md:text-sm leading-none">
+                  {lbl}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
 
-        {/* Container สำหรับกระดานเกมและหมอก */}
-        <div className="w-full aspect-square relative rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)]">
+          {/* Container สำหรับกระดานเกมและหมอก */}
+          <div className="w-full h-full relative rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.5)]">
           {/* ตารางแผนที่ขนาด 15x15 */}
           <div
             className="w-full h-full border-4 border-[#572e18] bg-amber-100/85 grid overflow-hidden relative z-0"
@@ -133,7 +139,7 @@ export default function GameBoard({
 
           {/* หมอก Fog of War สำหรับ Navigator */}
           {role === "navigator" && (
-            <div 
+            <div
               className="absolute z-20 pointer-events-none"
               style={{
                 top: "6.666%",
@@ -151,6 +157,7 @@ export default function GameBoard({
             </div>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

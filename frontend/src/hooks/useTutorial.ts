@@ -7,8 +7,10 @@ interface UseTutorialOptions {
 }
 
 export function useTutorial({ socket }: UseTutorialOptions) {
+  // If user previously completed tutorial, they start at step 0 (Waiting for partner).
+  // Otherwise, they start at step 1.
   const [tutorialStep, setTutorialStep] = useState(() => {
-    return localStorage.getItem("tutorialCompleted") === "true" ? 99 : 1;
+    return localStorage.getItem("tutorialCompleted") === "true" ? 0 : 1;
   });
   const [selfReady, setSelfReady] = useState(false);
   const [partnerReady, setPartnerReady] = useState(false);
@@ -19,6 +21,17 @@ export function useTutorial({ socket }: UseTutorialOptions) {
   useEffect(() => {
     tutorialStepRef.current = tutorialStep;
   }, [tutorialStep]);
+
+  // If this user already completed the tutorial in a previous game,
+  // automatically mark them as ready so the other player isn't stuck.
+  useEffect(() => {
+    if (tutorialStep === 0) {
+      setSelfReady(true);
+      if (socket) {
+        socket.emit("sync_game_state", { tutorialReady: true });
+      }
+    }
+  }, [tutorialStep, socket]);
 
   // Sync tutorialReady globally
   useEffect(() => {
@@ -34,7 +47,9 @@ export function useTutorial({ socket }: UseTutorialOptions) {
 
   // When both are ready, finish tutorial
   useEffect(() => {
-    if (selfReady && partnerReady && tutorialStep === 4) {
+    // Both must be ready. The current user must be at the end of the tutorial (step 4)
+    // OR they must be in the waiting state (step 0).
+    if (selfReady && partnerReady && (tutorialStep === 4 || tutorialStep === 0)) {
       setTutorialStep(99);
       if (localStorage.getItem("tutorialCompleted") !== "true") {
         justCompletedRef.current = true;

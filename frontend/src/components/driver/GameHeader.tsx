@@ -2,7 +2,8 @@ interface GameHeaderProps {
   role?: string;
   dungeonTime?: string;
   swapTime?: string;
-  swapProgress?: number; // รับค่า 0 - 100 เพื่อคำนวณความยาวหลอด
+  swapProgress?: number;
+  blocksLeft?: number;
 }
 
 export default function GameHeader({
@@ -10,49 +11,74 @@ export default function GameHeader({
   dungeonTime = "5:00",
   swapTime = "02:00",
   swapProgress = 100,
+  blocksLeft,
 }: GameHeaderProps) {
   let barColor = "bg-green-500";
   if (swapProgress <= 25) {
-    barColor = "bg-red-600 shadow-[0_0_15px_rgba(220,38,38,0.8)]"; // Add glowing effect when critical
+    barColor = "bg-red-600 shadow-[0_0_15px_rgba(220,38,38,0.8)]";
   } else if (swapProgress <= 50) {
     barColor = "bg-orange-500";
   }
 
+  const blocksWarning = blocksLeft !== undefined && blocksLeft <= 10;
+  const blocksCritical = blocksLeft !== undefined && blocksLeft <= 5;
+
   return (
-    <header className="grid grid-cols-3 items-center w-full">
-      <h1 
-        className="text-white text-5xl md:text-6xl font-bold uppercase justify-self-start"
-        style={{ textShadow: "1px 1px 0 #ea580c, 2px 2px 0 #ea580c, 3px 3px 0 #ea580c, 4px 4px 0 #ea580c, 5px 5px 4px rgba(0,0,0,0.8)" }}
+    <header className="flex items-center justify-between w-full gap-2 flex-wrap">
+      {/* Role */}
+      <h1
+        className="text-white text-3xl md:text-4xl lg:text-5xl font-bold uppercase shrink-0"
+        style={{ textShadow: "1px 1px 0 #ea580c, 2px 2px 0 #ea580c, 3px 3px 0 #ea580c, 4px 4px 4px rgba(0,0,0,0.8)" }}
       >
         {role}
       </h1>
 
-      <div className="flex flex-col items-center bg-black/80 px-8 md:px-16 py-3 rounded-full border-4 border-black shadow-2xl justify-self-center">
-        <span className="text-blue-300 font-bold tracking-widest mb-1 text-xl md:text-2xl drop-shadow-sm">
+      {/* Swap Bar — center */}
+      <div className="flex flex-col items-center bg-black/80 px-4 md:px-8 lg:px-12 py-2 rounded-full border-2 border-black shadow-lg min-w-0 flex-1 max-w-[500px]">
+        <span className="text-blue-300 font-bold tracking-widest text-xs md:text-sm lg:text-base drop-shadow-sm">
           ROLE SWAP
         </span>
-        <div className="w-72 md:w-[600px] h-4 md:h-5 bg-gray-900 rounded-full border-2 border-black overflow-hidden relative shadow-inner">
+        <div className="w-full h-3 md:h-4 bg-gray-900 rounded-full border-2 border-black overflow-hidden relative shadow-inner">
           <div
             className={`absolute top-0 left-0 h-full ${barColor} transition-all duration-1000 linear`}
             style={{ width: `${swapProgress}%` }}
-          ></div>
+          />
         </div>
-        <span className="text-white text-xl md:text-2xl mt-2 font-bold tracking-widest drop-shadow-md">{swapTime}</span>
+        <span className="text-white text-sm md:text-base lg:text-lg mt-1 font-bold tracking-widest drop-shadow-md">{swapTime}</span>
       </div>
 
-      <div className="flex flex-col items-center justify-self-end bg-black/70 backdrop-blur-sm px-6 py-3 rounded-2xl border-4 border-[#333] shadow-2xl">
-        <span className="text-orange-600 font-bold text-xl md:text-2xl drop-shadow-sm tracking-widest mb-1">
-          DUNGEON TIME
-        </span>
-        <div className="flex items-center gap-2">
-          <span className="text-white text-5xl md:text-6xl font-bold drop-shadow-md">
+      {/* Right group: Blocks + Dungeon Time */}
+      <div className="flex items-center gap-2 md:gap-3 shrink-0">
+        {/* Blocks Left — persistent indicator */}
+        {blocksLeft !== undefined && (
+          <div className={`flex flex-col items-center bg-black/70 backdrop-blur-sm px-3 md:px-4 py-2 rounded-xl border-2 transition-all duration-300 ${
+            blocksCritical
+              ? 'border-red-600 shadow-[0_0_12px_rgba(220,38,38,0.6)] animate-pulse'
+              : blocksWarning
+                ? 'border-orange-500 shadow-[0_0_8px_rgba(234,88,12,0.4)]'
+                : 'border-[#333]'
+          }`}>
+            <span className={`font-bold text-xs md:text-sm tracking-widest ${
+              blocksCritical ? 'text-red-500' : blocksWarning ? 'text-orange-400' : 'text-[#fde68a]'
+            }`}>
+              BLOCKS
+            </span>
+            <span className={`text-2xl md:text-3xl lg:text-4xl font-bold drop-shadow-md ${
+              blocksCritical ? 'text-red-500' : blocksWarning ? 'text-orange-400' : 'text-white'
+            }`}>
+              {blocksLeft}
+            </span>
+          </div>
+        )}
+
+        {/* Dungeon Time */}
+        <div className="flex flex-col items-center bg-black/70 backdrop-blur-sm px-3 md:px-4 py-2 rounded-xl border-2 border-[#333] shadow-lg">
+          <span className="text-orange-600 font-bold text-xs md:text-sm drop-shadow-sm tracking-widest">
+            DUNGEON
+          </span>
+          <span className="text-white text-2xl md:text-3xl lg:text-4xl font-bold drop-shadow-md">
             {dungeonTime}
           </span>
-          <div className="w-10 h-10 border-4 border-orange-600 rounded-full flex items-center justify-center">
-            <div className="w-1 h-3 bg-orange-600 rounded-full -mt-1 relative">
-              <div className="absolute bottom-0 right-0 w-2 h-1 bg-orange-600 rounded-full"></div>
-            </div>
-          </div>
         </div>
       </div>
     </header>
