@@ -18,45 +18,46 @@ export default function TopRightMenu() {
 
   return (
     <>
-      <div className={`fixed z-50 flex flex-col items-end gap-2 sm:gap-3 ${isGame ? 'top-6 right-4 md:right-8' : 'top-6 right-6'} font-pixel`}>
-        {/* User Badge (Primary Anchor) */}
-        <div className="bg-[#b45309] border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#382503] shadow-[0_4px_0px_#2a1b12] rounded-md px-4 py-2 sm:px-5 sm:py-3 flex items-center gap-3 text-[#fffbeb]">
-          {avatarUrl ? (
-            <img src={avatarUrl} alt="Avatar" className="w-8 h-8 sm:w-10 sm:h-10 rounded-sm border-2 border-[#382503]" />
-          ) : (
-            <span role="img" aria-label="user" className="bg-[#fef3c7] text-[#5c2e0b] rounded-sm w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-sm sm:text-base border-2 border-[#382503] font-bold">👤</span>
-          )}
-          <span className="font-bold tracking-wider drop-shadow-md text-lg sm:text-xl">{username || "PLAYER"}</span>
-          <div className="bg-[#5c2e0b] px-3 py-1 sm:px-4 sm:py-1.5 rounded border-2 border-[#382503] flex items-center gap-1 sm:gap-2 shadow-inner ml-2">
-            <span className="text-yellow-400 font-bold text-lg sm:text-xl">🪙</span>
-            <span className="text-yellow-400 font-bold text-lg sm:text-xl">{coins}</span>
-          </div>
-        </div>
+      <div className={`fixed z-50 flex flex-col items-end gap-1.5 ${isGame ? 'top-2 right-2 md:top-4 md:right-6' : 'top-4 right-4 md:top-6 md:right-6'} font-pixel`}>
 
-        {/* System Utilities (Secondary Stacked) */}
-        <div className="flex gap-2 sm:gap-3">
+        {/* ถ้าไม่ใช่หน้าเกม แสดง User Badge แบบเดิม */}
+        {!isGame && (
+          <div className="bg-[#b45309] border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#382503] shadow-[0_4px_0px_#2a1b12] rounded-md px-4 py-2 sm:px-5 sm:py-3 flex items-center gap-3 text-[#fffbeb]">
+            {avatarUrl ? (
+              <img src={avatarUrl} alt="Avatar" className="w-8 h-8 sm:w-10 sm:h-10 rounded-sm border-2 border-[#382503]" />
+            ) : (
+              <span role="img" aria-label="user" className="bg-[#fef3c7] text-[#5c2e0b] rounded-sm w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center text-sm sm:text-base border-2 border-[#382503] font-bold">👤</span>
+            )}
+            <span className="font-bold tracking-wider drop-shadow-md text-lg sm:text-xl">{username || "PLAYER"}</span>
+            <div className="bg-[#5c2e0b] px-3 py-1 sm:px-4 sm:py-1.5 rounded border-2 border-[#382503] flex items-center gap-1 sm:gap-2 shadow-inner ml-2">
+              <span className="text-yellow-400 font-bold text-lg sm:text-xl">🪙</span>
+              <span className="text-yellow-400 font-bold text-lg sm:text-xl">{coins}</span>
+            </div>
+          </div>
+        )}
+
+        {/* System Utilities — vertical ในเกม, horizontal นอกเกม */}
+        <div className={`flex ${isGame ? 'flex-col' : 'flex-row'} gap-1.5`}>
           {/* Mute Button */}
-          <button 
+          <button
             onClick={toggleMute}
-            className={`w-10 h-10 sm:w-12 sm:h-12 ${isMuted ? 'bg-[#5c2e0b]' : 'bg-[#b45309] hover:bg-[#d97706]'} border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#382503] rounded-md flex items-center justify-center text-white text-lg sm:text-xl shadow-[0_4px_0px_#2a1b12] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75`}
+            className={`w-9 h-9 sm:w-10 sm:h-10 ${isMuted ? 'bg-[#5c2e0b]' : 'bg-[#b45309] hover:bg-[#d97706]'} border-b-[3px] border-r-[3px] border-t-[2px] border-l-[2px] border-[#382503] rounded-md flex items-center justify-center text-white text-base sm:text-lg shadow-[0_3px_0px_#2a1b12] active:translate-y-[3px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 relative`}
             title={isMuted ? "Unmute Sound" : "Mute Sound"}
           >
             <span role="img" aria-label="sound" className="drop-shadow-md relative z-10">{isMuted ? "🔇" : "🔊"}</span>
-            <span className="absolute inset-0 border-t-2 border-l-2 border-white/20 rounded-sm pointer-events-none" />
           </button>
-          
-          {/* Logout Button */}
-          <button 
-            className="w-10 h-10 sm:w-12 sm:h-12 bg-[#991b1b] hover:bg-[#b91c1c] border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#450a0a] rounded-md flex items-center justify-center text-white text-lg sm:text-xl shadow-[0_4px_0px_#450a0a] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 relative overflow-hidden" 
+
+          {/* Logout / Leave Button */}
+          <button
+            className="w-9 h-9 sm:w-10 sm:h-10 bg-[#991b1b] hover:bg-[#b91c1c] border-b-[3px] border-r-[3px] border-t-[2px] border-l-[2px] border-[#450a0a] rounded-md flex items-center justify-center text-white text-base sm:text-lg shadow-[0_3px_0px_#450a0a] active:translate-y-[3px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 relative"
             onClick={() => setShowConfirm(true)}
             title={isGame ? "Leave Stage" : "Log Out"}
           >
-            <span className="absolute inset-0 border-t-2 border-l-2 border-white/20 rounded-sm pointer-events-none" />
-            <div className="drop-shadow-md relative z-10 flex items-center justify-center scale-90">
+            <div className="drop-shadow-md relative z-10 flex items-center justify-center">
               {isGame ? (
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
               ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
               )}
             </div>
           </button>
@@ -76,14 +77,14 @@ export default function TopRightMenu() {
                   {isGame ? "Are you sure you want to return to the waiting room?" : "Are you sure you want to log out?"}
                 </p>
                 <div className="flex gap-4 w-full mt-4">
-                  <button 
+                  <button
                     onClick={() => setShowConfirm(false)}
                     className="flex-1 py-3 bg-[#78716c] hover:bg-[#57534e] text-white font-bold text-xl rounded-xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#292524] shadow-[0_4px_0px_#1c1917] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 uppercase tracking-widest relative overflow-hidden"
                   >
                     <span className="absolute inset-0 border-t-2 border-l-2 border-white/20 rounded-lg pointer-events-none" />
                     <span className="relative z-10 drop-shadow-md">Cancel</span>
                   </button>
-                  <button 
+                  <button
                     onClick={handleAction}
                     className="flex-1 py-3 bg-[#991b1b] hover:bg-[#b91c1c] text-white font-bold text-xl rounded-xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#450a0a] shadow-[0_4px_0px_#2a0606] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 uppercase tracking-widest relative overflow-hidden"
                   >
