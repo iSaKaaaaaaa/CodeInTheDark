@@ -50,16 +50,20 @@ export default function GameBoard({
           className="relative flex-col items-center justify-center h-full max-h-full max-w-full"
           style={{
             aspectRatio: '1 / 1',
-            paddingTop: '2.5rem', // เผื่อที่ให้ Header
-            paddingLeft: '2.5rem', // เผื่อที่ให้ Sidebar
+            paddingTop: '2.75rem', // เผื่อที่ให้ Header พิกัด A-M
+            paddingLeft: '2.75rem', // เผื่อที่ให้ Sidebar พิกัด 1-13
           }}
         >
           {/* แถบตัวอักษรบอกพิกัดด้านบน (A-M) */}
-          <div className="absolute top-0 left-[2.5rem] right-0 h-[2.5rem] flex items-center justify-center">
+          <div className="absolute top-0 left-[2.75rem] right-0 h-[2.75rem] flex items-center justify-center">
             {/* ขยับซ้ายขวาให้ตรงกับ 13 ช่องด้านใน (86.666% คือ 13/15 ของกระดาน) */}
-            <div className="w-[86.666%] h-8 bg-[#d2a356] border-4 border-[#572e18] text-black font-bold rounded-lg flex justify-around items-center shadow-md font-pixel z-10">
+            <div className="w-[86.666%] h-9 md:h-10 bg-[#d2a356] border-4 border-[#572e18] text-[#2a1306] rounded-lg flex justify-around items-center shadow-lg z-10" style={{ fontFamily: '"Chakra Petch", sans-serif' }}>
               {COL_LABELS.map((lbl, idx) => (
-                <span key={idx} className="flex-1 text-center text-lg md:text-xl font-bold leading-none">
+                <span
+                  key={idx}
+                  className="flex-1 text-center text-base sm:text-lg md:text-xl font-bold leading-none select-none tracking-tight"
+                  style={{ textShadow: "0.5px 0.5px 0 rgba(255,255,255,0.6)" }}
+                >
                   {lbl}
                 </span>
               ))}
@@ -67,10 +71,14 @@ export default function GameBoard({
           </div>
 
           {/* แถบตัวเลขบอกพิกัดด้านซ้าย (1-13) */}
-          <div className="absolute left-0 top-[2.5rem] bottom-0 w-[2.5rem] flex items-center justify-end pr-1">
-            <div className="h-[86.666%] w-8 bg-[#d2a356] border-4 border-[#572e18] text-black font-bold rounded-lg flex flex-col justify-around items-center shadow-md font-pixel z-10">
+          <div className="absolute left-0 top-[2.75rem] bottom-0 w-[2.75rem] flex items-center justify-end pr-1">
+            <div className="h-[86.666%] w-9 md:w-10 bg-[#d2a356] border-4 border-[#572e18] text-[#2a1306] rounded-lg flex flex-col justify-around items-center shadow-lg z-10" style={{ fontFamily: '"Chakra Petch", sans-serif' }}>
               {ROW_LABELS.map((lbl, idx) => (
-                <span key={idx} className="flex-1 flex items-center justify-center text-lg md:text-xl font-bold leading-none">
+                <span
+                  key={idx}
+                  className="flex-1 flex items-center justify-center text-sm sm:text-base md:text-lg font-bold leading-none select-none"
+                  style={{ textShadow: "0.5px 0.5px 0 rgba(255,255,255,0.6)" }}
+                >
                   {lbl}
                 </span>
               ))}

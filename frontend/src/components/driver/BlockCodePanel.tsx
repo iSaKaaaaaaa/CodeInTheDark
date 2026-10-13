@@ -3,6 +3,7 @@ import * as Blockly from "blockly";
 
 interface BlockCodePanelProps {
   blocksLeft?: number;
+  maxBlocks?: number;
   onRun?: () => void;
   onReady: (workspace: Blockly.WorkspaceSvg) => void;
   readOnly?: boolean;
@@ -11,6 +12,7 @@ interface BlockCodePanelProps {
 
 export default function BlockCodePanel({
   blocksLeft,
+  maxBlocks = 50,
   onRun,
   onReady,
   readOnly = false,
@@ -100,16 +102,21 @@ export default function BlockCodePanel({
                   ? 'border-orange-500 shadow-[0_0_15px_rgba(234,88,12,0.6)] scale-105'
                   : 'border-[#444] shadow-lg'
             }`}>
-              <span className={`font-bold text-sm sm:text-base uppercase tracking-widest leading-none mb-1.5 ${
-                blocksCritical ? 'text-red-400' : blocksWarning ? 'text-orange-300' : 'text-[#c4a265]'
+              <span className={`font-bold text-xs sm:text-sm uppercase tracking-widest leading-none mb-1.5 ${
+                blocksCritical ? 'text-red-400' : blocksWarning ? 'text-orange-300' : 'text-[#fde68a]'
               }`}>
                 Blocks Left
               </span>
-              <span className={`font-pixel text-4xl sm:text-5xl leading-none tracking-wider font-bold ${
-                blocksCritical ? 'text-red-500' : blocksWarning ? 'text-orange-400' : 'text-[#fde68a]'
-              }`} style={{ textShadow: "2px 2px 0 #000" }}>
-                {blocksLeft}
-              </span>
+              <div className="flex items-baseline gap-1.5">
+                <span className={`font-pixel text-4xl sm:text-5xl leading-none tracking-wider font-bold ${
+                  blocksCritical ? 'text-red-500' : blocksWarning ? 'text-orange-400' : 'text-[#fde68a]'
+                }`} style={{ textShadow: "2px 2px 0 #000" }}>
+                  {blocksLeft}
+                </span>
+                <span className="font-pixel text-sm sm:text-base font-bold text-gray-400 tracking-wider" style={{ textShadow: "1px 1px 0 #000" }}>
+                  / {maxBlocks}
+                </span>
+              </div>
             </div>
           )}
         </div>

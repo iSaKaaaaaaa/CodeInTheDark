@@ -73,19 +73,19 @@ export default function ChatBox() {
   }, [messages]);
 
   return (
-    <div className="h-64 md:h-72 bg-black/85 rounded-xl border-4 border-black p-3.5 flex flex-col shadow-2xl">
-      <span className="text-white font-bold text-3xl md:text-4xl mb-2 tracking-widest font-pixel">
+    <div className="h-48 md:h-56 bg-black/85 rounded-xl border-4 border-black p-2.5 sm:p-3 flex flex-col shadow-2xl shrink-0">
+      <span className="text-white font-bold text-lg sm:text-xl md:text-2xl mb-1 tracking-widest font-pixel">
         CHAT BOX
       </span>
 
-      <div className="flex-1 overflow-y-auto mb-2.5 flex flex-col gap-1.5 pr-1">
+      <div className="flex-1 overflow-y-auto mb-1.5 flex flex-col gap-1 pr-1 min-h-0" style={{ fontFamily: '"Chakra Petch", sans-serif' }}>
         {messages.map((msg, index) => {
           const isSystem = msg.sender === "[SYSTEM]";
           const isMe = msg.sender === username;
 
           if (isSystem) {
             return (
-              <div key={index} className="text-yellow-400 text-xl md:text-2xl font-pixel italic py-0.5 leading-snug">
+              <div key={index} className="text-yellow-400 text-sm md:text-base font-bold italic leading-snug shrink-0 break-words py-0.5">
                 <span className="font-bold">⚠ </span>
                 {msg.text}
               </div>
@@ -93,7 +93,7 @@ export default function ChatBox() {
           }
 
           return (
-            <div key={index} className="text-white text-2xl md:text-3xl font-pixel leading-snug">
+            <div key={index} className="text-white text-sm md:text-base font-semibold leading-snug shrink-0 break-words py-0.5">
               <span className={`font-bold ${isMe ? 'text-sky-400' : 'text-orange-400'}`}>
                 {msg.sender}{isMe && " (You)"}:{" "}
               </span>
@@ -110,7 +110,8 @@ export default function ChatBox() {
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Type a message (English / ไทย)..."
-        className="bg-black/60 border-2 border-gray-700 rounded-lg px-4 py-2.5 text-white text-xl md:text-2xl outline-none focus:border-orange-500 transition-colors font-pixel placeholder:text-gray-500"
+        style={{ fontFamily: '"Chakra Petch", sans-serif' }}
+        className="bg-black/60 border-2 border-gray-700 rounded-lg px-3 py-1.5 text-white text-sm md:text-base font-medium outline-none focus:border-orange-500 transition-colors placeholder:text-gray-500 shrink-0"
       />
     </div>
   );

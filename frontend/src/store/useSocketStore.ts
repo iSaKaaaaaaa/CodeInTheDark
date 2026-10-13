@@ -106,7 +106,17 @@ export const useSocketStore = create<SocketState>()(
   loginWithGoogle: async (payload: string | { credential?: string; accessToken?: string }) => {
     try {
       const backendUrl = getBackendUrl();
-      const body = typeof payload === 'string' ? { credential: payload } : payload;
+      let body: { credential?: string; accessToken?: string };
+      if (typeof payload === 'string') {
+        // JWT ID token has 3 parts separated by dots, access token typically doesn't
+        if (payload.split('.').length === 3) {
+          body = { credential: payload };
+        } else {
+          body = { accessToken: payload };
+        }
+      } else {
+        body = payload;
+      }
       const response = await axios.post(`${backendUrl}/api/auth/google`, body);
       const user = response.data;
       

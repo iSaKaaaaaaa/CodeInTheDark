@@ -12,7 +12,7 @@ export default function LoginModal() {
     onSuccess: async (tokenResponse) => {
       try {
         if (tokenResponse.access_token) {
-          await loginWithGoogle(tokenResponse.access_token);
+          await loginWithGoogle({ accessToken: tokenResponse.access_token });
         }
       } catch (err: any) {
         setError(err.message || "Login failed. Please try again.");

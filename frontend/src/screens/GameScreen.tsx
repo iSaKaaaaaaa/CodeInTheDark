@@ -162,7 +162,7 @@ export default function GameScreen() {
 
   return (
     <div
-      className="w-full h-screen bg-cover bg-center flex flex-col font-pixel cursor-default relative overflow-hidden"
+      className="w-full h-screen bg-cover bg-center flex flex-col font-pixel cursor-default relative overflow-x-hidden overflow-y-auto"
       style={{ backgroundImage: "url('/ui/ingame.png')" }}
       onClick={handleScreenClick}
     >
@@ -283,7 +283,7 @@ export default function GameScreen() {
       )}
 
       {/* Game Layout — fit screen */}
-      <div className="w-full max-w-[1600px] mx-auto flex flex-col flex-1 p-2 md:p-3 lg:p-4 gap-2 md:gap-3 relative overflow-hidden">
+      <div className="w-full max-w-[1700px] mx-auto flex flex-col flex-1 p-2 md:p-3 lg:p-4 gap-2 md:gap-3 relative min-h-0">
         <div className={`shrink-0 transition-all duration-300 ${tutorialStep === 5 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-xl pointer-events-none bg-black/50' : ''}`}>
           <GameHeader
             role={role === "driver" ? "DRIVER" : "NAVIGATOR"}
@@ -293,8 +293,9 @@ export default function GameScreen() {
           />
         </div>
 
-        <div className="flex flex-1 gap-2 md:gap-4 w-full items-stretch min-h-0">
-          <div className="flex-[6] min-w-0 flex flex-col gap-2 md:gap-3 min-h-0">
+        <div className="flex flex-1 gap-3 md:gap-4 w-full items-stretch min-h-0">
+          {/* Left Column: Game Board + Chat */}
+          <div className="flex-[5.5] min-w-0 flex flex-col gap-2 md:gap-3 min-h-0">
             <div className={`flex-1 flex flex-col min-h-0 transition-all duration-300 ${tutorialStep === 2 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-[20px] pointer-events-none' : ''}`}>
               <GameBoard
                 playerX={playerX}
@@ -313,10 +314,12 @@ export default function GameScreen() {
             </div>
           </div>
 
-          <div className={`flex-[4] min-w-0 flex flex-col min-h-0 transition-all duration-300 ${tutorialStep === 4 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-2xl pointer-events-none' : ''}`}>
+          {/* Right Column: Toolbox + Your Program */}
+          <div className={`flex-[4.5] min-w-0 flex flex-col min-h-0 transition-all duration-300 ${tutorialStep === 4 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-2xl pointer-events-none' : ''}`}>
             <BlockCodePanel
               key={panelKey}
               blocksLeft={blocksLeft}
+              maxBlocks={MAX_BLOCKS}
               onReady={handleWorkspaceReady}
               onRun={role === "driver" ? runProgram : undefined}
               readOnly={role !== "driver"}
