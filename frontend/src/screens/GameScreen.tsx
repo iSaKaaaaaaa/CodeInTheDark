@@ -36,40 +36,40 @@ function TutorialCard({
   className?: string;
 }) {
   return (
-    <div className={`pointer-events-auto max-w-[450px] w-[92vw] mx-auto shadow-[0_20px_50px_rgba(0,0,0,0.8)] rounded-xl ${className}`}>
+    <div className={`pointer-events-auto max-w-[530px] w-[94vw] mx-auto shadow-[0_20px_50px_rgba(0,0,0,0.8)] rounded-xl ${className}`}>
       {/* Wooden frame top */}
-      <div className="mx-2 h-3 sm:h-4 rounded-t-md relative" style={{
+      <div className="mx-2 h-4 sm:h-5 rounded-t-md relative" style={{
         background: 'linear-gradient(180deg, #8B5E3C 0%, #6B3F1F 40%, #5C2E18 100%)',
         borderTop: '2px solid #A97B50', borderLeft: '2px solid #7A4E2D', borderRight: '2px solid #4A2510',
         boxShadow: '0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15)',
       }}>
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(0,0,0,0.15) 8px, rgba(0,0,0,0.15) 9px)' }} />
-        {[0, 1].map(i => <div key={i} className={`absolute top-1/2 -translate-y-1/2 ${i === 0 ? 'left-2' : 'right-2'} w-1.5 h-1.5 rounded-full bg-[#C4A265] border border-[#8B6F3A]`} />)}
+        {[0, 1].map(i => <div key={i} className={`absolute top-1/2 -translate-y-1/2 ${i === 0 ? 'left-2.5' : 'right-2.5'} w-2 h-2 rounded-full bg-[#C4A265] border border-[#8B6F3A]`} />)}
       </div>
       {/* Parchment body */}
-      <div className="mx-0.5 px-6 sm:px-8 py-6 sm:py-8 relative" style={{
+      <div className="mx-0.5 px-6 sm:px-9 py-6 sm:py-8 relative" style={{
         background: 'linear-gradient(170deg, #F5E6C8 0%, #EDD9A3 30%, #E8D08E 60%, #DBBF78 100%)',
         borderLeft: '3px solid #B8944F', borderRight: '3px solid #9A7A3D',
         boxShadow: 'inset 0 0 30px rgba(139,99,49,0.15), inset 0 0 60px rgba(139,99,49,0.08), 4px 0 8px rgba(0,0,0,0.2), -4px 0 8px rgba(0,0,0,0.2), 0 4px 12px rgba(0,0,0,0.3)',
       }}>
         <div className="absolute inset-0 pointer-events-none" style={{ boxShadow: 'inset 0 0 40px rgba(101,67,33,0.12)' }} />
-        <div className="relative z-10 flex flex-col items-center gap-4 sm:gap-6">
+        <div className="relative z-10 flex flex-col items-center gap-4 sm:gap-5">
           {/* Title badge */}
-          <span className="inline-block font-bold text-white text-xl sm:text-2xl px-6 py-2 rounded-xl border-2 uppercase tracking-widest" style={{
+          <span className="inline-block font-bold text-white text-2xl sm:text-3xl px-7 py-2 rounded-xl border-2 uppercase tracking-widest font-pixel" style={{
             background: titleColor, borderColor: titleBorder,
-            boxShadow: `0 4px 0 ${titleBorder}`, textShadow: '1px 1px 0 rgba(0,0,0,0.3)',
+            boxShadow: `0 4px 0 ${titleBorder}`, textShadow: '1px 1px 0 rgba(0,0,0,0.4)',
           }}>
             {title}
           </span>
           {/* Content */}
-          <div className="text-base sm:text-lg font-bold text-[#382503] leading-relaxed text-center w-full">
+          <div className="text-xl sm:text-2xl font-bold text-[#382503] leading-relaxed text-center w-full font-pixel">
             {children}
           </div>
           {/* Button */}
           <button
             onClick={onNext}
             disabled={disabled}
-            className={`mt-2 font-bold text-lg sm:text-xl px-10 py-2.5 rounded-xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 uppercase tracking-widest transition-all ${
+            className={`mt-2 font-bold text-xl sm:text-2xl px-12 py-3 rounded-xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 uppercase tracking-widest transition-all font-pixel ${
               disabled
                 ? 'bg-[#8B6F3A] border-[#5c2e0b] text-[#d4c9a8] shadow-none translate-y-1 cursor-not-allowed'
                 : 'bg-[#b45309] border-[#382503] text-white hover:bg-[#d97706] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none shadow-[0_4px_0_#2a1b12]'
@@ -80,13 +80,13 @@ function TutorialCard({
         </div>
       </div>
       {/* Wooden frame bottom */}
-      <div className="mx-2 h-3 sm:h-4 rounded-b-md relative" style={{
+      <div className="mx-2 h-4 sm:h-5 rounded-b-md relative" style={{
         background: 'linear-gradient(0deg, #8B5E3C 0%, #6B3F1F 40%, #5C2E18 100%)',
         borderBottom: '2px solid #4A2510', borderLeft: '2px solid #7A4E2D', borderRight: '2px solid #4A2510',
         boxShadow: '0 4px 8px rgba(0,0,0,0.4), inset 0 -1px 0 rgba(255,255,255,0.1)',
       }}>
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(0,0,0,0.15) 8px, rgba(0,0,0,0.15) 9px)' }} />
-        {[0, 1].map(i => <div key={i} className={`absolute top-1/2 -translate-y-1/2 ${i === 0 ? 'left-2' : 'right-2'} w-1.5 h-1.5 rounded-full bg-[#C4A265] border border-[#8B6F3A]`} />)}
+        {[0, 1].map(i => <div key={i} className={`absolute top-1/2 -translate-y-1/2 ${i === 0 ? 'left-2.5' : 'right-2.5'} w-2 h-2 rounded-full bg-[#C4A265] border border-[#8B6F3A]`} />)}
       </div>
     </div>
   );
@@ -94,7 +94,7 @@ function TutorialCard({
 
 /* ─── Inline badge helper ─── */
 function Badge({ children, color = 'bg-blue-100 text-blue-800 border-blue-800' }: { children: React.ReactNode; color?: string }) {
-  return <span className={`inline-block ${color} border px-2 py-0.5 rounded-md font-bold shadow-sm text-sm sm:text-base uppercase tracking-wider`}>{children}</span>;
+  return <span className={`inline-block ${color} border-2 px-2.5 py-0.5 rounded-md font-bold shadow-sm text-lg sm:text-xl uppercase tracking-wider font-pixel`}>{children}</span>;
 }
 
 export default function GameScreen() {
@@ -203,18 +203,18 @@ export default function GameScreen() {
               <TutorialCard title="WELCOME!" onNext={() => setTutorialStep(2)}>
                 {role === "driver" ? (
                   <>
-                    <p>You are the <Badge color="bg-blue-100 text-blue-800 border-blue-800">DRIVER 🚙</Badge></p>
-                    <p className="mt-4">You can see the <Badge color="bg-green-100 text-green-800 border-green-800">Goal</Badge> and <Badge color="bg-red-100 text-red-800 border-red-800">Traps</Badge>, but you <span className="text-red-600 font-black">CANNOT</span> see the walls!</p>
-                    <p className="mt-4 text-[#8b6840] bg-[#f5e6c8] p-3 rounded-lg border-2 border-[#b8944f]/30">Your partner (Navigator) sees the walls.</p>
+                    <p className="text-xl sm:text-2xl">You are the <Badge color="bg-blue-100 text-blue-800 border-blue-800">DRIVER 🚙</Badge></p>
+                    <p className="mt-4 text-xl sm:text-2xl">You can see the <Badge color="bg-green-100 text-green-800 border-green-800">Goal</Badge> and <Badge color="bg-red-100 text-red-800 border-red-800">Traps</Badge>, but you <span className="text-red-600 font-black">CANNOT</span> see the walls!</p>
+                    <p className="mt-4 text-[#8b6840] bg-[#f5e6c8] p-3 rounded-lg border-2 border-[#b8944f]/40 text-base sm:text-lg">Your partner (Navigator) sees the walls.</p>
                   </>
                 ) : (
                   <>
-                    <p>You are the <Badge color="bg-purple-100 text-purple-800 border-purple-800">NAVIGATOR 🗺️</Badge></p>
-                    <p className="mt-4">You can see the <Badge color="bg-amber-100 text-amber-900 border-amber-900">Walls</Badge>, but you <span className="text-red-600 font-black">CANNOT</span> see the traps or goal!</p>
-                    <p className="mt-4 text-[#8b6840] bg-[#f5e6c8] p-3 rounded-lg border-2 border-[#b8944f]/30">Your partner (Driver) sees the traps.</p>
+                    <p className="text-xl sm:text-2xl">You are the <Badge color="bg-purple-100 text-purple-800 border-purple-800">NAVIGATOR 🗺️</Badge></p>
+                    <p className="mt-4 text-xl sm:text-2xl">You can see the <Badge color="bg-amber-100 text-amber-900 border-amber-900">Walls</Badge>, but you <span className="text-red-600 font-black">CANNOT</span> see the traps or goal!</p>
+                    <p className="mt-4 text-[#8b6840] bg-[#f5e6c8] p-3 rounded-lg border-2 border-[#b8944f]/40 text-base sm:text-lg">Your partner (Driver) sees the traps.</p>
                   </>
                 )}
-                <p className="mt-5 text-[#ea580c] font-black text-xl">Work together to survive!</p>
+                <p className="mt-5 text-[#ea580c] font-black text-2xl sm:text-3xl">Work together to survive!</p>
               </TutorialCard>
             </div>
           )}
@@ -224,9 +224,9 @@ export default function GameScreen() {
             <div className="absolute top-1/2 -translate-y-1/2 right-[2%] lg:right-[8%] xl:right-[15%] animate-in fade-in slide-in-from-right-8 duration-300">
               <TutorialCard title="THE MAP & FOG" titleColor="#2B6CB0" titleBorder="#1A365D" buttonText="GOT IT ➔" onNext={() => setTutorialStep(3)}>
                 {role === "driver" ? (
-                  <p>This is the map. What you see is <strong className="text-red-700">only half the truth.</strong><br/><br/>Do not move until you <Badge color="bg-yellow-100 text-yellow-900 border-yellow-700">ask your partner</Badge> if the path is safe!</p>
+                  <p className="text-xl sm:text-2xl">This is the map. What you see is <strong className="text-red-700">only half the truth.</strong><br/><br/>Do not move until you <Badge color="bg-yellow-100 text-yellow-900 border-yellow-700">ask your partner</Badge> if the path is safe!</p>
                 ) : (
-                  <p>Notice the <Badge color="bg-gray-800 text-gray-200 border-gray-600">Dark Fog</Badge>? It moves when the player moves.<br/><br/>You must <strong className="text-purple-800 underline">guide your partner</strong> through the darkness!</p>
+                  <p className="text-xl sm:text-2xl">Notice the <Badge color="bg-gray-800 text-gray-200 border-gray-600">Dark Fog</Badge>? It moves when the player moves.<br/><br/>You must <strong className="text-purple-800 underline">guide your partner</strong> through the darkness!</p>
                 )}
               </TutorialCard>
             </div>
@@ -236,21 +236,21 @@ export default function GameScreen() {
           {tutorialStep === 3 && (
             <div className="absolute bottom-[20%] lg:bottom-[30%] right-[2%] lg:right-[8%] xl:right-[15%] animate-in fade-in slide-in-from-right-8 duration-300">
               <TutorialCard title="TRAPS & CHAT" titleColor="#16a34a" titleBorder="#14532d" buttonText="NEXT ➔" onNext={() => setTutorialStep(4)}>
-                <p className="mb-4">Use the <Badge color="bg-white text-blue-700 border-gray-300">chat</Badge> below to warn your partner!</p>
+                <p className="mb-4 text-xl sm:text-2xl">Use the <Badge color="bg-white text-blue-700 border-gray-300">chat</Badge> below to warn your partner!</p>
 
-                <div className="w-full text-left space-y-3 bg-white/40 p-4 rounded-xl border-2 border-[#b8944f]/30">
-                  <p className="font-black text-[#5c2e0b] uppercase tracking-wider text-center border-b-2 border-[#b8944f]/30 pb-2 mb-3">Trap Types:</p>
+                <div className="w-full text-left space-y-3.5 bg-white/50 p-4 rounded-xl border-2 border-[#b8944f]/40">
+                  <p className="font-black text-[#5c2e0b] text-xl sm:text-2xl uppercase tracking-wider text-center border-b-2 border-[#b8944f]/40 pb-2 mb-3">Trap Types:</p>
                   <div className="flex items-start gap-3">
-                    <span className="text-2xl shrink-0">🪤</span>
-                    <p><strong className="text-red-700">Trap</strong> — Instant death! Avoid at all costs.</p>
+                    <span className="text-3xl shrink-0">🪤</span>
+                    <p className="text-lg sm:text-xl"><strong className="text-red-700">Trap</strong> — Instant death! Avoid at all costs.</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="text-2xl shrink-0">🪨</span>
-                    <p><strong className="text-[#5c2e0b]">Rock</strong> — Blocks your path. Bounces you back.</p>
+                    <span className="text-3xl shrink-0">🪨</span>
+                    <p className="text-lg sm:text-xl"><strong className="text-[#5c2e0b]">Rock</strong> — Blocks path. Bounces you back.</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <span className="text-2xl shrink-0">🔺</span>
-                    <p><strong className="text-orange-700">Spike</strong> — Bounces you 2 tiles back. Wastes blocks!</p>
+                    <span className="text-3xl shrink-0">🔺</span>
+                    <p className="text-lg sm:text-xl"><strong className="text-orange-700">Spike</strong> — Bounces 2 tiles back. Wastes blocks!</p>
                   </div>
                 </div>
               </TutorialCard>
@@ -261,10 +261,10 @@ export default function GameScreen() {
           {tutorialStep === 4 && (
             <div className="absolute top-1/2 -translate-y-1/2 left-[2%] lg:left-[5%] xl:left-[10%] animate-in fade-in slide-in-from-left-8 duration-300">
               <TutorialCard title="PROGRAMMING" titleColor="#DB5C00" titleBorder="#7c2d12" buttonText={selfReady ? "WAITING..." : "READY ✓"} onNext={markSelfReady} disabled={selfReady}>
-                <p>Drag blocks to move the character.</p>
+                <p className="text-xl sm:text-2xl">Drag blocks to move the character.</p>
                 <p className="mt-4"><Badge color="bg-red-100 text-red-800 border-red-800">WARNING</Badge></p>
-                <p className="mt-2">You only have <strong className="text-red-600 text-2xl font-black mx-1">{MAX_BLOCKS}</strong> blocks per game.<br/>Use them wisely!</p>
-                <p className="mt-6 text-[#8b6840] text-sm">Click READY when you understand.</p>
+                <p className="mt-2 text-xl sm:text-2xl">You only have <strong className="text-red-600 text-3xl font-black mx-1">{MAX_BLOCKS}</strong> blocks per game.<br/>Use them wisely!</p>
+                <p className="mt-6 text-[#8b6840] text-base sm:text-lg">Click READY when you understand.</p>
               </TutorialCard>
             </div>
           )}
@@ -273,9 +273,9 @@ export default function GameScreen() {
           {tutorialStep === 5 && (
             <div className="absolute top-[15%] left-1/2 -translate-x-1/2 animate-in fade-in slide-in-from-top-8 duration-300">
               <TutorialCard title="TIME TO SWAP" titleColor="#eab308" titleBorder="#a16207" buttonText="GOT IT ➔" onNext={() => setTutorialStep(99)}>
-                <p>Watch the <Badge color="bg-green-100 text-green-800 border-green-700">Green Bar</Badge> at the top!</p>
-                <p className="mt-4">When it runs out, you will <Badge color="bg-orange-100 text-orange-800 border-orange-800">Swap Roles</Badge> with your partner.</p>
-                <p className="mt-4">Also watch the <Badge color="bg-red-100 text-red-700 border-red-400">Dungeon Time</Badge>.<br/>If it reaches 0, you lose!</p>
+                <p className="text-xl sm:text-2xl">Watch the <Badge color="bg-green-100 text-green-800 border-green-700">Green Bar</Badge> at the top!</p>
+                <p className="mt-4 text-xl sm:text-2xl">When it runs out, you will <Badge color="bg-orange-100 text-orange-800 border-orange-800">Swap Roles</Badge> with your partner.</p>
+                <p className="mt-4 text-xl sm:text-2xl">Also watch the <Badge color="bg-red-100 text-red-700 border-red-400">Dungeon Time</Badge>.<br/>If it reaches 0, you lose!</p>
               </TutorialCard>
             </div>
           )}

@@ -2,7 +2,7 @@
 
 /* วิธีการสร้างฟอนต์แบบใหม่ของ Tailwind v4 */
 @theme {
-  --font-pixel: "VT323", monospace;
+  --font-pixel: "VT323", "Chakra Petch", monospace;
 }
 
 body {
@@ -13,13 +13,14 @@ body {
 /* --- การปรับแต่งสไตล์ Blockly ให้เข้ากับธีมพิกเซลอียิปต์โบราณ --- */
 
 /* กำหนดฟอนต์พิกเซลให้กับข้อความทั้งหมดใน Blockly */
-.blocklyText, 
-.blocklyFlyoutLabelText, 
+.blocklyText,
+.blocklyFlyoutLabelText,
 .blocklyToolboxContents,
 .blocklyTreeLabel {
-  font-family: "VT323", monospace !important;
-  font-size: 20px !important;
+  font-family: "VT323", "Chakra Petch", monospace !important;
+  font-size: 26px !important;
   font-weight: bold !important;
+  letter-spacing: 0.5px !important;
 }
 
 /* ซ่อนกรอบแถบเครื่องมือดั้งเดิม (เนื่องจากใช้ flyoutToolbox) */
@@ -27,10 +28,10 @@ body {
   display: none !important;
 }
 
-/* ปรับแต่งขนาดและสีของแถบบิน (Flyout) ให้มีความกว้าง 220px พอดีกับฝั่ง Blocks ของ Header */
+/* ปรับแต่งขนาดและสีของแถบบิน (Flyout) ให้มีความกว้าง 230px พอดีกับฝั่ง Blocks ของ Header */
 .blocklyFlyout,
 .blocklyFlyoutBackground {
-  width: 220px !important;
+  width: 230px !important;
 }
 
 .blocklyFlyoutBackground {
@@ -80,9 +81,10 @@ body {
 .blocklyEditableText text,
 .blocklyText {
   fill: #382503 !important; /* คำหลัก (Move Up/Down/Left/Right) เป็นสีดำ */
-  font-family: "VT323", monospace !important;
-  font-size: 20px !important;
+  font-family: "VT323", "Chakra Petch", monospace !important;
+  font-size: 26px !important;
   font-weight: bold !important;
+  letter-spacing: 0.5px !important;
 }
 
 /* เฉพาะสัญลักษณ์ลูกศรบอกทิศทางที่เป็นสีขาว */

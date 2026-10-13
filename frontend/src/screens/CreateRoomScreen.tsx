@@ -107,26 +107,26 @@ export default function CreateRoomScreen() {
 
           <div className="flex flex-col items-center gap-4 sm:gap-5">
             {/* Room Name + Code */}
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center gap-1.5">
               <p
-                className="text-lg sm:text-xl md:text-2xl text-[#5c2e0b] font-bold uppercase tracking-wider"
+                className="text-2xl sm:text-3xl md:text-4xl text-[#5c2e0b] font-bold uppercase tracking-wider"
                 style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.3)' }}
               >
                 {roomName}
               </p>
-              <div className="flex items-center gap-2 sm:gap-3">
-                <span className="text-xs sm:text-sm text-[#8b6840] uppercase tracking-widest">
+              <div className="flex items-center gap-3">
+                <span className="text-sm sm:text-base text-[#8b6840] uppercase tracking-widest font-bold">
                   Code:
                 </span>
                 <span
-                  className="text-2xl sm:text-3xl md:text-4xl text-[#5c2e0b] font-bold tracking-[0.2em] uppercase"
+                  className="text-3xl sm:text-4xl md:text-5xl text-[#5c2e0b] font-bold tracking-[0.2em] uppercase"
                   style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.3)' }}
                 >
                   {roomCode || "------"}
                 </span>
                 <button
                   onClick={handleCopyCode}
-                  className="relative bg-[#5c2e0b] hover:bg-[#7a3f12] text-[#fde68a] w-8 h-8 sm:w-9 sm:h-9 rounded-lg border-b-[3px] border-r-[3px] border-t-2 border-l-2 border-[#382503] shadow-[0_3px_0px_#2a1b12] active:translate-y-[3px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 flex items-center justify-center text-base sm:text-lg"
+                  className="relative bg-[#5c2e0b] hover:bg-[#7a3f12] text-[#fde68a] w-9 h-9 sm:w-10 sm:h-10 rounded-lg border-b-[3px] border-r-[3px] border-t-2 border-l-2 border-[#382503] shadow-[0_3px_0px_#2a1b12] active:translate-y-[3px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 flex items-center justify-center text-lg sm:text-xl font-bold"
                   title="Copy Code"
                 >
                   <span className="absolute inset-0 border-t border-l border-white/10 rounded-lg pointer-events-none" />
@@ -137,12 +137,12 @@ export default function CreateRoomScreen() {
 
             {/* Visibility Toggle */}
             {isHost && (
-              <div className="flex items-center gap-1 p-0.5 rounded-lg border-2 border-[#5c2e0b]/30" style={{
+              <div className="flex items-center gap-1 p-1 rounded-xl border-2 border-[#5c2e0b]/30" style={{
                 background: 'linear-gradient(135deg, rgba(244,222,179,0.5) 0%, rgba(222,194,140,0.5) 100%)',
               }}>
                 <button
                   onClick={() => setIsPublic(false)}
-                  className={`px-4 sm:px-5 py-1.5 rounded-md text-sm sm:text-base font-bold uppercase tracking-wider transition-all duration-150 ${
+                  className={`px-5 sm:px-6 py-2 rounded-lg text-base sm:text-lg font-bold uppercase tracking-wider transition-all duration-150 ${
                     !isPublic
                       ? 'bg-[#5c2e0b] text-[#fde68a] shadow-md'
                       : 'text-[#8b6840] hover:text-[#5c2e0b]'
@@ -152,7 +152,7 @@ export default function CreateRoomScreen() {
                 </button>
                 <button
                   onClick={() => setIsPublic(true)}
-                  className={`px-4 sm:px-5 py-1.5 rounded-md text-sm sm:text-base font-bold uppercase tracking-wider transition-all duration-150 ${
+                  className={`px-5 sm:px-6 py-2 rounded-lg text-base sm:text-lg font-bold uppercase tracking-wider transition-all duration-150 ${
                     isPublic
                       ? 'bg-[#5c2e0b] text-[#fde68a] shadow-md'
                       : 'text-[#8b6840] hover:text-[#5c2e0b]'
@@ -166,34 +166,34 @@ export default function CreateRoomScreen() {
             {/* Divider */}
             <div className="w-full flex items-center gap-3">
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#B8944F] to-transparent opacity-50" />
-              <div className="w-1.5 h-1.5 rotate-45 bg-[#B8944F] opacity-60" />
+              <div className="w-2 h-2 rotate-45 bg-[#B8944F] opacity-60" />
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#B8944F] to-transparent opacity-50" />
             </div>
 
             {/* Players Section */}
-            <div className="w-full flex flex-col gap-2.5 sm:gap-3">
-              <p className="text-xs sm:text-sm text-[#8b6840] uppercase tracking-widest text-center">
+            <div className="w-full flex flex-col gap-3">
+              <p className="text-sm sm:text-base text-[#8b6840] uppercase tracking-widest text-center font-bold">
                 Players
               </p>
 
               {/* Player 1 — Host */}
               <div
-                className="w-full flex items-center justify-between px-4 sm:px-5 py-3 sm:py-3.5 rounded-xl border-2 border-[#5c2e0b]/40"
+                className="w-full flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl border-2 border-[#5c2e0b]/40"
                 style={{
                   background: 'linear-gradient(135deg, rgba(244,222,179,0.8) 0%, rgba(222,194,140,0.8) 100%)',
                   boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.1)',
                 }}
               >
-                <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#b45309] border-2 border-[#5c2e0b] flex items-center justify-center text-white text-sm sm:text-base font-bold shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)]">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#b45309] border-2 border-[#5c2e0b] flex items-center justify-center text-white text-base sm:text-lg font-bold shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)]">
                     {(players.length > 0 ? players[0].username : username || "H").charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-lg sm:text-xl md:text-2xl font-bold text-[#382503] uppercase tracking-wider">
+                  <span className="text-xl sm:text-2xl md:text-3xl font-bold text-[#382503] uppercase tracking-wider">
                     {players.length > 0 ? players[0].username : username || "HOST"}
                   </span>
                 </div>
                 <span
-                  className="text-sm sm:text-base font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-md"
+                  className="text-base sm:text-lg font-bold tracking-widest uppercase px-3 py-1 rounded-md"
                   style={{
                     color: '#9B2C2C',
                     background: 'rgba(155, 44, 44, 0.1)',
@@ -206,7 +206,7 @@ export default function CreateRoomScreen() {
 
               {/* Player 2 — Guest / Waiting */}
               <div
-                className={`w-full flex items-center justify-between px-4 sm:px-5 py-3 sm:py-3.5 rounded-xl border-2 transition-all ${
+                className={`w-full flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl border-2 transition-all ${
                   players.length > 1
                     ? 'border-[#5c2e0b]/40'
                     : 'border-dashed border-[#B8944F]/50'
@@ -222,16 +222,16 @@ export default function CreateRoomScreen() {
               >
                 {players.length > 1 ? (
                   <>
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-[#2B6CB0] border-2 border-[#1A365D] flex items-center justify-center text-white text-sm sm:text-base font-bold shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)]">
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#2B6CB0] border-2 border-[#1A365D] flex items-center justify-center text-white text-base sm:text-lg font-bold shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)]">
                         {players[1].username.charAt(0).toUpperCase()}
                       </div>
-                      <span className="text-lg sm:text-xl md:text-2xl font-bold text-[#382503] uppercase tracking-wider">
+                      <span className="text-xl sm:text-2xl md:text-3xl font-bold text-[#382503] uppercase tracking-wider">
                         {players[1].username}
                       </span>
                     </div>
                     <span
-                      className="text-sm sm:text-base font-bold tracking-widest uppercase px-2.5 py-0.5 rounded-md"
+                      className="text-base sm:text-lg font-bold tracking-widest uppercase px-3 py-1 rounded-md"
                       style={{
                         color: '#2B6CB0',
                         background: 'rgba(43, 108, 176, 0.1)',
@@ -242,11 +242,11 @@ export default function CreateRoomScreen() {
                     </span>
                   </>
                 ) : (
-                  <div className="w-full flex flex-col items-center py-1 gap-1">
-                    <span className="text-base sm:text-lg text-[#B8944F] font-bold uppercase tracking-wider">
+                  <div className="w-full flex flex-col items-center py-1.5 gap-1">
+                    <span className="text-lg sm:text-xl text-[#B8944F] font-bold uppercase tracking-wider">
                       Waiting for opponent...
                     </span>
-                    <span className="text-xs sm:text-sm text-[#B8944F]/70">
+                    <span className="text-sm sm:text-base text-[#B8944F]/80">
                       {isPublic ? 'Visible in public lobby' : 'Share the room code above'}
                     </span>
                   </div>
@@ -257,7 +257,7 @@ export default function CreateRoomScreen() {
             {/* Divider */}
             <div className="w-full flex items-center gap-3">
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#B8944F] to-transparent opacity-50" />
-              <div className="w-1.5 h-1.5 rotate-45 bg-[#B8944F] opacity-60" />
+              <div className="w-2 h-2 rotate-45 bg-[#B8944F] opacity-60" />
               <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#B8944F] to-transparent opacity-50" />
             </div>
 
@@ -267,14 +267,14 @@ export default function CreateRoomScreen() {
                 <button
                   onClick={startGame}
                   disabled={players.length < 2}
-                  className="bg-[#b45309] hover:bg-[#d97706] disabled:bg-[#8B6F3A] disabled:opacity-50 disabled:cursor-not-allowed text-[#fffbeb] font-bold text-xl sm:text-2xl px-10 sm:px-14 py-2.5 sm:py-3 rounded-xl border-b-[4px] border-r-[4px] border-t-[3px] border-l-[3px] border-[#382503] shadow-[0_4px_0px_#2a1b12] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 uppercase tracking-widest relative overflow-hidden"
+                  className="bg-[#b45309] hover:bg-[#d97706] disabled:bg-[#8B6F3A] disabled:opacity-50 disabled:cursor-not-allowed text-[#fffbeb] font-bold text-2xl sm:text-3xl px-12 sm:px-16 py-3 sm:py-3.5 rounded-xl border-b-[4px] border-r-[4px] border-t-[3px] border-l-[3px] border-[#382503] shadow-[0_4px_0px_#2a1b12] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 uppercase tracking-widest relative overflow-hidden"
                 >
                   <span className="absolute inset-0 border-t-[3px] border-l-[3px] border-white/15 rounded-lg pointer-events-none" />
                   <span className="relative z-10">⚔ Play</span>
                 </button>
               ) : (
                 <div
-                  className="px-10 sm:px-14 py-2.5 sm:py-3 rounded-xl text-lg sm:text-xl font-bold uppercase tracking-widest text-center border-2 border-[#5c2e0b]/30 text-[#8b6840]"
+                  className="px-12 sm:px-16 py-3 rounded-xl text-xl sm:text-2xl font-bold uppercase tracking-widest text-center border-2 border-[#5c2e0b]/30 text-[#8b6840]"
                   style={{
                     background: 'linear-gradient(135deg, rgba(244,222,179,0.5) 0%, rgba(222,194,140,0.5) 100%)',
                   }}

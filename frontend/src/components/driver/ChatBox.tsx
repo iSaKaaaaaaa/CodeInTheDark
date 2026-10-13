@@ -73,31 +73,31 @@ export default function ChatBox() {
   }, [messages]);
 
   return (
-    <div className="h-56 bg-black/80 rounded-xl border-4 border-black p-3 flex flex-col shadow-2xl">
-      <span className="text-white font-bold text-3xl mb-2 tracking-wider">
+    <div className="h-64 md:h-72 bg-black/85 rounded-xl border-4 border-black p-3.5 flex flex-col shadow-2xl">
+      <span className="text-white font-bold text-3xl md:text-4xl mb-2 tracking-widest font-pixel">
         CHAT BOX
       </span>
 
-      <div className="flex-1 overflow-y-auto mb-2 flex flex-col gap-1">
+      <div className="flex-1 overflow-y-auto mb-2.5 flex flex-col gap-1.5 pr-1">
         {messages.map((msg, index) => {
           const isSystem = msg.sender === "[SYSTEM]";
           const isMe = msg.sender === username;
-          
+
           if (isSystem) {
             return (
-              <div key={index} className="text-yellow-400 text-lg font-sans italic py-0.5">
+              <div key={index} className="text-yellow-400 text-xl md:text-2xl font-pixel italic py-0.5 leading-snug">
                 <span className="font-bold">⚠ </span>
                 {msg.text}
               </div>
             );
           }
-          
+
           return (
-            <div key={index} className="text-white text-xl font-sans">
-              <span className={`font-bold ${isMe ? 'text-sky-400' : 'text-orange-500'}`}>
+            <div key={index} className="text-white text-2xl md:text-3xl font-pixel leading-snug">
+              <span className={`font-bold ${isMe ? 'text-sky-400' : 'text-orange-400'}`}>
                 {msg.sender}{isMe && " (You)"}:{" "}
               </span>
-              {msg.text}
+              <span className="text-gray-100">{msg.text}</span>
             </div>
           );
         })}
@@ -109,8 +109,8 @@ export default function ChatBox() {
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder="Enter the message"
-        className="bg-black/50 border-2 border-gray-700 rounded-lg p-3 text-white text-xl outline-none focus:border-orange-500 transition-colors font-sans"
+        placeholder="Type a message (English / ไทย)..."
+        className="bg-black/60 border-2 border-gray-700 rounded-lg px-4 py-2.5 text-white text-xl md:text-2xl outline-none focus:border-orange-500 transition-colors font-pixel placeholder:text-gray-500"
       />
     </div>
   );

@@ -12,14 +12,14 @@ export default function LoginModal() {
     onSuccess: async (tokenResponse) => {
       try {
         if (tokenResponse.access_token) {
-          await loginWithGoogle({ accessToken: tokenResponse.access_token });
+          await loginWithGoogle(tokenResponse.access_token);
         }
-      } catch (err) {
-        setError("Login failed. Please try again.");
+      } catch (err: any) {
+        setError(err.message || "Login failed. Please try again.");
       }
     },
     onError: () => {
-      setError("Google Login was unsuccessful");
+      setError("Google Login was unsuccessful. Please try again.");
     },
   });
 
@@ -28,8 +28,8 @@ export default function LoginModal() {
       className="absolute inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300 ease-in-out font-pixel"
       onClick={() => setScreen("landing")}
     >
-      {/* Container ����� Title & Modal ��������觡�ҧ�ͨ�ԧ� ��ШѴ��������� gap */}
-      <div className="flex flex-col items-center justify-center gap-8 sm:gap-12 w-full max-w-[400px]">
+      {/* Container กลุ่ม Title & Modal จัดกึ่งกลางจอ */}
+      <div className="flex flex-col items-center justify-center gap-6 sm:gap-10 w-full max-w-[460px]">
         {/* Title */}
         <h2
           className="text-[#fde68a] text-4xl sm:text-5xl md:text-6xl lg:text-7xl uppercase text-center relative z-10 font-bold tracking-widest leading-tight whitespace-nowrap"
@@ -49,9 +49,9 @@ export default function LoginModal() {
           {/* Outer glow */}
           <div className="absolute -inset-3 bg-[#f59e0b]/15 rounded-3xl blur-2xl pointer-events-none" />
 
-          {/* Wooden frame � top bar */}
+          {/* Wooden frame — top bar */}
           <div
-            className="relative z-10 mx-3 h-4 sm:h-5 rounded-t-md"
+            className="relative z-10 mx-3 h-5 sm:h-6 rounded-t-md"
             style={{
               background:
                 "linear-gradient(180deg, #8B5E3C 0%, #6B3F1F 40%, #5C2E18 100%)",
@@ -69,13 +69,13 @@ export default function LoginModal() {
                   "repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(0,0,0,0.15) 8px, rgba(0,0,0,0.15) 9px)",
               }}
             />
-            <div className="absolute top-1/2 -translate-y-1/2 left-2.5 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#C4A265] border border-[#8B6F3A] shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]" />
-            <div className="absolute top-1/2 -translate-y-1/2 right-2.5 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#C4A265] border border-[#8B6F3A] shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]" />
+            <div className="absolute top-1/2 -translate-y-1/2 left-2.5 w-2 h-2 rounded-full bg-[#C4A265] border border-[#8B6F3A] shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]" />
+            <div className="absolute top-1/2 -translate-y-1/2 right-2.5 w-2 h-2 rounded-full bg-[#C4A265] border border-[#8B6F3A] shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]" />
           </div>
 
           {/* Parchment body */}
           <div
-            className="relative z-10 mx-1.5 px-5 sm:px-7 pt-6 sm:pt-8 pb-5 sm:pb-7"
+            className="relative z-10 mx-1.5 px-6 sm:px-9 pt-7 sm:pt-9 pb-6 sm:pb-8"
             style={{
               background:
                 "linear-gradient(170deg, #F5E6C8 0%, #EDD9A3 30%, #E8D08E 60%, #DBBF78 100%)",
@@ -110,24 +110,24 @@ export default function LoginModal() {
 
             {/* Close button */}
             <button
-              className="absolute top-1.5 right-2.5 text-[#8B5E3C] text-xl sm:text-2xl font-bold hover:text-[#C4553A] active:translate-y-0.5 transition-all duration-75 leading-none"
+              className="absolute top-2 right-3 text-[#8B5E3C] text-2xl sm:text-3xl font-bold hover:text-[#C4553A] active:translate-y-0.5 transition-all duration-75 leading-none"
               onClick={() => setScreen("landing")}
               title="Close"
               style={{ textShadow: "1px 1px 0 rgba(0,0,0,0.15)" }}
             >
-              X
+              ✕
             </button>
 
             {/* Content */}
-            <div className="flex flex-col items-center gap-3 sm:gap-4 relative z-20">
-              <div className="text-center flex flex-col gap-0.5">
+            <div className="flex flex-col items-center gap-4 sm:gap-5 relative z-20">
+              <div className="text-center flex flex-col gap-1">
                 <p
-                  className="text-xl sm:text-2xl md:text-3xl text-[#5c2e0b] font-bold uppercase tracking-widest"
+                  className="text-2xl sm:text-3xl md:text-4xl text-[#5c2e0b] font-bold uppercase tracking-widest"
                   style={{ textShadow: "1px 1px 0 rgba(255,255,255,0.3)" }}
                 >
                   Welcome
                 </p>
-                <p className="text-xs sm:text-sm md:text-base text-[#8b6840]">
+                <p className="text-base sm:text-lg md:text-xl text-[#8b6840]">
                   Sign in to start the adventure
                 </p>
               </div>
@@ -135,14 +135,14 @@ export default function LoginModal() {
               {/* Divider */}
               <div className="w-full flex items-center gap-3">
                 <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#B8944F] to-transparent opacity-50" />
-                <div className="w-1.5 h-1.5 rotate-45 bg-[#B8944F] opacity-60" />
+                <div className="w-2 h-2 rotate-45 bg-[#B8944F] opacity-60" />
                 <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#B8944F] to-transparent opacity-50" />
               </div>
 
               {/* Custom Google Login Button */}
               <button
                 onClick={() => googleLogin()}
-                className="flex items-center justify-center gap-3 w-full bg-[#5c2e0b] hover:bg-[#9E6023] text-[#EEEAE8] font-pixel font-bold text-lg sm:text-xl px-6 py-3 rounded-xl border-b-[4px] border-r-[4px] border-t-[2px] border-l-[2px] border-[#382503] shadow-[0_4px_0px_#2a1b12] hover:brightness-105 active:border-b-0 active:border-r-0 active:translate-y-1 active:shadow-none transition-all duration-100 mt-2 cursor-pointer relative overflow-hidden"
+                className="flex items-center justify-center gap-3.5 w-full bg-[#5c2e0b] hover:bg-[#9E6023] text-[#EEEAE8] font-pixel font-bold text-xl sm:text-2xl px-6 py-3.5 rounded-xl border-b-[4px] border-r-[4px] border-t-[2px] border-l-[2px] border-[#382503] shadow-[0_4px_0px_#2a1b12] hover:brightness-105 active:border-b-0 active:border-r-0 active:translate-y-1 active:shadow-none transition-all duration-100 mt-2 cursor-pointer relative overflow-hidden"
               >
                 <span className="absolute inset-0 border-t-[2px] border-l-[2px] border-white/10 rounded-lg pointer-events-none" />
                 <svg
@@ -171,16 +171,16 @@ export default function LoginModal() {
 
               {/* Error */}
               {error && (
-                <div className="w-full bg-[#7f1d1d]/90 text-[#fef2f2] border-2 border-[#b91c1c] px-3 py-2 rounded-xl text-center text-sm sm:text-base font-bold shadow-md font-pixel">
-                  ?? {error}
+                <div className="w-full bg-[#7f1d1d]/90 text-[#fef2f2] border-2 border-[#b91c1c] px-4 py-2.5 rounded-xl text-center text-base sm:text-lg font-bold shadow-md font-pixel">
+                  ⚠ {error}
                 </div>
               )}
             </div>
           </div>
 
-          {/* Wooden frame � bottom bar */}
+          {/* Wooden frame — bottom bar */}
           <div
-            className="relative z-10 mx-3 h-4 sm:h-5 rounded-b-md"
+            className="relative z-10 mx-3 h-5 sm:h-6 rounded-b-md"
             style={{
               background:
                 "linear-gradient(0deg, #8B5E3C 0%, #6B3F1F 40%, #5C2E18 100%)",
@@ -198,8 +198,8 @@ export default function LoginModal() {
                   "repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(0,0,0,0.15) 8px, rgba(0,0,0,0.15) 9px)",
               }}
             />
-            <div className="absolute top-1/2 -translate-y-1/2 left-2.5 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#C4A265] border border-[#8B6F3A] shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]" />
-            <div className="absolute top-1/2 -translate-y-1/2 right-2.5 w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#C4A265] border border-[#8B6F3A] shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]" />
+            <div className="absolute top-1/2 -translate-y-1/2 left-2.5 w-2 h-2 rounded-full bg-[#C4A265] border border-[#8B6F3A] shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]" />
+            <div className="absolute top-1/2 -translate-y-1/2 right-2.5 w-2 h-2 rounded-full bg-[#C4A265] border border-[#8B6F3A] shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]" />
           </div>
 
           {/* Drop shadow */}

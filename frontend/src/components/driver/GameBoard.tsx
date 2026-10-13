@@ -57,9 +57,9 @@ export default function GameBoard({
           {/* แถบตัวอักษรบอกพิกัดด้านบน (A-M) */}
           <div className="absolute top-0 left-[2.5rem] right-0 h-[2.5rem] flex items-center justify-center">
             {/* ขยับซ้ายขวาให้ตรงกับ 13 ช่องด้านใน (86.666% คือ 13/15 ของกระดาน) */}
-            <div className="w-[86.666%] h-8 bg-[#d2a356] border-4 border-[#572e18] text-black font-bold rounded-lg flex justify-around items-center shadow-md font-sans z-10">
+            <div className="w-[86.666%] h-8 bg-[#d2a356] border-4 border-[#572e18] text-black font-bold rounded-lg flex justify-around items-center shadow-md font-pixel z-10">
               {COL_LABELS.map((lbl, idx) => (
-                <span key={idx} className="flex-1 text-center text-xs md:text-sm leading-none">
+                <span key={idx} className="flex-1 text-center text-lg md:text-xl font-bold leading-none">
                   {lbl}
                 </span>
               ))}
@@ -67,10 +67,10 @@ export default function GameBoard({
           </div>
 
           {/* แถบตัวเลขบอกพิกัดด้านซ้าย (1-13) */}
-          <div className="absolute left-0 top-[2.5rem] bottom-0 w-[2.5rem] flex items-center justify-end pr-2">
-            <div className="h-[86.666%] w-8 bg-[#d2a356] border-4 border-[#572e18] text-black font-bold rounded-lg flex flex-col justify-around items-center shadow-md font-sans z-10">
+          <div className="absolute left-0 top-[2.5rem] bottom-0 w-[2.5rem] flex items-center justify-end pr-1">
+            <div className="h-[86.666%] w-8 bg-[#d2a356] border-4 border-[#572e18] text-black font-bold rounded-lg flex flex-col justify-around items-center shadow-md font-pixel z-10">
               {ROW_LABELS.map((lbl, idx) => (
-                <span key={idx} className="flex-1 flex items-center justify-center text-xs md:text-sm leading-none">
+                <span key={idx} className="flex-1 flex items-center justify-center text-lg md:text-xl font-bold leading-none">
                   {lbl}
                 </span>
               ))}
