@@ -219,12 +219,12 @@ export default function GameScreen() {
             </div>
           )}
 
-          {/* Step 2: Map & Fog (Right of the map) */}
+          {/* Step 2: Map & Fog (Right of center map) */}
           {tutorialStep === 2 && (
-            <div className="absolute top-1/2 -translate-y-1/2 right-[2%] lg:right-[8%] xl:right-[15%] animate-in fade-in slide-in-from-right-8 duration-300">
+            <div className="absolute top-1/2 -translate-y-1/2 right-[3%] lg:right-[6%] xl:right-[10%] animate-in fade-in slide-in-from-right-8 duration-300">
               <TutorialCard title="THE MAP & FOG" titleColor="#2B6CB0" titleBorder="#1A365D" buttonText="GOT IT ➔" onNext={() => setTutorialStep(3)}>
                 {role === "driver" ? (
-                  <p className="text-xl sm:text-2xl">This is the map. What you see is <strong className="text-red-700">only half the truth.</strong><br/><br/>Do not move until you <Badge color="bg-yellow-100 text-yellow-900 border-yellow-700">ask your partner</Badge> if the path is safe!</p>
+                  <p className="text-xl sm:text-2xl">This is the map in the center. What you see is <strong className="text-red-700">only half the truth.</strong><br/><br/>Do not move until you <Badge color="bg-yellow-100 text-yellow-900 border-yellow-700">ask your partner</Badge> if the path is safe!</p>
                 ) : (
                   <p className="text-xl sm:text-2xl">Notice the <Badge color="bg-gray-800 text-gray-200 border-gray-600">Dark Fog</Badge>? It moves when the player moves.<br/><br/>You must <strong className="text-purple-800 underline">guide your partner</strong> through the darkness!</p>
                 )}
@@ -232,11 +232,11 @@ export default function GameScreen() {
             </div>
           )}
 
-          {/* Step 3: Traps & Chat (Above the chat box) */}
+          {/* Step 3: Traps & Chat (Next to the left chat box) */}
           {tutorialStep === 3 && (
-            <div className="absolute bottom-[20%] lg:bottom-[30%] right-[2%] lg:right-[8%] xl:right-[15%] animate-in fade-in slide-in-from-right-8 duration-300">
+            <div className="absolute top-1/2 -translate-y-1/2 left-[290px] md:left-[320px] lg:left-[350px] xl:left-[380px] animate-in fade-in slide-in-from-left-8 duration-300 max-w-[500px]">
               <TutorialCard title="TRAPS & CHAT" titleColor="#16a34a" titleBorder="#14532d" buttonText="NEXT ➔" onNext={() => setTutorialStep(4)}>
-                <p className="mb-4 text-xl sm:text-2xl">Use the <Badge color="bg-white text-blue-700 border-gray-300">chat</Badge> below to warn your partner!</p>
+                <p className="mb-4 text-xl sm:text-2xl">Use the <Badge color="bg-white text-blue-700 border-gray-300">chat</Badge> on the left to warn your partner!</p>
 
                 <div className="w-full text-left space-y-3.5 bg-white/50 p-4 rounded-xl border-2 border-[#b8944f]/40">
                   <p className="font-black text-[#5c2e0b] text-xl sm:text-2xl uppercase tracking-wider text-center border-b-2 border-[#b8944f]/40 pb-2 mb-3">Trap Types:</p>
@@ -282,8 +282,8 @@ export default function GameScreen() {
         </div>
       )}
 
-      {/* Game Layout — fit screen */}
-      <div className="w-full max-w-[1700px] mx-auto flex flex-col flex-1 p-2 md:p-3 lg:p-4 gap-2 md:gap-3 relative min-h-0">
+      {/* Game Layout — 3 Column: Chat (Left) | Map (Center) | Your Program (Right) */}
+      <div className="w-full max-w-[1850px] min-w-[1080px] mx-auto flex flex-col flex-1 p-2 md:p-3 lg:p-4 gap-2 md:gap-3 relative min-h-0">
         <div className={`shrink-0 transition-all duration-300 ${tutorialStep === 5 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-xl pointer-events-none bg-black/50' : ''}`}>
           <GameHeader
             role={role === "driver" ? "DRIVER" : "NAVIGATOR"}
@@ -294,28 +294,28 @@ export default function GameScreen() {
         </div>
 
         <div className="flex flex-1 gap-3 md:gap-4 w-full items-stretch min-h-0">
-          {/* Left Column: Game Board + Chat */}
-          <div className="flex-[5.5] min-w-0 flex flex-col gap-2 md:gap-3 min-h-0">
-            <div className={`flex-1 flex flex-col min-h-0 transition-all duration-300 ${tutorialStep === 2 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-[20px] pointer-events-none' : ''}`}>
-              <GameBoard
-                playerX={playerX}
-                playerY={playerY}
-                direction={direction}
-                walls={role === "driver" ? BOUNDARY_WALLS : WALLS}
-                traps={mapData.traps}
-                rocks={mapData.rocks}
-                spikes={mapData.spikes}
-                goal={GOAL}
-                role={role || "driver"}
-              />
-            </div>
-            <div className={`shrink-0 transition-all duration-300 ${tutorialStep === 3 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-xl pointer-events-none' : ''}`}>
-              <ChatBox />
-            </div>
+          {/* Left Column: Chat Box */}
+          <div className={`w-[270px] md:w-[290px] lg:w-[320px] xl:w-[350px] shrink-0 flex flex-col min-h-0 transition-all duration-300 ${tutorialStep === 3 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-xl pointer-events-none' : ''}`}>
+            <ChatBox />
+          </div>
+
+          {/* Center Column: Game Board (Map) */}
+          <div className={`flex-[4.5] min-w-0 flex items-center justify-center min-h-0 transition-all duration-300 ${tutorialStep === 2 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-[20px] pointer-events-none' : ''}`}>
+            <GameBoard
+              playerX={playerX}
+              playerY={playerY}
+              direction={direction}
+              walls={role === "driver" ? BOUNDARY_WALLS : WALLS}
+              traps={mapData.traps}
+              rocks={mapData.rocks}
+              spikes={mapData.spikes}
+              goal={GOAL}
+              role={role || "driver"}
+            />
           </div>
 
           {/* Right Column: Toolbox + Your Program */}
-          <div className={`flex-[4.5] min-w-0 flex flex-col min-h-0 transition-all duration-300 ${tutorialStep === 4 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-2xl pointer-events-none' : ''}`}>
+          <div className={`flex-[5.5] min-w-[420px] xl:min-w-[460px] flex flex-col min-h-0 transition-all duration-300 ${tutorialStep === 4 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-2xl pointer-events-none' : ''}`}>
             <BlockCodePanel
               key={panelKey}
               blocksLeft={blocksLeft}

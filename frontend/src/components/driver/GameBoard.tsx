@@ -42,13 +42,15 @@ export default function GameBoard({
     : undefined;
 
   return (
-    <div className="flex-1 relative w-full h-full min-h-0 flex items-center justify-center p-2 overflow-hidden">
+    <div className="flex-1 relative w-full h-full min-h-0 flex items-center justify-center p-1 sm:p-2 overflow-hidden" style={{ containerType: 'size' }}>
       {/* Wrapper นี้ควบคุมขนาดให้พอดีกับความสูงหรือความกว้างของหน้าจอ โดยคง aspect-ratio ไว้ */}
-      <div className="relative flex items-center justify-center w-full h-full p-2">
-        {/* ใช้ height เป็น 100% ของ flex container และให้ width หดตาม aspect-ratio (max-width จำกัดเพื่อไม่ให้ล้น) */}
+      <div className="relative flex items-center justify-center w-full h-full">
+        {/* ใช้ min(100cqw, 100cqh) เพื่อให้คงรูปสี่เหลี่ยมจัตุรัสที่พอดีกับ container เสมอ ไม่ยืดเป็นสี่เหลี่ยมผืนผ้า */}
         <div
-          className="relative flex-col items-center justify-center h-full max-h-full max-w-full"
+          className="relative flex-col items-center justify-center max-h-full max-w-full"
           style={{
+            width: 'min(100cqw, 100cqh)',
+            height: 'min(100cqw, 100cqh)',
             aspectRatio: '1 / 1',
             paddingTop: '2.75rem', // เผื่อที่ให้ Header พิกัด A-M
             paddingLeft: '2.75rem', // เผื่อที่ให้ Sidebar พิกัด 1-13

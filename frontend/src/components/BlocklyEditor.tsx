@@ -69,7 +69,21 @@ export default function BlocklyEditor({ onReady, readOnly = false }: Props) {
 
     onReady(workspace);
 
+    const handleResize = () => {
+      Blockly.svgResize(workspace);
+    };
+    window.addEventListener("resize", handleResize);
+
+    const resizeObserver = new ResizeObserver(() => {
+      Blockly.svgResize(workspace);
+    });
+    if (blocklyDiv.current) {
+      resizeObserver.observe(blocklyDiv.current);
+    }
+
     return () => {
+      window.removeEventListener("resize", handleResize);
+      resizeObserver.disconnect();
       const xml = Blockly.Xml.workspaceToDom(workspace);
       savedXmlRef.current = Blockly.Xml.domToText(xml);
       workspace.dispose();

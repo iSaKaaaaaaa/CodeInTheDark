@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSocketStore } from "../../store/useSocketStore";
 
 interface ChatMessage {
@@ -6,10 +6,15 @@ interface ChatMessage {
   text: string;
 }
 
-export default function ChatBox() {
+interface ChatBoxProps {
+  className?: string;
+}
+
+export default function ChatBox({ className = "" }: ChatBoxProps) {
   const [inputValue, setInputValue] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const { socket, username } = useSocketStore();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!socket) return;
@@ -55,37 +60,97 @@ export default function ChatBox() {
     };
   }, [socket]);
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter" && inputValue.trim() !== "") {
-      const newMsg = { sender: username, text: inputValue };
-      // Optimistically add to own screen
-      setMessages((prev) => [...prev, newMsg]);
-      // Emit to server
-      socket?.emit("chat_message", newMsg);
-      setInputValue("");
-    }
-  };
-
-  const messagesEndRef = React.useRef<HTMLDivElement>(null);
-
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  return (
-    <div className="h-48 md:h-56 bg-black/85 rounded-xl border-4 border-black p-2.5 sm:p-3 flex flex-col shadow-2xl shrink-0">
-      <span className="text-white font-bold text-lg sm:text-xl md:text-2xl mb-1 tracking-widest font-pixel">
-        CHAT BOX
-      </span>
+  const handleSendMessage = (textToSend?: string) => {
+    const text = (textToSend ?? inputValue).trim();
+    if (!text) return;
 
-      <div className="flex-1 overflow-y-auto mb-1.5 flex flex-col gap-1 pr-1 min-h-0" style={{ fontFamily: '"Chakra Petch", sans-serif' }}>
+    const newMsg = { sender: username, text };
+    setMessages((prev) => [...prev, newMsg]);
+    socket?.emit("chat_message", newMsg);
+    if (!textToSend) {
+      setInputValue("");
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSendMessage();
+    }
+  };
+
+  // Quick preset alerts for rapid cooperative communication
+  const quickAlerts = [
+    { label: "⚠️ Trap!", text: "⚠️ Watch out! Trap ahead!" },
+    { label: "🧱 Wall!", text: "🧱 Blocked! There is a wall!" },
+    { label: "✅ Safe!", text: "✅ Path is clear, go ahead!" },
+    { label: "🛑 Stop!", text: "🛑 Wait! Do not move yet!" },
+  ];
+
+  return (
+    <div
+      className={`h-full w-full bg-black/85 backdrop-blur-sm rounded-xl border-4 border-[#333] p-3 flex flex-col shadow-2xl min-h-0 ${className}`}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between pb-2 mb-2 border-b-2 border-neutral-800 shrink-0">
+        <div className="flex items-center gap-2">
+          <span className="text-xl">💬</span>
+          <h2
+            className="text-[#fde68a] text-lg sm:text-xl font-bold font-pixel tracking-wider uppercase"
+            style={{ textShadow: "1px 1px 0px #000, 2px 2px 0px rgba(0,0,0,0.8)" }}
+          >
+            Chat Box
+          </h2>
+        </div>
+        <div className="flex items-center gap-1.5 bg-black/60 px-2 py-0.5 rounded border border-neutral-700/80">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="text-[11px] text-neutral-300 font-pixel tracking-wide uppercase">
+            LIVE
+          </span>
+        </div>
+      </div>
+
+      {/* Quick Tactical Preset Chips */}
+      <div className="grid grid-cols-2 gap-1.5 mb-2 shrink-0">
+        {quickAlerts.map((alert, idx) => (
+          <button
+            key={idx}
+            type="button"
+            onClick={() => handleSendMessage(alert.text)}
+            className="text-xs font-pixel py-1 px-2 rounded-md bg-[#24170d] hover:bg-[#3d2412] border border-[#78350f] text-[#fde68a] active:scale-95 transition-all truncate text-left shadow-sm"
+            title={alert.text}
+          >
+            {alert.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Messages Scroll Area */}
+      <div
+        className="flex-1 overflow-y-auto mb-2 flex flex-col gap-1.5 pr-1 min-h-0"
+        style={{ fontFamily: '"Chakra Petch", sans-serif' }}
+      >
+        {messages.length === 0 && (
+          <div className="flex-1 flex flex-col items-center justify-center text-center p-4 text-neutral-500">
+            <span className="text-2xl mb-1 opacity-60">📜</span>
+            <p className="text-xs sm:text-sm font-medium">Coordinate with your partner here!</p>
+            <p className="text-[11px] opacity-75 mt-0.5">Click quick alerts or type below.</p>
+          </div>
+        )}
+
         {messages.map((msg, index) => {
           const isSystem = msg.sender === "[SYSTEM]";
           const isMe = msg.sender === username;
 
           if (isSystem) {
             return (
-              <div key={index} className="text-yellow-400 text-sm md:text-base font-bold italic leading-snug shrink-0 break-words py-0.5">
+              <div
+                key={index}
+                className="text-yellow-400 text-xs md:text-sm font-bold italic leading-snug shrink-0 break-words py-1 px-2 bg-yellow-950/30 rounded border-l-2 border-yellow-500"
+              >
                 <span className="font-bold">⚠ </span>
                 {msg.text}
               </div>
@@ -93,26 +158,52 @@ export default function ChatBox() {
           }
 
           return (
-            <div key={index} className="text-white text-sm md:text-base font-semibold leading-snug shrink-0 break-words py-0.5">
-              <span className={`font-bold ${isMe ? 'text-sky-400' : 'text-orange-400'}`}>
-                {msg.sender}{isMe && " (You)"}:{" "}
+            <div
+              key={index}
+              className={`text-xs md:text-sm font-semibold leading-snug shrink-0 break-words py-1 px-2 rounded-lg ${
+                isMe
+                  ? "bg-sky-950/40 border border-sky-800/50 ml-2"
+                  : "bg-orange-950/40 border border-orange-800/50 mr-2"
+              }`}
+            >
+              <div className="text-[11px] mb-0.5">
+                <span
+                  className={`font-bold font-pixel tracking-wide ${
+                    isMe ? "text-sky-400" : "text-orange-400"
+                  }`}
+                >
+                  {msg.sender}
+                  {isMe && " (You)"}
+                </span>
+              </div>
+              <span className="text-gray-100 font-medium text-xs sm:text-sm">
+                {msg.text}
               </span>
-              <span className="text-gray-100">{msg.text}</span>
             </div>
           );
         })}
         <div ref={messagesEndRef} />
       </div>
 
-      <input
-        type="text"
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder="Type a message (English / ไทย)..."
-        style={{ fontFamily: '"Chakra Petch", sans-serif' }}
-        className="bg-black/60 border-2 border-gray-700 rounded-lg px-3 py-1.5 text-white text-sm md:text-base font-medium outline-none focus:border-orange-500 transition-colors placeholder:text-gray-500 shrink-0"
-      />
+      {/* Input Box + Send Button */}
+      <div className="flex gap-1.5 shrink-0">
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Message (Eng / ไทย)..."
+          style={{ fontFamily: '"Chakra Petch", sans-serif' }}
+          className="flex-1 min-w-0 bg-black/60 border-2 border-gray-700 rounded-lg px-2.5 py-1.5 text-white text-xs sm:text-sm font-medium outline-none focus:border-orange-500 transition-colors placeholder:text-gray-500"
+        />
+        <button
+          type="button"
+          onClick={() => handleSendMessage()}
+          className="bg-[#b45309] hover:bg-[#d97706] border-b-2 border-r-2 border-[#382503] text-white font-pixel px-3 py-1.5 rounded-lg active:translate-y-0.5 shadow-sm text-xs sm:text-sm uppercase tracking-wider shrink-0"
+        >
+          Send
+        </button>
+      </div>
     </div>
   );
 }
