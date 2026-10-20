@@ -259,7 +259,7 @@ export default function GameScreen() {
 
           {/* Step 4: Programming (Immediately left of the workspace) */}
           {tutorialStep === 4 && (
-            <div className="absolute top-1/2 -translate-y-1/2 right-[370px] md:right-[400px] lg:right-[430px] xl:right-[460px] animate-in fade-in slide-in-from-right-8 duration-300">
+            <div className="absolute top-1/2 -translate-y-1/2 right-[430px] md:right-[460px] lg:right-[490px] xl:right-[520px] animate-in fade-in slide-in-from-right-8 duration-300">
               <TutorialCard title="PROGRAMMING" titleColor="#DB5C00" titleBorder="#7c2d12" buttonText={selfReady ? "WAITING..." : "READY ✓"} onNext={markSelfReady} disabled={selfReady}>
                 <p className="text-xl sm:text-2xl">Drag blocks to move the character.</p>
                 <p className="mt-4"><Badge color="bg-red-100 text-red-800 border-red-800">WARNING</Badge></p>
@@ -295,7 +295,7 @@ export default function GameScreen() {
 
         <div className="flex flex-1 gap-3 md:gap-4 w-full items-stretch min-h-0">
           {/* Left Column: Chat Box */}
-          <div className={`w-[260px] md:w-[280px] lg:w-[305px] xl:w-[330px] shrink-0 flex flex-col min-h-0 transition-all duration-300 ${tutorialStep === 3 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-xl pointer-events-none' : ''}`}>
+          <div className={`w-[270px] md:w-[290px] lg:w-[320px] xl:w-[340px] shrink-0 flex flex-col min-h-0 transition-all duration-300 ${tutorialStep === 3 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-xl pointer-events-none' : ''}`}>
             <ChatBox />
           </div>
 
@@ -315,7 +315,7 @@ export default function GameScreen() {
           </div>
 
           {/* Right Column: Toolbox + Your Program — comfortably sized */}
-          <div className={`w-[360px] md:w-[390px] lg:w-[420px] xl:w-[450px] shrink-0 flex flex-col min-h-0 transition-all duration-300 ${tutorialStep === 4 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-2xl pointer-events-none' : ''}`}>
+          <div className={`w-[420px] md:w-[450px] lg:w-[480px] xl:w-[510px] shrink-0 flex flex-col min-h-0 transition-all duration-300 ${tutorialStep === 4 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-2xl pointer-events-none' : ''}`}>
             <BlockCodePanel
               key={panelKey}
               blocksLeft={blocksLeft}

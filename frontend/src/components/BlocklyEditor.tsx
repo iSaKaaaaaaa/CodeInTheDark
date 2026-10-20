@@ -55,8 +55,8 @@ export default function BlocklyEditor({ onReady, readOnly = false }: Props) {
       },
     });
 
-    // ปรับขนาดบล็อกในแถบเมนู (Flyout) ด้านซ้ายให้พอดีกับแถบ 185px
-    workspace.getFlyout()?.getWorkspace()?.setScale(1.12);
+    // ปรับขนาดบล็อกในแถบเมนู (Flyout) ด้านซ้ายให้พอดีกับแถบ 215px-225px
+    workspace.getFlyout()?.getWorkspace()?.setScale(1.1);
 
     if (savedXmlRef.current) {
       try {

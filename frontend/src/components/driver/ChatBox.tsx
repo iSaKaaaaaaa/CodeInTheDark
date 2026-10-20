@@ -87,18 +87,18 @@ export default function ChatBox({ className = "" }: ChatBoxProps) {
       className={`h-full w-full bg-black/85 backdrop-blur-sm rounded-xl border-4 border-[#333] p-3 flex flex-col shadow-2xl min-h-0 ${className}`}
     >
       {/* Header */}
-      <div className="pb-2 mb-2 border-b-2 border-neutral-800 shrink-0">
+      <div className="pb-2.5 mb-2 border-b-2 border-neutral-800 shrink-0">
         <h2
-          className="text-[#fde68a] text-lg sm:text-xl font-bold font-pixel tracking-wider uppercase"
+          className="text-[#fde68a] text-xl md:text-2xl font-bold font-pixel tracking-wider uppercase"
           style={{ textShadow: "1px 1px 0px #000, 2px 2px 0px rgba(0,0,0,0.8)" }}
         >
-          Chat Box
+          CHAT BOX
         </h2>
       </div>
 
       {/* Messages Scroll Area */}
       <div
-        className="flex-1 overflow-y-auto mb-2 flex flex-col gap-1.5 pr-1 min-h-0"
+        className="flex-1 overflow-y-auto mb-2 flex flex-col gap-2 pr-1 min-h-0"
         style={{ fontFamily: '"Chakra Petch", sans-serif' }}
       >
         {messages.length === 0 && (
@@ -117,7 +117,7 @@ export default function ChatBox({ className = "" }: ChatBoxProps) {
             return (
               <div
                 key={index}
-                className="text-yellow-400 text-xs md:text-sm font-bold italic leading-snug shrink-0 break-words py-1 px-2 bg-yellow-950/30 rounded border-l-2 border-yellow-500"
+                className="w-full text-yellow-400 text-xs md:text-sm font-bold italic leading-snug shrink-0 break-words py-1.5 px-2.5 bg-yellow-950/30 rounded-lg border-l-4 border-yellow-500"
               >
                 <span className="font-bold">⚠ </span>
                 {msg.text}
@@ -128,25 +128,30 @@ export default function ChatBox({ className = "" }: ChatBoxProps) {
           return (
             <div
               key={index}
-              className={`text-xs md:text-sm font-semibold leading-snug shrink-0 break-words py-1 px-2 rounded-lg ${
+              className={`w-full text-sm md:text-base leading-snug shrink-0 break-words py-2 px-3 rounded-xl border ${
                 isMe
-                  ? "bg-sky-950/40 border border-sky-800/50 ml-2"
-                  : "bg-orange-950/40 border border-orange-800/50 mr-2"
+                  ? "bg-sky-950/45 border-sky-800/60"
+                  : "bg-orange-950/45 border-orange-800/60"
               }`}
             >
-              <div className="text-[11px] mb-0.5">
+              <div className="flex items-baseline gap-1.5 mb-0.5">
                 <span
-                  className={`font-bold font-pixel tracking-wide ${
+                  className={`font-bold font-pixel text-base sm:text-lg md:text-xl tracking-wider leading-tight ${
                     isMe ? "text-sky-400" : "text-orange-400"
                   }`}
+                  style={{ textShadow: "1px 1px 0 rgba(0,0,0,0.8)" }}
                 >
                   {msg.sender}
-                  {isMe && " (You)"}
                 </span>
+                {isMe && (
+                  <span className="text-xs text-sky-300 font-pixel opacity-70">
+                    (You)
+                  </span>
+                )}
               </div>
-              <span className="text-gray-100 font-medium text-xs sm:text-sm">
+              <p className="text-gray-100 font-medium text-sm md:text-base leading-relaxed">
                 {msg.text}
-              </span>
+              </p>
             </div>
           );
         })}
