@@ -257,9 +257,9 @@ export default function GameScreen() {
             </div>
           )}
 
-          {/* Step 4: Programming (Immediately left of the compact right workspace) */}
+          {/* Step 4: Programming (Immediately left of the workspace) */}
           {tutorialStep === 4 && (
-            <div className="absolute top-1/2 -translate-y-1/2 right-[300px] md:right-[330px] lg:right-[360px] xl:right-[390px] animate-in fade-in slide-in-from-right-8 duration-300">
+            <div className="absolute top-1/2 -translate-y-1/2 right-[370px] md:right-[400px] lg:right-[430px] xl:right-[460px] animate-in fade-in slide-in-from-right-8 duration-300">
               <TutorialCard title="PROGRAMMING" titleColor="#DB5C00" titleBorder="#7c2d12" buttonText={selfReady ? "WAITING..." : "READY ✓"} onNext={markSelfReady} disabled={selfReady}>
                 <p className="text-xl sm:text-2xl">Drag blocks to move the character.</p>
                 <p className="mt-4"><Badge color="bg-red-100 text-red-800 border-red-800">WARNING</Badge></p>
@@ -282,7 +282,7 @@ export default function GameScreen() {
         </div>
       )}
 
-      {/* Game Layout — 3 Column: Chat (Left) | Map (Dead Center) | Your Program (Right) */}
+      {/* Game Layout — 3 Column: Chat (Left) | Map (Center) | Your Program (Right) */}
       <div className="w-full max-w-[1850px] min-w-[1080px] mx-auto flex flex-col flex-1 p-2 md:p-3 lg:p-4 gap-2 md:gap-3 relative min-h-0">
         <div className={`shrink-0 transition-all duration-300 ${tutorialStep === 5 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-xl pointer-events-none bg-black/50' : ''}`}>
           <GameHeader
@@ -295,7 +295,7 @@ export default function GameScreen() {
 
         <div className="flex flex-1 gap-3 md:gap-4 w-full items-stretch min-h-0">
           {/* Left Column: Chat Box */}
-          <div className={`w-[280px] md:w-[300px] lg:w-[325px] xl:w-[350px] shrink-0 flex flex-col min-h-0 transition-all duration-300 ${tutorialStep === 3 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-xl pointer-events-none' : ''}`}>
+          <div className={`w-[260px] md:w-[280px] lg:w-[305px] xl:w-[330px] shrink-0 flex flex-col min-h-0 transition-all duration-300 ${tutorialStep === 3 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-xl pointer-events-none' : ''}`}>
             <ChatBox />
           </div>
 
@@ -314,8 +314,8 @@ export default function GameScreen() {
             />
           </div>
 
-          {/* Right Column: Toolbox + Your Program — compact & squeezed to the right */}
-          <div className={`w-[290px] md:w-[310px] lg:w-[335px] xl:w-[360px] shrink-0 flex flex-col min-h-0 transition-all duration-300 ${tutorialStep === 4 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-2xl pointer-events-none' : ''}`}>
+          {/* Right Column: Toolbox + Your Program — comfortably sized */}
+          <div className={`w-[360px] md:w-[390px] lg:w-[420px] xl:w-[450px] shrink-0 flex flex-col min-h-0 transition-all duration-300 ${tutorialStep === 4 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-2xl pointer-events-none' : ''}`}>
             <BlockCodePanel
               key={panelKey}
               blocksLeft={blocksLeft}

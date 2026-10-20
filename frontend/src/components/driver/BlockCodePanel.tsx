@@ -26,8 +26,8 @@ export default function BlockCodePanel({
       {/* กล่องหลัก */}
       <div className="flex-1 bg-white/20 backdrop-blur-sm rounded-xl border-4 border-[#333] flex flex-col overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.5)] relative">
         {/* Header Bar */}
-        <div className="flex bg-black/80 border-b-4 border-[#333] h-11 sm:h-12 md:h-13 shrink-0">
-          <div className="w-[140px] sm:w-[150px] md:w-[155px] flex-shrink-0 border-r-4 border-[#333] flex items-center justify-center">
+        <div className="flex bg-black/80 border-b-4 border-[#333] h-12 md:h-14 shrink-0">
+          <div className="w-[175px] md:w-[185px] flex-shrink-0 border-r-4 border-[#333] flex items-center justify-center">
             <h2
               className="text-[#fde68a] text-sm sm:text-base md:text-lg font-bold font-pixel tracking-wider uppercase"
               style={{ textShadow: "1px 1px 0px #000, 2px 2px 0px rgba(0,0,0,0.8)" }}
@@ -47,11 +47,11 @@ export default function BlockCodePanel({
 
         {/* พื้นที่ของ Blockly Workspace */}
         <div className={`flex-1 w-full relative min-h-0 ${readOnly ? "pointer-events-none" : ""}`}>
-          <div className="absolute top-0 bottom-0 left-[140px] sm:left-[150px] md:left-[155px] w-1 bg-[#333] z-10" />
+          <div className="absolute top-0 bottom-0 left-[175px] md:left-[185px] w-1 bg-[#333] z-10" />
 
           {readOnly && (
             <div
-              className="absolute top-0 bottom-0 left-0 w-[140px] sm:w-[150px] md:w-[155px] z-20 flex flex-col items-center justify-center pointer-events-auto"
+              className="absolute top-0 bottom-0 left-0 w-[175px] md:w-[185px] z-20 flex flex-col items-center justify-center pointer-events-auto"
               style={{
                 backgroundColor: 'rgba(0,0,0,0.5)',
                 backgroundImage: 'repeating-linear-gradient(45deg, rgba(220,38,38,0.15) 0px, rgba(220,38,38,0.15) 10px, transparent 10px, transparent 20px)'
@@ -70,7 +70,7 @@ export default function BlockCodePanel({
           )}
 
           {executionError && (
-            <div className="absolute inset-0 left-[140px] sm:left-[150px] md:left-[155px] bg-black/60 backdrop-blur-sm z-30 flex items-center justify-center pointer-events-none">
+            <div className="absolute inset-0 left-[175px] md:left-[185px] bg-black/60 backdrop-blur-sm z-30 flex items-center justify-center pointer-events-none">
               <div className="bg-[#3d1f0f] border-4 border-red-800 rounded-xl p-4 text-center shadow-[0_0_20px_rgba(220,38,38,0.5)] animate-bounce max-w-[90%]">
                 <h3
                   className="text-red-500 text-lg sm:text-xl font-bold font-pixel tracking-wider mb-1 uppercase"

@@ -82,50 +82,18 @@ export default function ChatBox({ className = "" }: ChatBoxProps) {
     }
   };
 
-  // Quick preset alerts for rapid cooperative communication
-  const quickAlerts = [
-    { label: "⚠️ Trap!", text: "⚠️ Watch out! Trap ahead!" },
-    { label: "🧱 Wall!", text: "🧱 Blocked! There is a wall!" },
-    { label: "✅ Safe!", text: "✅ Path is clear, go ahead!" },
-    { label: "🛑 Stop!", text: "🛑 Wait! Do not move yet!" },
-  ];
-
   return (
     <div
       className={`h-full w-full bg-black/85 backdrop-blur-sm rounded-xl border-4 border-[#333] p-3 flex flex-col shadow-2xl min-h-0 ${className}`}
     >
       {/* Header */}
-      <div className="flex items-center justify-between pb-2 mb-2 border-b-2 border-neutral-800 shrink-0">
-        <div className="flex items-center gap-2">
-          <span className="text-xl">💬</span>
-          <h2
-            className="text-[#fde68a] text-lg sm:text-xl font-bold font-pixel tracking-wider uppercase"
-            style={{ textShadow: "1px 1px 0px #000, 2px 2px 0px rgba(0,0,0,0.8)" }}
-          >
-            Chat Box
-          </h2>
-        </div>
-        <div className="flex items-center gap-1.5 bg-black/60 px-2 py-0.5 rounded border border-neutral-700/80">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-          <span className="text-[11px] text-neutral-300 font-pixel tracking-wide uppercase">
-            LIVE
-          </span>
-        </div>
-      </div>
-
-      {/* Quick Tactical Preset Chips */}
-      <div className="grid grid-cols-2 gap-1.5 mb-2 shrink-0">
-        {quickAlerts.map((alert, idx) => (
-          <button
-            key={idx}
-            type="button"
-            onClick={() => handleSendMessage(alert.text)}
-            className="text-xs font-pixel py-1 px-2 rounded-md bg-[#24170d] hover:bg-[#3d2412] border border-[#78350f] text-[#fde68a] active:scale-95 transition-all truncate text-left shadow-sm"
-            title={alert.text}
-          >
-            {alert.label}
-          </button>
-        ))}
+      <div className="pb-2 mb-2 border-b-2 border-neutral-800 shrink-0">
+        <h2
+          className="text-[#fde68a] text-lg sm:text-xl font-bold font-pixel tracking-wider uppercase"
+          style={{ textShadow: "1px 1px 0px #000, 2px 2px 0px rgba(0,0,0,0.8)" }}
+        >
+          Chat Box
+        </h2>
       </div>
 
       {/* Messages Scroll Area */}
@@ -137,7 +105,7 @@ export default function ChatBox({ className = "" }: ChatBoxProps) {
           <div className="flex-1 flex flex-col items-center justify-center text-center p-4 text-neutral-500">
             <span className="text-2xl mb-1 opacity-60">📜</span>
             <p className="text-xs sm:text-sm font-medium">Coordinate with your partner here!</p>
-            <p className="text-[11px] opacity-75 mt-0.5">Click quick alerts or type below.</p>
+            <p className="text-[11px] opacity-75 mt-0.5">Type a message below.</p>
           </div>
         )}
 
