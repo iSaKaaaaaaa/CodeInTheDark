@@ -51,12 +51,12 @@ export default function BlocklyEditor({ onReady, readOnly = false }: Props) {
         wheel: false,
       },
       zoom: {
-        startScale: 1.3,
+        startScale: 1.15,
       },
     });
 
-    // ปรับขนาดบล็อกในแถบเมนู (Flyout) ด้านซ้ายให้ขยาย 50% (ขนาดรวม 1.5 เท่า) เหมือนฝั่งกระดานเขียนโค้ด
-    workspace.getFlyout()?.getWorkspace()?.setScale(1.25);
+    // ปรับขนาดบล็อกในแถบเมนู (Flyout) ด้านซ้ายให้พอดีกับแถบ 150px
+    workspace.getFlyout()?.getWorkspace()?.setScale(1.05);
 
     if (savedXmlRef.current) {
       try {

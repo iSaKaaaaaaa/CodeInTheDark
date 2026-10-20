@@ -24,7 +24,7 @@ export default function GameHeader({
   const blocksCritical = blocksLeft !== undefined && blocksLeft <= 5;
 
   return (
-    <header className="flex items-center justify-between w-full gap-2 flex-wrap">
+    <header className="flex items-center justify-between w-full gap-2 flex-wrap pr-14 sm:pr-16 md:pr-20">
       {/* Role */}
       <h1
         className="text-white text-4xl md:text-5xl lg:text-6xl font-bold uppercase shrink-0"

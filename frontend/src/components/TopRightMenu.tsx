@@ -18,7 +18,7 @@ export default function TopRightMenu() {
 
   return (
     <>
-      <div className={`fixed z-50 flex flex-col items-end gap-1.5 ${isGame ? 'top-2 right-2 md:top-4 md:right-6' : 'top-4 right-4 md:top-6 md:right-6'} font-pixel`}>
+      <div className={`fixed z-50 flex flex-col items-end gap-1.5 ${isGame ? 'top-2 right-2 sm:top-2.5 sm:right-3 md:top-3 md:right-4' : 'top-4 right-4 md:top-6 md:right-6'} font-pixel`}>
 
         {/* ถ้าไม่ใช่หน้าเกม แสดง User Badge แบบเดิม */}
         {!isGame && (
