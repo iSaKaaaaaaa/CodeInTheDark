@@ -19,6 +19,7 @@ interface UseGameMovementOptions {
   username: string;
   workspaceRef: React.MutableRefObject<Blockly.WorkspaceSvg | null>;
   availableQuotaRef: React.MutableRefObject<number>;
+  tutorialStepRef?: React.MutableRefObject<number>;
   mapData: MapData;
   playerX: number;
   playerY: number;
@@ -56,6 +57,7 @@ export function useGameMovement({
   username,
   workspaceRef,
   availableQuotaRef,
+  tutorialStepRef,
   mapData,
   playerX,
   playerY,
@@ -112,6 +114,8 @@ export function useGameMovement({
 
   const runProgram = async () => {
     if (!workspaceRef.current || role !== "driver") return;
+    const isPractice = tutorialStepRef?.current !== undefined && tutorialStepRef.current !== 99;
+
     setIsWin(false);
     setIsLose(false);
     setExecutionError(null);
@@ -165,7 +169,7 @@ export function useGameMovement({
       } else if (isWall(nextX, nextY)) {
         runFailReason = "hit_wall";
         setExecutionError("Hit The Wall");
-        if (socket) {
+        if (socket && !isPractice) {
           socket.emit("obstacle_hit", { type: "wall", x: nextX, y: nextY, playerName: username });
         }
         emitGameState({ playerX: currentX, playerY: currentY, direction: currentDirection, executionError: "Hit The Wall" });
@@ -176,7 +180,7 @@ export function useGameMovement({
       } else if (isRock(nextX, nextY)) {
         runFailReason = "hit_rock";
         setExecutionError("Hit The Rock");
-        if (socket) {
+        if (socket && !isPractice) {
           socket.emit("obstacle_hit", { type: "rock", x: nextX, y: nextY, playerName: username });
         }
         emitGameState({ playerX: currentX, playerY: currentY, direction: currentDirection, executionError: "Hit The Rock" });
@@ -191,15 +195,12 @@ export function useGameMovement({
       if (isSpike(currentX, currentY)) {
         runFailReason = "hit_spike";
         setExecutionError("Hit The Spike");
-        if (socket) {
+        if (socket && !isPractice) {
           socket.emit("obstacle_hit", { type: "spike", x: currentX, y: currentY, playerName: username });
         }
         emitGameState({ playerX: currentX, playerY: currentY, direction: currentDirection, executionError: "Hit The Spike" });
         await sleep(350);
 
-        // ดึงประวัติถอยหลังไป 2 ก้าว
-        // - pathHistory.length - 1 คือจุดก่อนเหยียบหนาม
-        // - pathHistory.length - 2 คือจุดก่อนหน้านั้น
         const targetIndex = Math.max(0, pathHistory.length - 2);
         const bounceTarget = pathHistory[targetIndex];
 
@@ -219,7 +220,7 @@ export function useGameMovement({
       if (isTrap(currentX, currentY)) {
         runFailReason = "fell_in_trap";
         setExecutionError("Fall In Trap");
-        if (socket) {
+        if (socket && !isPractice) {
           socket.emit("obstacle_hit", { type: "trap", x: currentX, y: currentY, playerName: username });
         }
         emitGameState({ playerX: currentX, playerY: currentY, direction: currentDirection, executionError: "Fall In Trap" });
@@ -245,7 +246,7 @@ export function useGameMovement({
       
       await sleep(350);
 
-      if (currentX === GOAL.x && currentY === GOAL.y) {
+      if (!isPractice && currentX === GOAL.x && currentY === GOAL.y) {
         runSuccess = true;
         setIsWin(true);
         const nextQuota = availableQuotaRef.current - blocksToUse;
@@ -283,17 +284,18 @@ export function useGameMovement({
 
     await sleep(500);
 
-    const nextQuota = availableQuotaRef.current - blocksToUse;
+    // ตอนฝึกสอน (isPractice) ไม่ลดจำนวนบล็อกที่เหลือ
+    const nextQuota = isPractice ? maxBlocks : availableQuotaRef.current - blocksToUse;
     availableQuotaRef.current = nextQuota;
     setAvailableQuota(nextQuota);
     setBlocksLeft(nextQuota);
     workspaceRef.current.clear();
 
-    if (socket && blockTypes.length > 0 && !runSuccess) {
+    if (!isPractice && socket && blockTypes.length > 0 && !runSuccess) {
       socket.emit("run_result", { blocks: blockTypes, success: false, failReason: runFailReason });
     }
 
-    if (nextQuota <= 0) {
+    if (!isPractice && nextQuota <= 0) {
       setIsLose(true);
       setLoseReason("blocks");
       if (socket) {
@@ -346,8 +348,6 @@ export function useGameMovement({
       });
       socket.emit("sync_blockly", "<xml></xml>");
 
-      // Driver เองก็ต้องเคลียร์ chat (เพราะ sync_game_state ส่งไปให้คนอื่นเท่านั้น)
-      // ใช้ emit event กลับมาหาตัวเอง
       socket.emit("reset_chat");
       socket.emit("reset_game");
     }

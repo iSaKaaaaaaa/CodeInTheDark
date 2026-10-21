@@ -53,11 +53,13 @@ interface SocketState {
   swapTimeLeft: number;
   joinError: string | null;
   isMuted: boolean;
-  
+  volume: number;
+  showGuideModal: boolean;
+
   setScreen: (screen: ScreenState) => void;
   setUsername: (username: string) => void;
   setRole: (role: 'driver' | 'navigator') => void;
-  
+
   loginWithGoogle: (payload: string | { credential?: string; accessToken?: string }) => Promise<void>;
   submitUsername: (username: string) => Promise<void>;
   createRoom: () => void;
@@ -73,6 +75,8 @@ interface SocketState {
   setSwapTimeLeft: (time: number | ((prev: number) => number)) => void;
   setJoinError: (error: string | null) => void;
   toggleMute: () => void;
+  setVolume: (volume: number) => void;
+  setShowGuideModal: (show: boolean) => void;
 }
 
 export const useSocketStore = create<SocketState>()(
@@ -94,6 +98,8 @@ export const useSocketStore = create<SocketState>()(
   swapTimeLeft: SWAP_TIME,
   joinError: null,
   isMuted: false,
+  volume: 15,
+  showGuideModal: false,
 
   setSelectedMapIndex: (index) => set({ selectedMapIndex: index }),
   setScreen: (screen) => set({ currentScreen: screen }),
@@ -102,6 +108,8 @@ export const useSocketStore = create<SocketState>()(
   setSwapTimeLeft: (time) => set((state) => ({ swapTimeLeft: typeof time === 'function' ? time(state.swapTimeLeft) : time })),
   setJoinError: (error) => set({ joinError: error }),
   toggleMute: () => set((state) => ({ isMuted: !state.isMuted })),
+  setVolume: (volume) => set({ volume }),
+  setShowGuideModal: (showGuideModal) => set({ showGuideModal }),
 
   loginWithGoogle: async (payload: string | { credential?: string; accessToken?: string }) => {
     try {
@@ -347,6 +355,7 @@ export const useSocketStore = create<SocketState>()(
         dungeonTimeLeft: state.dungeonTimeLeft,
         swapTimeLeft: state.swapTimeLeft,
         isMuted: state.isMuted,
+        volume: state.volume,
       }),
     }
   )

@@ -9,7 +9,7 @@ import GameScreen from "./screens/GameScreen";
 import { useSocketStore } from "./store/useSocketStore";
 
 export default function App() {
-  const { currentScreen, setScreen, socket, roomCode, reconnect, isMuted } = useSocketStore();
+  const { currentScreen, setScreen, socket, roomCode, reconnect, isMuted, volume } = useSocketStore();
   const audioRef = useRef<HTMLAudioElement>(null);
 
   useEffect(() => {
@@ -19,22 +19,21 @@ export default function App() {
   }, [socket, roomCode, reconnect]);
 
   useEffect(() => {
-    // Set background music volume to 10%
     if (audioRef.current) {
-      audioRef.current.volume = 0.1;
-      
+      audioRef.current.volume = Math.min(1, Math.max(0, (volume / 100) * 0.25));
+      audioRef.current.muted = isMuted;
+
       if (currentScreen === 'game') {
         if (audioRef.current.currentTime === 0) {
           audioRef.current.currentTime = 10;
         }
-        audioRef.current.muted = isMuted;
         audioRef.current.play().catch(e => console.log('Audio play failed:', e));
       } else {
         audioRef.current.pause();
         audioRef.current.currentTime = 0;
       }
     }
-  }, [currentScreen, isMuted]);
+  }, [currentScreen, isMuted, volume]);
 
   const handleAudioEnded = () => {
     if (audioRef.current) {

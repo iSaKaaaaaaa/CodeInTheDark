@@ -2,25 +2,31 @@
 
 /* วิธีการสร้างฟอนต์แบบใหม่ของ Tailwind v4 */
 @theme {
-  --font-pixel: "VT323", "Chakra Petch", monospace;
+  --font-pixel: "VT323", "Prompt", "Chakra Petch", sans-serif;
+  --font-thai: "Prompt", "Chakra Petch", sans-serif;
 }
 
 body {
   margin: 0;
   padding: 0;
+  font-family: var(--font-pixel);
+}
+
+.font-thai {
+  font-family: var(--font-thai) !important;
 }
 
 /* --- การปรับแต่งสไตล์ Blockly ให้เข้ากับธีมพิกเซลอียิปต์โบราณ --- */
 
-/* กำหนดฟอนต์พิกเซลให้กับข้อความทั้งหมดใน Blockly */
+/* กำหนดฟอนต์ให้กับข้อความทั้งหมดใน Blockly */
 .blocklyText,
 .blocklyFlyoutLabelText,
 .blocklyToolboxContents,
 .blocklyTreeLabel {
-  font-family: "VT323", "Chakra Petch", monospace !important;
-  font-size: 26px !important;
-  font-weight: bold !important;
-  letter-spacing: 0.5px !important;
+  font-family: "VT323", "Prompt", "Chakra Petch", sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.2px !important;
 }
 
 /* ซ่อนกรอบแถบเครื่องมือดั้งเดิม (เนื่องจากใช้ flyoutToolbox) */
@@ -28,14 +34,21 @@ body {
   display: none !important;
 }
 
-/* ปรับแต่งขนาดและสีของแถบบิน (Flyout) ให้มีความกว้าง 230px พอดีกับฝั่ง Blocks ของ Header */
+/* ขยายแถบ Toolbox (Flyout) ให้กว้างขึ้นเป็น 185px (md: 200px) เพื่อไม่ให้บล็อกล้น */
 .blocklyFlyout,
 .blocklyFlyoutBackground {
-  width: 230px !important;
+  width: 185px !important;
+}
+
+@media (min-width: 768px) {
+  .blocklyFlyout,
+  .blocklyFlyoutBackground {
+    width: 200px !important;
+  }
 }
 
 .blocklyFlyoutBackground {
-  fill: transparent !important; /* ทำให้โปร่งใสเพื่อให้ลวดลายกระดานจุดสีเหลืองเชื่อมต่อกันทั้งซ้ายขวา */
+  fill: transparent !important;
   fill-opacity: 0 !important;
   stroke: none !important;
 }
@@ -52,21 +65,21 @@ body {
   stroke: none !important;
 }
 
-/* ซ่อนปุ่มซูมดั้งเดิมเพื่อความคลีน (ถ้าต้องการ) */
+/* ซ่อนปุ่มซูมดั้งเดิมเพื่อความคลีน */
 .blocklyZoom {
   display: none !important;
 }
 
-/* ซ่อนสไลเดอร์เลื่อนหน้าจอ (Scrollbar) ของ Blockly ทั้งหมดเพื่อความราบเรียบ */
+/* ซ่อนสไลเดอร์เลื่อนหน้าจอของ Blockly ทั้งหมด */
 .blocklyScrollbarBackground,
 .blocklyScrollbarHandle,
 .blocklyScrollbarDiv {
   display: none !important;
 }
 
-/* --- ปรับแต่งหน้าตาตัว Block ให้สวยงามพรีเมียม ขอบสีไม้หนาและมีเงาตกลงสไตล์ Pixel Art --- */
+/* --- ปรับแต่งหน้าตาตัว Block ขอบสีไม้เข้มและมีเงา --- */
 .blocklyPath {
-  stroke: #572E18 !important; /* เปลี่ยนจากเส้นขอบสีดำเป็นสีไม้เข้มขรึม */
+  stroke: #572E18 !important;
   stroke-width: 3px !important;
   filter: drop-shadow(0px 3px 0px rgba(0, 0, 0, 0.2)) !important;
 }
@@ -77,14 +90,14 @@ body {
   stroke-width: 3px !important;
 }
 
-/* ปรับฟอนต์ป้ายข้อความบนตัว Block ให้ใหญ่ขึ้นและอ่านง่าย */
+/* ปรับฟอนต์ข้อความบนตัว Block ให้ขนาดพอดีกับกรอบ ไม่ล้นออกมานอกบล็อก */
 .blocklyEditableText text,
 .blocklyText {
-  fill: #382503 !important; /* คำหลัก (Move Up/Down/Left/Right) เป็นสีดำ */
-  font-family: "VT323", "Chakra Petch", monospace !important;
-  font-size: 26px !important;
-  font-weight: bold !important;
-  letter-spacing: 0.5px !important;
+  fill: #382503 !important;
+  font-family: "VT323", "Prompt", "Chakra Petch", sans-serif !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.2px !important;
 }
 
 /* เฉพาะสัญลักษณ์ลูกศรบอกทิศทางที่เป็นสีขาว */

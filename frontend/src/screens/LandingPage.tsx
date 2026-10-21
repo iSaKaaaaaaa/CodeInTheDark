@@ -68,11 +68,11 @@ export default function LandingPage({ onStart, contentHidden = false }: LandingP
               {/* แสงเรืองคบเพลิงดึงดูดสายตาด้านหลังปุ่ม (Torch Glow Effect) */}
               <div className="absolute -inset-1 bg-gradient-to-r from-[#f59e0b]/40 via-[#b45309]/50 to-[#f59e0b]/40 rounded-full blur-md opacity-75 group-hover:opacity-100 animate-pulse transition-opacity" />
               
-              <p 
-                className="relative text-[#fffbeb] font-bold text-lg md:text-2xl tracking-widest uppercase bg-[#451a03]/90 backdrop-blur-md px-8 py-3.5 rounded-full border-2 border-[#f59e0b] shadow-[0_0_15px_rgba(245,158,11,0.4)] group-hover:bg-[#78350f] group-hover:border-[#fbbf24] group-hover:shadow-[0_0_25px_rgba(245,158,11,0.8)] group-hover:scale-105 active:scale-95 transition-all"
+              <p
+                className="relative text-[#fffbeb] font-bold text-lg md:text-2xl tracking-wider uppercase bg-[#451a03]/90 backdrop-blur-md px-8 py-3.5 rounded-full border-2 border-[#f59e0b] shadow-[0_0_15px_rgba(245,158,11,0.4)] group-hover:bg-[#78350f] group-hover:border-[#fbbf24] group-hover:shadow-[0_0_25px_rgba(245,158,11,0.8)] group-hover:scale-105 active:scale-95 transition-all font-thai"
                 style={{ textShadow: "0 2px 4px rgba(0,0,0,0.8)" }}
               >
-                - Click Anywhere to Start -
+                - คลิกที่ใดก็ได้เพื่อเริ่มเล่น -
               </p>
             </div>
           </div>

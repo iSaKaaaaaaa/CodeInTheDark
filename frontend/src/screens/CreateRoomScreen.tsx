@@ -26,7 +26,7 @@ export default function CreateRoomScreen() {
 
   return (
     <div
-      className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center font-pixel cursor-default p-4"
+      className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center font-pixel cursor-default p-3 sm:p-4"
       style={{ backgroundImage: "url('/ui/land-waitroom.png')" }}
     >
       {/* Overlays */}
@@ -37,54 +37,54 @@ export default function CreateRoomScreen() {
 
       {/* Title */}
       <h2
-        className="text-[#fde68a] text-3xl sm:text-4xl md:text-5xl lg:text-6xl mb-3 md:mb-5 uppercase text-center relative z-10 font-bold tracking-widest"
-        style={{ textShadow: "4px 4px 0px #2a1b12, -2px -2px 0px #2a1b12, 2px -2px 0px #2a1b12, -2px 2px 0px #2a1b12, 0 6px 10px rgba(0,0,0,0.8)" }}
+        className="text-[#fde68a] text-3xl sm:text-4xl md:text-5xl mb-2.5 sm:mb-3.5 uppercase text-center relative z-10 font-bold tracking-widest font-thai"
+        style={{ textShadow: "4px 4px 0px #2a1b12, -2px -2px 0px #2a1b12, 2px -2px 0px #2a1b12, -2px 2px 0px #2a1b12, 0 5px 10px rgba(0,0,0,0.8)" }}
       >
-        Room Lobby
+        ห้องรอผู้เล่น (Lobby)
       </h2>
 
-      {/* Main Panel */}
-      <div className="relative w-[min(92vw,580px)] mx-auto z-10">
+      {/* Main Panel (+30% larger than 470px -> 580px) */}
+      <div className="relative w-[min(94vw,580px)] mx-auto z-10">
         {/* Outer glow */}
-        <div className="absolute -inset-4 bg-[#f59e0b]/10 rounded-3xl blur-2xl pointer-events-none" />
+        <div className="absolute -inset-3.5 bg-[#f59e0b]/15 rounded-3xl blur-2xl pointer-events-none" />
 
         {/* Wooden frame — top */}
         <div
           className="relative z-10 mx-3 h-5 sm:h-6 rounded-t-md"
           style={{
             background: 'linear-gradient(180deg, #8B5E3C 0%, #6B3F1F 40%, #5C2E18 100%)',
-            borderTop: '2px solid #A97B50',
-            borderLeft: '2px solid #7A4E2D',
-            borderRight: '2px solid #4A2510',
-            boxShadow: '0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.15)',
+            borderTop: '2.5px solid #A97B50',
+            borderLeft: '2.5px solid #7A4E2D',
+            borderRight: '2.5px solid #4A2510',
+            boxShadow: '0 2px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.2)',
           }}
         >
           <div className="absolute inset-0 opacity-20" style={{
             backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(0,0,0,0.15) 8px, rgba(0,0,0,0.15) 9px)',
           }} />
           {[0, 1].map(i => (
-            <div key={i} className={`absolute top-1/2 -translate-y-1/2 ${i === 0 ? 'left-3' : 'right-3'} w-2 h-2 rounded-full bg-[#C4A265] border border-[#8B6F3A] shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]`} />
+            <div key={i} className={`absolute top-1/2 -translate-y-1/2 ${i === 0 ? 'left-3' : 'right-3'} w-2.5 h-2.5 rounded-full bg-[#C4A265] border border-[#8B6F3A] shadow-[inset_0_1px_0_rgba(255,255,255,0.4)]`} />
           ))}
         </div>
 
         {/* Parchment body */}
         <div
-          className="relative z-10 mx-1.5 px-5 sm:px-8 md:px-10 py-6 sm:py-8"
+          className="relative z-10 mx-1.5 px-6 sm:px-8 md:px-10 py-5 sm:py-6"
           style={{
             background: 'linear-gradient(170deg, #F5E6C8 0%, #EDD9A3 30%, #E8D08E 60%, #DBBF78 100%)',
-            borderLeft: '3px solid #B8944F',
-            borderRight: '3px solid #9A7A3D',
+            borderLeft: '3.5px solid #B8944F',
+            borderRight: '3.5px solid #9A7A3D',
             boxShadow: `
-              inset 0 0 30px rgba(139, 99, 49, 0.15),
-              inset 0 0 60px rgba(139, 99, 49, 0.08),
-              4px 0 8px rgba(0,0,0,0.2),
-              -4px 0 8px rgba(0,0,0,0.2),
-              0 4px 12px rgba(0,0,0,0.3)
+              inset 0 0 35px rgba(139, 99, 49, 0.2),
+              inset 0 0 70px rgba(139, 99, 49, 0.1),
+              4px 0 10px rgba(0,0,0,0.25),
+              -4px 0 10px rgba(0,0,0,0.25),
+              0 6px 16px rgba(0,0,0,0.35)
             `,
           }}
         >
           {/* Parchment texture */}
-          <div className="absolute inset-0 pointer-events-none opacity-[0.04]" style={{
+          <div className="absolute inset-0 pointer-events-none opacity-[0.05]" style={{
             backgroundImage: `
               radial-gradient(ellipse at 20% 50%, rgba(101,67,33,1) 0%, transparent 50%),
               radial-gradient(ellipse at 80% 20%, rgba(101,67,33,1) 0%, transparent 40%),
@@ -92,12 +92,12 @@ export default function CreateRoomScreen() {
             `,
           }} />
           <div className="absolute inset-0 pointer-events-none" style={{
-            boxShadow: 'inset 0 0 40px rgba(101,67,33,0.12)',
+            boxShadow: 'inset 0 0 45px rgba(101,67,33,0.15)',
           }} />
 
           {/* Back button */}
           <button
-            className="absolute top-2 left-3 text-[#8B5E3C] hover:text-[#C4553A] active:translate-y-0.5 transition-all duration-75 text-xl sm:text-2xl font-bold leading-none"
+            className="absolute top-3 left-4 text-[#8B5E3C] hover:text-[#C4553A] active:translate-y-0.5 transition-all duration-75 text-2xl sm:text-3xl font-bold leading-none p-1 rounded-lg"
             onClick={leaveRoom}
             title="Back"
             style={{ textShadow: '1px 1px 0 rgba(0,0,0,0.15)' }}
@@ -105,29 +105,29 @@ export default function CreateRoomScreen() {
             ←
           </button>
 
-          <div className="flex flex-col items-center gap-4 sm:gap-5">
+          <div className="flex flex-col items-center gap-3.5 sm:gap-4">
             {/* Room Name + Code */}
             <div className="flex flex-col items-center gap-1.5">
               <p
-                className="text-2xl sm:text-3xl md:text-4xl text-[#5c2e0b] font-bold uppercase tracking-wider"
-                style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.3)' }}
+                className="text-3xl sm:text-4xl text-[#4a2408] font-bold uppercase tracking-wider font-pixel text-center"
+                style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.4)' }}
               >
                 {roomName}
               </p>
-              <div className="flex items-center gap-3">
-                <span className="text-sm sm:text-base text-[#8b6840] uppercase tracking-widest font-bold">
-                  Code:
+              <div className="flex items-center gap-3 sm:gap-3.5 bg-[#ecd29d]/70 px-5 py-2 rounded-xl border-2 border-[#b8944f]/60 shadow-inner">
+                <span className="text-sm sm:text-base text-[#7c532b] font-bold font-thai">
+                  รหัสห้อง (CODE):
                 </span>
                 <span
-                  className="text-3xl sm:text-4xl md:text-5xl text-[#5c2e0b] font-bold tracking-[0.2em] uppercase"
-                  style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.3)' }}
+                  className="text-3xl sm:text-4xl md:text-5xl text-[#382503] font-bold tracking-[0.24em] uppercase font-pixel"
+                  style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.5)' }}
                 >
                   {roomCode || "------"}
                 </span>
                 <button
                   onClick={handleCopyCode}
-                  className="relative bg-[#5c2e0b] hover:bg-[#7a3f12] text-[#fde68a] w-9 h-9 sm:w-10 sm:h-10 rounded-lg border-b-[3px] border-r-[3px] border-t-2 border-l-2 border-[#382503] shadow-[0_3px_0px_#2a1b12] active:translate-y-[3px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 flex items-center justify-center text-lg sm:text-xl font-bold"
-                  title="Copy Code"
+                  className="relative bg-[#5c2e0b] hover:bg-[#7a3f12] text-[#fde68a] w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-b-[3px] border-r-[3px] border-t-2 border-l-2 border-[#382503] shadow-[0_3px_0px_#2a1b12] active:translate-y-[3px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 flex items-center justify-center text-lg sm:text-xl font-bold"
+                  title="คัดลอกรหัสห้อง (Copy Code)"
                 >
                   <span className="absolute inset-0 border-t border-l border-white/10 rounded-lg pointer-events-none" />
                   {copied ? "✓" : "⎘"}
@@ -137,117 +137,132 @@ export default function CreateRoomScreen() {
 
             {/* Visibility Toggle */}
             {isHost && (
-              <div className="flex items-center gap-1 p-1 rounded-xl border-2 border-[#5c2e0b]/30" style={{
-                background: 'linear-gradient(135deg, rgba(244,222,179,0.5) 0%, rgba(222,194,140,0.5) 100%)',
+              <div className="flex items-center gap-1.5 p-1 rounded-xl border-2 border-[#5c2e0b]/40 shadow-inner" style={{
+                background: 'linear-gradient(135deg, rgba(244,222,179,0.7) 0%, rgba(222,194,140,0.7) 100%)',
               }}>
                 <button
                   onClick={() => setIsPublic(false)}
-                  className={`px-5 sm:px-6 py-2 rounded-lg text-base sm:text-lg font-bold uppercase tracking-wider transition-all duration-150 ${
+                  className={`px-5 sm:px-6 py-2 rounded-lg text-sm sm:text-base font-bold tracking-wide transition-all duration-150 font-thai ${
                     !isPublic
-                      ? 'bg-[#5c2e0b] text-[#fde68a] shadow-md'
-                      : 'text-[#8b6840] hover:text-[#5c2e0b]'
+                      ? 'bg-[#5c2e0b] text-[#fde68a] shadow-md border border-[#382503]'
+                      : 'text-[#7c532b] hover:text-[#5c2e0b]'
                   }`}
                 >
-                  🔒 Private
+                  ส่วนตัว (Private)
                 </button>
                 <button
                   onClick={() => setIsPublic(true)}
-                  className={`px-5 sm:px-6 py-2 rounded-lg text-base sm:text-lg font-bold uppercase tracking-wider transition-all duration-150 ${
+                  className={`px-5 sm:px-6 py-2 rounded-lg text-sm sm:text-base font-bold tracking-wide transition-all duration-150 font-thai ${
                     isPublic
-                      ? 'bg-[#5c2e0b] text-[#fde68a] shadow-md'
-                      : 'text-[#8b6840] hover:text-[#5c2e0b]'
+                      ? 'bg-[#5c2e0b] text-[#fde68a] shadow-md border border-[#382503]'
+                      : 'text-[#7c532b] hover:text-[#5c2e0b]'
                   }`}
                 >
-                  🌐 Public
+                  สาธารณะ (Public)
                 </button>
               </div>
             )}
 
             {/* Divider */}
             <div className="w-full flex items-center gap-3">
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#B8944F] to-transparent opacity-50" />
-              <div className="w-2 h-2 rotate-45 bg-[#B8944F] opacity-60" />
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#B8944F] to-transparent opacity-50" />
+              <div className="flex-1 h-0.5 bg-gradient-to-r from-transparent via-[#9A7A3D] to-transparent opacity-60" />
+              <div className="w-2 h-2 rotate-45 bg-[#8B6F3A] opacity-80" />
+              <div className="flex-1 h-0.5 bg-gradient-to-r from-transparent via-[#9A7A3D] to-transparent opacity-60" />
             </div>
 
             {/* Players Section */}
-            <div className="w-full flex flex-col gap-3">
-              <p className="text-sm sm:text-base text-[#8b6840] uppercase tracking-widest text-center font-bold">
-                Players
-              </p>
+            <div className="w-full flex flex-col gap-2.5 sm:gap-3">
+              <div className="flex items-center justify-between px-1">
+                <span className="text-sm sm:text-base text-[#7c532b] font-bold font-thai">
+                  ผู้เล่น ({players.length > 0 ? players.length : 1}/2 คน)
+                </span>
+                <span className="text-xs sm:text-sm text-[#7c532b] font-thai font-medium">
+                  ต้องมี 2 คนเพื่อเริ่มเกม
+                </span>
+              </div>
 
               {/* Player 1 — Host */}
               <div
-                className="w-full flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl border-2 border-[#5c2e0b]/40"
+                className="w-full flex items-center justify-between px-4 sm:px-6 py-3 sm:py-3.5 rounded-2xl border-2 border-[#5c2e0b]/45 shadow-md"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(244,222,179,0.8) 0%, rgba(222,194,140,0.8) 100%)',
-                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.1)',
+                  background: 'linear-gradient(135deg, rgba(248,228,190,0.95) 0%, rgba(228,200,150,0.95) 100%)',
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.4), 0 3px 6px rgba(0,0,0,0.1)',
                 }}
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#b45309] border-2 border-[#5c2e0b] flex items-center justify-center text-white text-base sm:text-lg font-bold shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)]">
+                <div className="flex items-center gap-3 sm:gap-3.5">
+                  <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#b45309] border-2 border-[#5c2e0b] flex items-center justify-center text-white text-lg sm:text-xl font-bold shadow-[inset_0_-2.5px_0_rgba(0,0,0,0.25)] font-pixel">
                     {(players.length > 0 ? players[0].username : username || "H").charAt(0).toUpperCase()}
                   </div>
-                  <span className="text-xl sm:text-2xl md:text-3xl font-bold text-[#382503] uppercase tracking-wider">
-                    {players.length > 0 ? players[0].username : username || "HOST"}
-                  </span>
+                  <div className="flex flex-col items-start">
+                    <span className="text-2xl sm:text-3xl font-bold text-[#382503] uppercase tracking-wider font-pixel leading-none">
+                      {players.length > 0 ? players[0].username : username || "HOST"}
+                    </span>
+                    <span className="text-xs sm:text-sm text-[#7c532b] font-thai font-medium mt-0.5">
+                      ผู้สร้างห้อง
+                    </span>
+                  </div>
                 </div>
                 <span
-                  className="text-base sm:text-lg font-bold tracking-widest uppercase px-3 py-1 rounded-md"
+                  className="text-sm sm:text-base font-bold px-3.5 py-1 rounded-lg font-thai"
                   style={{
                     color: '#9B2C2C',
-                    background: 'rgba(155, 44, 44, 0.1)',
-                    border: '1px solid rgba(155, 44, 44, 0.25)',
+                    background: 'rgba(155, 44, 44, 0.12)',
+                    border: '2px solid rgba(155, 44, 44, 0.35)',
                   }}
                 >
-                  Host
+                  หัวหน้าห้อง
                 </span>
               </div>
 
               {/* Player 2 — Guest / Waiting */}
               <div
-                className={`w-full flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 rounded-xl border-2 transition-all ${
+                className={`w-full flex items-center justify-between px-4 sm:px-6 py-3 sm:py-3.5 rounded-2xl border-2 transition-all ${
                   players.length > 1
-                    ? 'border-[#5c2e0b]/40'
-                    : 'border-dashed border-[#B8944F]/50'
+                    ? 'border-[#5c2e0b]/45 shadow-md'
+                    : 'border-dashed border-[#B8944F]/80 shadow-inner'
                 }`}
                 style={{
                   background: players.length > 1
-                    ? 'linear-gradient(135deg, rgba(244,222,179,0.8) 0%, rgba(222,194,140,0.8) 100%)'
-                    : 'linear-gradient(135deg, rgba(244,222,179,0.3) 0%, rgba(222,194,140,0.3) 100%)',
+                    ? 'linear-gradient(135deg, rgba(248,228,190,0.95) 0%, rgba(228,200,150,0.95) 100%)'
+                    : 'linear-gradient(135deg, rgba(244,222,179,0.35) 0%, rgba(222,194,140,0.35) 100%)',
                   boxShadow: players.length > 1
-                    ? 'inset 0 1px 0 rgba(255,255,255,0.3), 0 2px 4px rgba(0,0,0,0.1)'
+                    ? 'inset 0 1px 0 rgba(255,255,255,0.4), 0 3px 6px rgba(0,0,0,0.1)'
                     : 'none',
                 }}
               >
                 {players.length > 1 ? (
                   <>
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-[#2B6CB0] border-2 border-[#1A365D] flex items-center justify-center text-white text-base sm:text-lg font-bold shadow-[inset_0_-2px_0_rgba(0,0,0,0.2)]">
+                    <div className="flex items-center gap-3 sm:gap-3.5">
+                      <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-[#2B6CB0] border-2 border-[#1A365D] flex items-center justify-center text-white text-lg sm:text-xl font-bold shadow-[inset_0_-2.5px_0_rgba(0,0,0,0.25)] font-pixel">
                         {players[1].username.charAt(0).toUpperCase()}
                       </div>
-                      <span className="text-xl sm:text-2xl md:text-3xl font-bold text-[#382503] uppercase tracking-wider">
-                        {players[1].username}
-                      </span>
+                      <div className="flex flex-col items-start">
+                        <span className="text-2xl sm:text-3xl font-bold text-[#382503] uppercase tracking-wider font-pixel leading-none">
+                          {players[1].username}
+                        </span>
+                        <span className="text-xs sm:text-sm text-[#2B6CB0] font-thai font-medium mt-0.5">
+                          ผู้เล่นคนที่ 2
+                        </span>
+                      </div>
                     </div>
                     <span
-                      className="text-base sm:text-lg font-bold tracking-widest uppercase px-3 py-1 rounded-md"
+                      className="text-sm sm:text-base font-bold px-3.5 py-1 rounded-lg font-thai"
                       style={{
                         color: '#2B6CB0',
-                        background: 'rgba(43, 108, 176, 0.1)',
-                        border: '1px solid rgba(43, 108, 176, 0.25)',
+                        background: 'rgba(43, 108, 176, 0.12)',
+                        border: '2px solid rgba(43, 108, 176, 0.35)',
                       }}
                     >
-                      Guest
+                      ผู้เล่นคนที่ 2
                     </span>
                   </>
                 ) : (
-                  <div className="w-full flex flex-col items-center py-1.5 gap-1">
-                    <span className="text-lg sm:text-xl text-[#B8944F] font-bold uppercase tracking-wider">
-                      Waiting for opponent...
+                  <div className="w-full flex flex-col items-center py-2 sm:py-2.5 gap-1">
+                    <span className="text-lg sm:text-xl md:text-2xl text-[#7c532b] font-bold font-thai tracking-wide animate-pulse">
+                      กำลังรอผู้เล่นคนที่ 2 เข้าร่วม...
                     </span>
-                    <span className="text-sm sm:text-base text-[#B8944F]/80">
-                      {isPublic ? 'Visible in public lobby' : 'Share the room code above'}
+                    <span className="text-xs sm:text-sm text-[#9a7047] font-thai font-medium">
+                      {isPublic ? 'เปิดสาธารณะในรายชื่อห้อง' : 'แชร์รหัส 6 หลักด้านบนให้เพื่อนเพื่อเข้าร่วม'}
                     </span>
                   </div>
                 )}
@@ -256,9 +271,9 @@ export default function CreateRoomScreen() {
 
             {/* Divider */}
             <div className="w-full flex items-center gap-3">
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#B8944F] to-transparent opacity-50" />
-              <div className="w-2 h-2 rotate-45 bg-[#B8944F] opacity-60" />
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-[#B8944F] to-transparent opacity-50" />
+              <div className="flex-1 h-0.5 bg-gradient-to-r from-transparent via-[#9A7A3D] to-transparent opacity-60" />
+              <div className="w-2 h-2 rotate-45 bg-[#8B6F3A] opacity-80" />
+              <div className="flex-1 h-0.5 bg-gradient-to-r from-transparent via-[#9A7A3D] to-transparent opacity-60" />
             </div>
 
             {/* Action Button */}
@@ -267,19 +282,20 @@ export default function CreateRoomScreen() {
                 <button
                   onClick={startGame}
                   disabled={players.length < 2}
-                  className="bg-[#b45309] hover:bg-[#d97706] disabled:bg-[#8B6F3A] disabled:opacity-50 disabled:cursor-not-allowed text-[#fffbeb] font-bold text-2xl sm:text-3xl px-12 sm:px-16 py-3 sm:py-3.5 rounded-xl border-b-[4px] border-r-[4px] border-t-[3px] border-l-[3px] border-[#382503] shadow-[0_4px_0px_#2a1b12] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 uppercase tracking-widest relative overflow-hidden"
+                  className="bg-[#b45309] hover:bg-[#d97706] disabled:bg-[#8B6F3A] disabled:opacity-50 disabled:cursor-not-allowed text-[#fffbeb] font-bold text-xl sm:text-2xl px-12 sm:px-16 py-3 sm:py-3.5 rounded-2xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#382503] shadow-[0_5px_0px_#2a1b12] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 uppercase tracking-wide relative overflow-hidden font-thai"
+                  style={{ textShadow: "2px 2px 0px #000" }}
                 >
-                  <span className="absolute inset-0 border-t-[3px] border-l-[3px] border-white/15 rounded-lg pointer-events-none" />
-                  <span className="relative z-10">⚔ Play</span>
+                  <span className="absolute inset-0 border-t-2 border-l-2 border-white/20 rounded-xl pointer-events-none" />
+                  <span className="relative z-10">เริ่มเกม (START) ➔</span>
                 </button>
               ) : (
                 <div
-                  className="px-12 sm:px-16 py-3 rounded-xl text-xl sm:text-2xl font-bold uppercase tracking-widest text-center border-2 border-[#5c2e0b]/30 text-[#8b6840]"
+                  className="px-10 sm:px-14 py-3 rounded-2xl text-lg sm:text-xl font-bold uppercase tracking-wider text-center border-2 border-[#5c2e0b]/40 text-[#7c532b] font-thai shadow-inner"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(244,222,179,0.5) 0%, rgba(222,194,140,0.5) 100%)',
+                    background: 'linear-gradient(135deg, rgba(244,222,179,0.6) 0%, rgba(222,194,140,0.6) 100%)',
                   }}
                 >
-                  Waiting for Host...
+                  รอหัวหน้าห้องเริ่มเกม...
                 </div>
               )}
             </div>
@@ -291,17 +307,17 @@ export default function CreateRoomScreen() {
           className="relative z-10 mx-3 h-5 sm:h-6 rounded-b-md"
           style={{
             background: 'linear-gradient(0deg, #8B5E3C 0%, #6B3F1F 40%, #5C2E18 100%)',
-            borderBottom: '2px solid #4A2510',
-            borderLeft: '2px solid #7A4E2D',
-            borderRight: '2px solid #4A2510',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.4), inset 0 -1px 0 rgba(255,255,255,0.1)',
+            borderBottom: '2.5px solid #4A2510',
+            borderLeft: '2.5px solid #7A4E2D',
+            borderRight: '2.5px solid #4A2510',
+            boxShadow: '0 4px 10px rgba(0,0,0,0.5), inset 0 -1px 0 rgba(255,255,255,0.15)',
           }}
         >
           <div className="absolute inset-0 opacity-20" style={{
             backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(0,0,0,0.15) 8px, rgba(0,0,0,0.15) 9px)',
           }} />
           {[0, 1].map(i => (
-            <div key={i} className={`absolute top-1/2 -translate-y-1/2 ${i === 0 ? 'left-3' : 'right-3'} w-2 h-2 rounded-full bg-[#C4A265] border border-[#8B6F3A] shadow-[inset_0_1px_0_rgba(255,255,255,0.3)]`} />
+            <div key={i} className={`absolute top-1/2 -translate-y-1/2 ${i === 0 ? 'left-3' : 'right-3'} w-2.5 h-2.5 rounded-full bg-[#C4A265] border border-[#8B6F3A] shadow-[inset_0_1px_0_rgba(255,255,255,0.4)]`} />
           ))}
         </div>
 

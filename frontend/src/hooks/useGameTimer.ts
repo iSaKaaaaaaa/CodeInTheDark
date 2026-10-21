@@ -40,7 +40,8 @@ export function useGameTimer({
   useEffect(() => {
     if (role !== "driver") return;
     const timer = setInterval(() => {
-      if (tutorialStepRef.current <= 5) return;
+      // หยุดเวลาไว้ตลอดช่วงฝึกสอน (Tutorial ทุกขั้นตอน รวมถึงโหมดทดลอง 10, 11, 12, 20, 22 และการ์ดเตือน 5)
+      if (tutorialStepRef.current !== 99) return;
 
       setDungeonTimeLeft((prev) => {
         if (isWinRef.current || isLoseRef.current) return prev;
