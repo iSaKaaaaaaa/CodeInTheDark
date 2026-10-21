@@ -1,12 +1,13 @@
+import { useEffect, useRef, lazy, Suspense } from "react";
 import LandingPage from "./screens/LandingPage";
 import LoginModal from "./screens/LoginModal";
 import SetUsernameModal from "./screens/SetUsernameModal";
 import SelectPlayScreen from "./screens/SelectPlayScreen";
 import CreateRoomScreen from "./screens/CreateRoomScreen";
 import JoinRoomScreen from "./screens/JoinRoomScreen";
-import { useEffect, useRef } from "react";
-import GameScreen from "./screens/GameScreen";
 import { useSocketStore } from "./store/useSocketStore";
+
+const GameScreen = lazy(() => import("./screens/GameScreen"));
 
 export default function App() {
   const { currentScreen, setScreen, socket, roomCode, reconnect, isMuted, volume } = useSocketStore();
@@ -71,7 +72,11 @@ export default function App() {
       case 'join':
         return <JoinRoomScreen />;
       case 'game':
-        return <GameScreen />;
+        return (
+          <Suspense fallback={<div className="h-screen flex items-center justify-center text-white bg-black font-pixel text-2xl">Loading...</div>}>
+            <GameScreen />
+          </Suspense>
+        );
       default:
         return <LandingPage onStart={() => setScreen('login')} />;
     }

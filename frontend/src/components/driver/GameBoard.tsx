@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 const PLAYER_SPRITES: Record<string, string> = {
   up: "/sprites/player_back.png",
@@ -20,7 +20,8 @@ interface Props {
 }
 
 const COL_LABELS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M"];
-const ROW_LABELS = Array.from({ length: 13 }).map((_, i) => String(i + 1));
+const ROW_LABELS = Array.from({ length: 13 }, (_, i) => String(i + 1));
+const GRID_INDICES = Array.from({ length: 15 * 15 }, (_, i) => i);
 
 export default function GameBoard({
   playerX = 6,
@@ -34,6 +35,12 @@ export default function GameBoard({
   role = "driver",
 }: Props) {
   const [hoveredCoord, setHoveredCoord] = useState<{ x: number; y: number } | null>(null);
+
+  // ใช้ Set เพื่อเช็คตำแหน่งสิ่งกีดขวางในตาราง 15x15 ด้วยความเร็ว O(1) แทนการวน .some() ทุกช่องเวลาขยับเมาส์
+  const wallSet = useMemo(() => new Set(walls.map((w) => `${w.x},${w.y}`)), [walls]);
+  const trapSet = useMemo(() => new Set(traps.map((t) => `${t.x},${t.y}`)), [traps]);
+  const rockSet = useMemo(() => new Set(rocks.map((r) => `${r.x},${r.y}`)), [rocks]);
+  const spikeSet = useMemo(() => new Set(spikes.map((s) => `${s.x},${s.y}`)), [spikes]);
 
   // คำนวณเปอร์เซ็นต์ตำแหน่งของตัวละครสำหรับ Fog of War ในพื้นที่ 13x13 (ด้านใน)
   const playerInnerX = playerX - 1;
@@ -151,9 +158,10 @@ export default function GameBoard({
                 gridTemplateRows: "repeat(15, minmax(0, 1fr))",
               }}
             >
-              {Array.from({ length: 15 * 15 }).map((_, index) => {
+              {GRID_INDICES.map((index) => {
                 const x = index % 15;
                 const y = Math.floor(index / 15);
+                const key = `${x},${y}`;
 
                 const isInner = x >= 1 && x <= 13 && y >= 1 && y <= 13;
                 const innerX = x - 1;
@@ -161,10 +169,10 @@ export default function GameBoard({
 
                 const isPlayer = x === playerX && y === playerY;
                 const isGoal = x === goal.x && y === goal.y;
-                const isWall = walls.some((wall) => wall.x === x && wall.y === y);
-                const isTrap = traps.some((trap) => trap.x === x && trap.y === y);
-                const isRock = rocks.some((rock) => rock.x === x && rock.y === y);
-                const isSpike = spikes.some((spike) => spike.x === x && spike.y === y);
+                const isWall = wallSet.has(key);
+                const isTrap = trapSet.has(key);
+                const isRock = rockSet.has(key);
+                const isSpike = spikeSet.has(key);
 
                 const isSideDirection = direction === "left" || direction === "right";
 

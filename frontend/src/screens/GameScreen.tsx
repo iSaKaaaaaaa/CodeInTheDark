@@ -1,8 +1,8 @@
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useState, useCallback, useEffect, useMemo } from "react";
 import * as Blockly from "blockly";
 import { useSocketStore } from "../store/useSocketStore";
 
-import { MAX_BLOCKS } from "../constants/game";
+import { MAX_BLOCKS, DUNGEON_TIME, SWAP_TIME } from "../constants/game";
 
 import { useTutorial } from "../hooks/useTutorial";
 import { useGameTimer } from "../hooks/useGameTimer";
@@ -12,7 +12,6 @@ import { useGameMovement } from "../hooks/useGameMovement";
 import GameHeader from "../components/driver/GameHeader";
 import GameBoard from "../components/driver/GameBoard";
 import ChatBox from "../components/driver/ChatBox";
-import TopRightMenu from "../components/TopRightMenu";
 import BlockCodePanel from "../components/driver/BlockCodePanel";
 
 /* ─── Reusable parchment tutorial card (ลดขนาดฟอนต์ลง 15-20% ให้สบายตา) ─── */
@@ -101,8 +100,14 @@ function Badge({ children, color = 'bg-blue-100 text-blue-800 border-blue-800' }
   return <span className={`inline-block ${color} border-2 px-2 py-0.5 rounded-md font-bold shadow-sm text-sm sm:text-base uppercase tracking-wide font-pixel`}>{children}</span>;
 }
 
+const formatTime = (seconds: number) => {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, "0")}`;
+};
+
 export default function GameScreen() {
-  const { username, socket, role, setRole, mapData: serverMapData, startGame, setSelectedMapIndex, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft, players, leaveStage } = useSocketStore();
+  const { username, socket, role, setRole, mapData: serverMapData, startGame, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft, players, leaveStage } = useSocketStore();
   const isHost = players.length > 0 ? players[0].username === username : role === 'driver';
 
   if (!serverMapData) {
@@ -137,8 +142,6 @@ export default function GameScreen() {
     setTutorialStep,
     tutorialStepRef,
     selfReady,
-    showStep5Tooltip,
-    setShowStep5Tooltip,
     markSelfReady,
     countdown,
     startInteractiveImmediately,
@@ -152,7 +155,7 @@ export default function GameScreen() {
   } = useTutorial({ socket, role });
 
   useGameTimer({ socket, role, setRole, tutorialStepRef, isWinRef, isLoseRef, workspaceRef, availableQuotaRef, setIsLose, setLoseReason, setShowSwapAlert, setBlocksLeft, setExecutionError, setDungeonTimeLeft, setSwapTimeLeft });
-  useGameSync({ socket, role, setRole, workspaceRef, availableQuotaRef, setPlayerX, setPlayerY, setDirection, setBlocksLeft, setAvailableQuota, setIsWin, setIsLose, setLoseReason, setDungeonTimeLeft, setSwapTimeLeft, setShowSwapAlert, setSelectedMapIndex, setExecutionError, setPanelKey });
+  useGameSync({ socket, role, setRole, workspaceRef, availableQuotaRef, setPlayerX, setPlayerY, setDirection, setBlocksLeft, setAvailableQuota, setIsWin, setIsLose, setLoseReason, setDungeonTimeLeft, setSwapTimeLeft, setShowSwapAlert, setExecutionError, setPanelKey });
   const { runProgram, resetGameToNewStart, emitGameState } = useGameMovement({
     socket,
     role,
@@ -198,8 +201,8 @@ export default function GameScreen() {
       setPlayerX(START.x);
       setPlayerY(START.y);
       setDirection("up");
-      setDungeonTimeLeft(300);
-      setSwapTimeLeft(120);
+      setDungeonTimeLeft(DUNGEON_TIME);
+      setSwapTimeLeft(SWAP_TIME);
       availableQuotaRef.current = MAX_BLOCKS;
       setAvailableQuota(MAX_BLOCKS);
       setBlocksLeft(MAX_BLOCKS);
@@ -214,8 +217,8 @@ export default function GameScreen() {
           direction: "up",
           blocksLeft: MAX_BLOCKS,
           availableQuota: MAX_BLOCKS,
-          dungeonTimeLeft: 300,
-          swapTimeLeft: 120,
+          dungeonTimeLeft: DUNGEON_TIME,
+          swapTimeLeft: SWAP_TIME,
           executionError: null,
         });
         socket.emit("sync_blockly", "<xml></xml>");
@@ -230,7 +233,6 @@ export default function GameScreen() {
     workspaceRef.current = ws;
     ws.options.maxBlocks = availableQuotaRef.current;
     ws.addChangeListener((event) => {
-      // Detect block creation for interactive tutorial step 11
       if (event.type === Blockly.Events.BLOCK_CREATE) {
         onTutorialBlockDragged();
       }
@@ -250,11 +252,19 @@ export default function GameScreen() {
         }
       }
     });
-  }, [role, socket, onTutorialBlockDragged, tutorialStepRef]);
+  }, [socket, onTutorialBlockDragged, tutorialStepRef]);
 
-  const formatTime = (seconds: number) => { const m = Math.floor(seconds / 60); const s = seconds % 60; return `${m}:${s.toString().padStart(2, "0")}`; };
-  const BOUNDARY_WALLS = WALLS.filter((wall) => wall.x === 0 || wall.x === 14 || wall.y === 0 || wall.y === 14);
-  const handleScreenClick = () => { if (executionError && role === "driver") { setExecutionError(null); emitGameState({ executionError: null }); } };
+  const boundaryWalls = useMemo(
+    () => WALLS.filter((wall) => wall.x === 0 || wall.x === 14 || wall.y === 0 || wall.y === 14),
+    [WALLS]
+  );
+
+  const handleScreenClick = () => {
+    if (executionError && role === "driver") {
+      setExecutionError(null);
+      emitGameState({ executionError: null });
+    }
+  };
 
   // สถานะความเร่งด่วนของเวลาเพื่อแสดงเอฟเฟกต์ภาพบนหน้าจอ (ทำงานเฉพาะตอนเริ่มเกมจริงแล้ว)
   const isPlaying = tutorialStep === 99 && !isWin && !isLose;
@@ -269,21 +279,9 @@ export default function GameScreen() {
       style={{ backgroundImage: "url('/ui/ingame.png')" }}
       onClick={handleScreenClick}
     >
-      <TopRightMenu />
-
       {/* Tutorial Overlay — blackout เฉพาะขั้นตอน briefing (0, 1, 2, 3) แต่ในโหมดลงมือทำ (10, 11, 12, 20, 22) ให้เปิดโล่ง ไม่บังกระดาน */}
       {(tutorialStep === 0 || tutorialStep === 1 || tutorialStep === 2 || tutorialStep === 3) && (
         <div className="fixed inset-0 z-[100] bg-black/75 pointer-events-auto backdrop-blur-sm transition-opacity duration-300" />
-      )}
-
-      {/* Step 5 Tooltip */}
-      {showStep5Tooltip && (
-        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-[110] animate-in fade-in slide-in-from-top-4">
-          <TutorialCard title="คำเตือนเรื่องเวลา" titleColor="#dc2626" titleBorder="#991b1b" buttonText="เข้าใจแล้ว" onNext={() => setShowStep5Tooltip(false)}>
-            <p>คุณมีเวลา <strong className="text-red-700 text-lg font-bold">5 นาที</strong> ในการผ่านด่าน</p>
-            <p className="mt-2">และทุกๆ 2 นาที <Badge color="bg-orange-100 text-orange-800 border-orange-800">จะสลับบทบาทกัน</Badge>!</p>
-          </TutorialCard>
-        </div>
       )}
 
       {/* Tutorial Modals — Positioned contextually */}
@@ -508,7 +506,7 @@ export default function GameScreen() {
             dungeonTime={formatTime(dungeonTimeLeft)}
             dungeonTimeLeft={dungeonTimeLeft}
             swapTime={formatTime(swapTimeLeft)}
-            swapProgress={(swapTimeLeft / 120) * 100}
+            swapProgress={(swapTimeLeft / SWAP_TIME) * 100}
             swapTimeLeft={swapTimeLeft}
           />
         </div>
@@ -524,7 +522,7 @@ export default function GameScreen() {
               playerX={playerX}
               playerY={playerY}
               direction={direction}
-              walls={role === "driver" ? BOUNDARY_WALLS : WALLS}
+              walls={role === "driver" ? boundaryWalls : WALLS}
               traps={mapData.traps}
               rocks={mapData.rocks}
               spikes={mapData.spikes}
@@ -570,7 +568,7 @@ export default function GameScreen() {
       {/* Win overlay */}
       {isWin && (() => {
         const blocksUsed = MAX_BLOCKS - blocksLeft;
-        const timeUsed = 300 - dungeonTimeLeft;
+        const timeUsed = DUNGEON_TIME - dungeonTimeLeft;
         const star2 = blocksUsed < 40;
         const star3 = timeUsed < 240;
         return (

@@ -1,7 +1,7 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import * as Blockly from "blockly";
 import { Socket } from "socket.io-client";
-import { DUNGEON_TIME } from "../constants/game";
+import { DUNGEON_TIME, SWAP_TIME } from "../constants/game";
 
 interface MapData {
   walls: { x: number; y: number }[];
@@ -87,10 +87,15 @@ export function useGameMovement({
 }: UseGameMovementOptions) {
   const { walls: WALLS, traps: TRAPS, rocks: ROCKS, spikes: SPIKES, start: START, goal: GOAL } = mapData;
 
-  const isWall = (x: number, y: number) => WALLS.some((w) => w.x === x && w.y === y);
-  const isTrap = (x: number, y: number) => TRAPS.some((t) => t.x === x && t.y === y);
-  const isRock = (x: number, y: number) => ROCKS.some((r) => r.x === x && r.y === y);
-  const isSpike = (x: number, y: number) => SPIKES.some((s) => s.x === x && s.y === y);
+  const wallSet = useMemo(() => new Set(WALLS.map((w) => `${w.x},${w.y}`)), [WALLS]);
+  const trapSet = useMemo(() => new Set(TRAPS.map((t) => `${t.x},${t.y}`)), [TRAPS]);
+  const rockSet = useMemo(() => new Set(ROCKS.map((r) => `${r.x},${r.y}`)), [ROCKS]);
+  const spikeSet = useMemo(() => new Set(SPIKES.map((s) => `${s.x},${s.y}`)), [SPIKES]);
+
+  const isWall = (x: number, y: number) => wallSet.has(`${x},${y}`);
+  const isTrap = (x: number, y: number) => trapSet.has(`${x},${y}`);
+  const isRock = (x: number, y: number) => rockSet.has(`${x},${y}`);
+  const isSpike = (x: number, y: number) => spikeSet.has(`${x},${y}`);
 
   const emitGameState = (stateOverrides: any = {}) => {
     if (role === "driver" && socket) {
@@ -141,9 +146,9 @@ export function useGameMovement({
     let currentX = playerX;
     let currentY = playerY;
     let currentDirection = direction;
-    
+
     // บันทึกประวัติการเดิน (ตำแหน่งเริ่มต้น)
-    const pathHistory: {x: number, y: number}[] = [{ x: currentX, y: currentY }];
+    const pathHistory: { x: number; y: number }[] = [{ x: currentX, y: currentY }];
 
     for (const cmdBlock of commandBlocks) {
       workspaceRef.current.highlightBlock(cmdBlock.id);
@@ -240,10 +245,10 @@ export function useGameMovement({
       }
 
       emitGameState({ playerX: currentX, playerY: currentY, direction: currentDirection });
-      
+
       // บันทึกตำแหน่งที่ปลอดภัยลงในประวัติ
       pathHistory.push({ x: currentX, y: currentY });
-      
+
       await sleep(350);
 
       if (!isPractice && currentX === GOAL.x && currentY === GOAL.y) {
@@ -326,8 +331,8 @@ export function useGameMovement({
     setIsWin(false);
     setIsLose(false);
     setLoseReason(null);
-    setDungeonTimeLeft(300);
-    setSwapTimeLeft(120);
+    setDungeonTimeLeft(DUNGEON_TIME);
+    setSwapTimeLeft(SWAP_TIME);
 
     if (workspaceRef.current) {
       workspaceRef.current.clear();
@@ -344,14 +349,14 @@ export function useGameMovement({
         playerX: START.x, playerY: START.y, direction: "up",
         blocksLeft: maxBlocks, availableQuota: maxBlocks,
         isWin: false, isLose: false, loseReason: null,
-        dungeonTimeLeft: 300, swapTimeLeft: 120, reset: true,
+        dungeonTimeLeft: DUNGEON_TIME, swapTimeLeft: SWAP_TIME, reset: true,
       });
       socket.emit("sync_blockly", "<xml></xml>");
 
       socket.emit("reset_chat");
       socket.emit("reset_game");
     }
-  }, [isHost, socket, START.x, START.y, maxBlocks]);
+  }, [isHost, socket, START.x, START.y, maxBlocks, setPlayerX, setPlayerY, setDirection, setIsWin, setIsLose, setLoseReason, setDungeonTimeLeft, setSwapTimeLeft, workspaceRef, availableQuotaRef, setAvailableQuota, setBlocksLeft, setPanelKey]);
 
   return { runProgram, resetGameToNewStart, emitGameState };
 }

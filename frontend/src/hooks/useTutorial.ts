@@ -32,7 +32,6 @@ export function useTutorial({ socket, role }: UseTutorialOptions) {
   });
   const [selfReady, setSelfReady] = useState(false);
   const [partnerReady, setPartnerReady] = useState(false);
-  const [showStep5Tooltip, setShowStep5Tooltip] = useState(false);
   const [countdown, setCountdown] = useState(5);
   const justCompletedRef = useRef(false);
 
@@ -58,7 +57,6 @@ export function useTutorial({ socket, role }: UseTutorialOptions) {
       setCountdown((prev) => {
         if (prev <= 1) {
           clearInterval(interval);
-          // Advance based on role
           if (role === "driver") {
             setTutorialStep(10);
           } else {
@@ -91,12 +89,12 @@ export function useTutorial({ socket, role }: UseTutorialOptions) {
   }, [tutorialStep, dragDone]);
 
   // Navigator flow:
-  // When Navigator enters Step 20, simulate an incoming message from Driver in chat!
+  // When Navigator enters Step 20, simulate an incoming message from Driver in chat
   useEffect(() => {
     if (tutorialStep === 20 && role === "navigator") {
       const t = setTimeout(() => {
         setMockMessage({
-          sender: "🕹️ Driver (จำลอง)",
+          sender: "Driver (จำลอง)",
           text: "เรามองไม่เห็นกำแพงเลย ตอนนี้ทางข้างหน้าปลอดภัยไหม? กำแพงอยู่ตรงไหนบ้าง?",
         });
       }, 500);
@@ -107,11 +105,10 @@ export function useTutorial({ socket, role }: UseTutorialOptions) {
   // Navigator: When Navigator replies in chat on step 20 -> mock driver responds & go to 22
   useEffect(() => {
     if (tutorialStep === 20 && chatDone) {
-      // Driver simulated response
       const t1 = setTimeout(() => {
         setMockMessage({
-          sender: "🕹️ Driver (จำลอง)",
-          text: "รับทราบ! กำลังเตรียมเดินตามทางที่บอก 👍",
+          sender: "Driver (จำลอง)",
+          text: "รับทราบ! กำลังเตรียมเดินตามทางที่บอก",
         });
       }, 800);
 
@@ -168,7 +165,9 @@ export function useTutorial({ socket, role }: UseTutorialOptions) {
       }
     };
     socket.on("sync_game_state", onSyncGlobal);
-    return () => { socket.off("sync_game_state", onSyncGlobal); };
+    return () => {
+      socket.off("sync_game_state", onSyncGlobal);
+    };
   }, [socket]);
 
   // When both are ready, finish tutorial
@@ -193,10 +192,10 @@ export function useTutorial({ socket, role }: UseTutorialOptions) {
     }
   }, [tutorialStep]);
 
-  const markSelfReady = () => {
+  const markSelfReady = useCallback(() => {
     setSelfReady(true);
     if (socket) socket.emit("sync_game_state", { tutorialReady: true });
-  };
+  }, [socket]);
 
   return {
     tutorialStep,
@@ -204,13 +203,10 @@ export function useTutorial({ socket, role }: UseTutorialOptions) {
     tutorialStepRef,
     selfReady,
     partnerReady,
-    showStep5Tooltip,
-    setShowStep5Tooltip,
     markSelfReady,
     countdown,
     startInteractiveImmediately,
     mockMessage,
-    // Interactive flags
     dragDone,
     runDone,
     chatDone,

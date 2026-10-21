@@ -19,7 +19,6 @@ interface UseGameSyncOptions {
   setDungeonTimeLeft: (time: number | ((prev: number) => number)) => void;
   setSwapTimeLeft: (time: number | ((prev: number) => number)) => void;
   setShowSwapAlert: (v: boolean) => void;
-  setSelectedMapIndex: (v: number) => void;
   setExecutionError: (v: string | null) => void;
   setPanelKey: (fn: (prev: number) => number) => void;
 }
@@ -41,7 +40,6 @@ export function useGameSync({
   setDungeonTimeLeft,
   setSwapTimeLeft,
   setShowSwapAlert,
-  setSelectedMapIndex,
   setExecutionError,
   setPanelKey,
 }: UseGameSyncOptions) {
@@ -63,19 +61,14 @@ export function useGameSync({
       if (state.isWin !== undefined) setIsWin(state.isWin);
       if (state.isLose !== undefined) setIsLose(state.isLose);
       if (state.loseReason !== undefined) setLoseReason(state.loseReason);
-      if (state.dungeonTimeLeft !== undefined)
-        setDungeonTimeLeft(state.dungeonTimeLeft);
+      if (state.dungeonTimeLeft !== undefined) setDungeonTimeLeft(state.dungeonTimeLeft);
       if (state.swapTimeLeft !== undefined) setSwapTimeLeft(state.swapTimeLeft);
-      if (state.showSwapAlert !== undefined)
-        setShowSwapAlert(state.showSwapAlert);
-      if (state.selectedMapIndex !== undefined)
-        setSelectedMapIndex(state.selectedMapIndex);
-      if (state.executionError !== undefined)
-        setExecutionError(state.executionError);
+      if (state.showSwapAlert !== undefined) setShowSwapAlert(state.showSwapAlert);
+      if (state.executionError !== undefined) setExecutionError(state.executionError);
 
       if (state.roleSwapped) {
         setRole("driver");
-        setExecutionError(null); // เคลียร์ error
+        setExecutionError(null);
         if (workspaceRef.current) {
           workspaceRef.current.clear();
           setBlocksLeft(availableQuotaRef.current);
@@ -139,7 +132,7 @@ export function useGameSync({
       setTimeout(() => {
         setRole(data.newRole);
         setShowSwapAlert(false);
-        setExecutionError(null); // เคลียร์ error
+        setExecutionError(null);
         if (workspaceRef.current) {
           workspaceRef.current.clear();
           setBlocksLeft(availableQuotaRef.current);
