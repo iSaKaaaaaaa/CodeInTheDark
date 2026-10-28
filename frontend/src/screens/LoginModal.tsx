@@ -19,7 +19,7 @@ export default function LoginModal() {
       }
     },
     onError: () => {
-      setError("การเข้าสู่ระบบด้วย Google ไม่สำเร็จ กรุณาลองใหม่อีกครั้ง");
+      setError("Google login failed. Please try again.");
     },
   });
 
@@ -112,23 +112,23 @@ export default function LoginModal() {
             <button
               className="absolute top-3 right-4 text-[#8B5E3C] text-2xl sm:text-3xl font-bold hover:text-[#C4553A] active:translate-y-0.5 transition-all duration-75 leading-none p-1 rounded-lg"
               onClick={() => setScreen("landing")}
-              title="ปิด (Close)"
+              title="Close"
               style={{ textShadow: "1px 1px 0 rgba(0,0,0,0.15)" }}
             >
               ✕
             </button>
 
             {/* Content */}
-            <div className="flex flex-col items-center gap-4 sm:gap-5 relative z-20">
+            <div className="flex flex-col items-center gap-4 sm:gap-5 relative z-20 font-game-body">
               <div className="text-center flex flex-col items-center gap-1.5">
                 <p
-                  className="text-3xl sm:text-4xl text-[#4a2408] font-bold uppercase tracking-wider font-pixel"
+                  className="text-2xl sm:text-3xl text-[#4a2408] uppercase tracking-wide font-bungee"
                   style={{ textShadow: "1px 1px 0 rgba(255,255,255,0.4)" }}
                 >
-                  ยินดีต้อนรับ
+                  WELCOME
                 </p>
-                <p className="text-sm sm:text-base md:text-lg text-[#7c532b] font-thai font-medium">
-                  เข้าสู่ระบบเพื่อเริ่มต้นการผจญภัย
+                <p className="text-sm sm:text-base md:text-lg text-[#7c532b] font-game-body font-medium">
+                  Sign in to begin your journey
                 </p>
               </div>
 
@@ -142,7 +142,7 @@ export default function LoginModal() {
               {/* Custom Google Login Button */}
               <button
                 onClick={() => googleLogin()}
-                className="flex items-center justify-center gap-3.5 w-full bg-[#5c2e0b] hover:bg-[#7a3f12] text-[#fffbeb] font-thai font-semibold text-lg sm:text-xl px-6 py-3.5 rounded-2xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#382503] shadow-[0_5px_0px_#2a1b12] hover:brightness-105 active:border-b-0 active:border-r-0 active:translate-y-[4px] active:shadow-none transition-all duration-75 cursor-pointer relative overflow-hidden"
+                className="flex items-center justify-center gap-3.5 w-full bg-[#5c2e0b] hover:bg-[#7a3f12] text-[#fffbeb] font-game-sub font-semibold text-base sm:text-lg px-6 py-3.5 rounded-2xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#382503] shadow-[0_5px_0px_#2a1b12] hover:brightness-105 active:border-b-0 active:border-r-0 active:translate-y-[4px] active:shadow-none transition-all duration-75 cursor-pointer relative overflow-hidden uppercase tracking-wider"
               >
                 <span className="absolute inset-0 border-t-2 border-l-2 border-white/15 rounded-xl pointer-events-none" />
                 <svg
@@ -166,7 +166,7 @@ export default function LoginModal() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                   />
                 </svg>
-                <span>เข้าสู่ระบบด้วย Google</span>
+                <span>Sign in with Google</span>
               </button>
 
               {/* Error */}

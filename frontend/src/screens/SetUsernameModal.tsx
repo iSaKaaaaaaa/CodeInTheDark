@@ -10,7 +10,7 @@ export default function SetUsernameModal() {
 
   const handleSubmit = async () => {
     if (username.trim() === '') {
-      setError('กรุณากรอกชื่อผู้เล่น');
+      setError('Please enter a username.');
       return;
     }
 
@@ -20,7 +20,7 @@ export default function SetUsernameModal() {
     try {
       await submitUsername(username);
     } catch (err: any) {
-      setError(err.message || 'บันทึกชื่อผู้เล่นไม่สำเร็จ กรุณาลองใหม่อีกครั้ง');
+      setError(err.message || 'Failed to save username. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -100,16 +100,16 @@ export default function SetUsernameModal() {
             }} />
 
             {/* Content */}
-            <div className="flex flex-col items-center gap-4 sm:gap-5 relative z-10">
+            <div className="flex flex-col items-center gap-4 sm:gap-5 relative z-10 font-game-body">
               <div className="text-center flex flex-col items-center gap-1.5">
                 <p
-                  className="text-3xl sm:text-4xl text-[#4a2408] font-bold uppercase tracking-wider font-pixel"
+                  className="text-2xl sm:text-3xl text-[#4a2408] uppercase tracking-wide font-bungee"
                   style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.4)' }}
                 >
-                  ตั้งชื่อผู้เล่น
+                  SET USERNAME
                 </p>
-                <p className="text-sm sm:text-base md:text-lg text-[#7c532b] font-thai font-medium">
-                  กรอกชื่อของคุณเพื่อเริ่มต้นการผจญภัย
+                <p className="text-sm sm:text-base md:text-lg text-[#7c532b] font-game-body font-medium">
+                  Enter your name to begin
                 </p>
               </div>
 
@@ -121,15 +121,15 @@ export default function SetUsernameModal() {
               </div>
 
               <div className="w-full flex flex-col gap-2">
-                <label className="text-[#6d4621] text-sm sm:text-base font-thai font-semibold ml-1">
-                  ชื่อผู้เล่น (Username)
+                <label className="text-[#6d4621] text-xs sm:text-sm font-game-sub uppercase tracking-wider font-bold ml-1">
+                  USERNAME
                 </label>
                 <input
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="เช่น Explorer_01"
+                  placeholder="e.g. Player_01"
                   maxLength={20}
                   className="w-full bg-[#fef3c7] p-3 sm:p-3.5 rounded-2xl border-3 border-[#5c2e0b] text-[#382503] font-pixel text-2xl sm:text-3xl font-bold outline-none focus:bg-white focus:border-[#b45309] focus:ring-4 focus:ring-[#f59e0b]/40 shadow-inner transition-colors placeholder:text-[#8b4513]/40"
                   autoFocus
@@ -137,7 +137,7 @@ export default function SetUsernameModal() {
               </div>
 
               {error && (
-                <div className="w-full bg-[#7f1d1d]/90 text-[#fef2f2] border-2 border-[#b91c1c] px-4 py-2.5 rounded-xl text-center text-sm sm:text-base font-thai font-medium shadow-md">
+                <div className="w-full bg-[#7f1d1d]/90 text-[#fef2f2] border-2 border-[#b91c1c] px-4 py-2.5 rounded-xl text-center text-sm sm:text-base font-game-body font-medium shadow-md">
                   ⚠ {error}
                 </div>
               )}
@@ -145,10 +145,10 @@ export default function SetUsernameModal() {
               <button
                 onClick={handleSubmit}
                 disabled={loading || username.trim() === ''}
-                className="w-full mt-1 bg-[#b45309] hover:bg-[#d97706] disabled:bg-[#8B6F3A] disabled:opacity-50 disabled:cursor-not-allowed text-[#fffbeb] font-bold text-xl sm:text-2xl py-3 sm:py-3.5 rounded-2xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#382503] shadow-[0_5px_0px_#2a1b12] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 uppercase tracking-widest relative overflow-hidden font-thai"
+                className="w-full mt-1 bg-[#b45309] hover:bg-[#d97706] disabled:bg-[#8B6F3A] disabled:opacity-50 disabled:cursor-not-allowed text-[#fffbeb] font-bold text-base sm:text-lg py-3 sm:py-3.5 rounded-2xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#382503] shadow-[0_5px_0px_#2a1b12] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 uppercase tracking-wide relative overflow-hidden font-bungee"
               >
                 <span className="absolute inset-0 border-t-2 border-l-2 border-white/15 rounded-xl pointer-events-none" />
-                <span className="relative z-10">{loading ? 'กำลังบันทึก...' : 'ยืนยัน'}</span>
+                <span className="relative z-10">{loading ? 'SAVING...' : 'CONFIRM'}</span>
               </button>
             </div>
           </div>

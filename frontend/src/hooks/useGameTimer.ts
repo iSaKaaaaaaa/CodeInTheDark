@@ -76,22 +76,27 @@ export function useGameTimer({
 
         let next = prev - 1;
         if (next <= 0) {
+          const myNewRole: "driver" | "navigator" = role === "driver" ? "navigator" : "driver";
+          const partnerNewRole: "driver" | "navigator" = role === "driver" ? "driver" : "navigator";
+
+          // Immediately switch role so the swap alert banner displays the player's true new role
+          setRole(myNewRole);
           setShowSwapAlert(true);
+          setExecutionError(null);
+          if (workspaceRef.current) {
+            workspaceRef.current.clear();
+            setBlocksLeft(availableQuotaRef.current);
+          }
+
           if (socket) {
             socket.emit("sync_game_state", { showSwapAlert: true });
-            socket.emit("trigger_role_swap", { newRole: "driver" });
+            socket.emit("trigger_role_swap", { newRole: partnerNewRole });
           }
 
           setTimeout(() => {
             setShowSwapAlert(false);
             if (socket)
               socket.emit("sync_game_state", { showSwapAlert: false, roleSwapped: true });
-            setRole("navigator");
-            setExecutionError(null); // เคลียร์ error เวลาเปลี่ยน role
-            if (workspaceRef.current) {
-              workspaceRef.current.clear();
-              setBlocksLeft(availableQuotaRef.current);
-            }
           }, 3000);
 
           next = 120;

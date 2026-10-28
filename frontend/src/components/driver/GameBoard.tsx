@@ -87,7 +87,7 @@ export default function GameBoard({
                   : "bg-[#d2a356] text-[#2a1306]"
               }`}
               style={{ textShadow: "1px 1px 0 rgba(255,255,255,0.6)" }}
-              title={hoveredCoord ? "พิกัดที่ชี้ (Cursor Coordinate)" : "พิกัดของคุณ (Your Position)"}
+              title={hoveredCoord ? "Cursor Coordinate" : "Your Position"}
             >
               {hoveredCoord
                 ? `${COL_LABELS[hoveredCoord.x]}${ROW_LABELS[hoveredCoord.y]}`
@@ -282,7 +282,7 @@ export default function GameBoard({
       {/* Prominent Coordinates Status Bar */}
       <div className="mt-1.5 w-full max-w-[540px] flex items-center justify-between bg-[#2a1306]/95 border-2 border-[#b8944f] rounded-xl px-4 py-2 shadow-xl backdrop-blur-md font-pixel shrink-0 text-base sm:text-lg">
         <div className="flex items-center gap-2">
-          <span className="text-[#d5bba2] text-xs sm:text-sm font-thai font-medium">ตำแหน่ง:</span>
+          <span className="text-[#d5bba2] text-xs sm:text-sm font-game-sub uppercase tracking-wider font-semibold">POS:</span>
           <span
             className="text-emerald-400 font-bold tracking-wider text-xl sm:text-2xl font-pixel bg-black/60 px-2.5 py-0.5 rounded-lg border border-emerald-500/50 shadow-inner"
             style={{ textShadow: "1px 1px 0 #000" }}
@@ -292,10 +292,10 @@ export default function GameBoard({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-[#d5bba2] text-xs sm:text-sm font-thai font-medium">เป้าหมาย:</span>
+          <span className="text-[#d5bba2] text-xs sm:text-sm font-game-sub uppercase tracking-wider font-semibold">GOAL:</span>
           {role === "navigator" ? (
-            <span className="text-sky-300 font-thai text-xs sm:text-sm font-medium bg-black/60 px-2.5 py-1 rounded-lg border border-sky-500/40">
-              รอ Driver แจ้งพิกัด
+            <span className="text-sky-300 font-game-sub text-xs sm:text-sm font-medium bg-black/60 px-2.5 py-1 rounded-lg border border-sky-500/40 uppercase tracking-wide">
+              Awaiting Driver
             </span>
           ) : (
             <span
@@ -308,7 +308,7 @@ export default function GameBoard({
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-[#d5bba2] text-xs sm:text-sm font-thai font-medium">เคอร์เซอร์:</span>
+          <span className="text-[#d5bba2] text-xs sm:text-sm font-game-sub uppercase tracking-wider font-semibold">CURSOR:</span>
           <span
             className="text-sky-300 font-bold tracking-wider text-xl sm:text-2xl font-pixel bg-black/60 px-2.5 py-0.5 rounded-lg border border-sky-500/50 min-w-[2.75rem] text-center shadow-inner"
             style={{ textShadow: "1px 1px 0 #000" }}

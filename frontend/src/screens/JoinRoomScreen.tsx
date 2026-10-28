@@ -39,10 +39,10 @@ export default function JoinRoomScreen() {
 
       {/* Title */}
       <h2
-        className="text-[#fde68a] text-3xl sm:text-4xl md:text-5xl mb-3 sm:mb-4 uppercase text-center relative z-10 font-bold tracking-widest font-thai"
-        style={{ textShadow: "4px 4px 0px #2a1b12, -2px -2px 0px #2a1b12, 2px -2px 0px #2a1b12, -2px 2px 0px #2a1b12, 0 5px 10px rgba(0,0,0,0.8)" }}
+        className="text-[#fde68a] text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4 uppercase text-center relative z-10 font-bold tracking-widest font-pixel"
+        style={{ textShadow: "4px 4px 0px #2a1b12, -2px -2px 0px #2a1b12, 2px -2px 0px #2a1b12, -2px 2px 0px #2a1b12, 0 6px 10px rgba(0,0,0,0.8)" }}
       >
-        เข้าร่วมห้อง (Join Room)
+        JOIN ROOM
       </h2>
 
       {/* Main Panel (+30% larger than 460px -> 560px) */}
@@ -107,30 +107,30 @@ export default function JoinRoomScreen() {
             ←
           </button>
 
-          <div className="flex flex-col items-center gap-4 sm:gap-5">
+          <div className="flex flex-col items-center gap-4 sm:gap-5 font-game-body">
             {/* Tab Switcher */}
-            <div className="flex items-center gap-1.5 p-1 rounded-xl border-2 border-[#5c2e0b]/40 shadow-inner" style={{
+            <div className="flex items-center gap-1.5 p-1 rounded-xl border-2 border-[#5c2e0b]/40 shadow-inner font-game-sub" style={{
               background: 'linear-gradient(135deg, rgba(244,222,179,0.7) 0%, rgba(222,194,140,0.7) 100%)',
             }}>
               <button
                 onClick={() => setTab('code')}
-                className={`px-5 sm:px-6 py-2 rounded-lg text-sm sm:text-base font-bold tracking-wide transition-all duration-150 font-thai ${
+                className={`px-5 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-150 ${
                   tab === 'code'
                     ? 'bg-[#5c2e0b] text-[#fde68a] shadow-md border border-[#382503]'
                     : 'text-[#7c532b] hover:text-[#5c2e0b]'
                 }`}
               >
-                กรอกรหัส (Code)
+                ROOM CODE
               </button>
               <button
                 onClick={() => setTab('public')}
-                className={`px-5 sm:px-6 py-2 rounded-lg text-sm sm:text-base font-bold tracking-wide transition-all duration-150 font-thai ${
+                className={`px-5 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-150 ${
                   tab === 'public'
                     ? 'bg-[#5c2e0b] text-[#fde68a] shadow-md border border-[#382503]'
                     : 'text-[#7c532b] hover:text-[#5c2e0b]'
                 }`}
               >
-                สาธารณะ (Public)
+                PUBLIC ROOMS
               </button>
             </div>
 
@@ -144,16 +144,16 @@ export default function JoinRoomScreen() {
             {/* Tab Content */}
             {tab === 'code' ? (
               /* === Enter Code Tab === */
-              <div className="w-full flex flex-col items-center gap-3.5 sm:gap-4">
+              <div className="w-full flex flex-col items-center gap-3.5 sm:gap-4 font-game-body">
                 <div className="flex flex-col items-center gap-1">
                   <p
-                    className="text-2xl sm:text-3xl text-[#4a2408] font-bold font-thai tracking-wide"
+                    className="text-xl sm:text-2xl text-[#4a2408] uppercase tracking-wide font-bungee"
                     style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.4)' }}
                   >
-                    ห้องส่วนตัว (Private Room)
+                    PRIVATE ROOM
                   </p>
-                  <p className="text-sm sm:text-base text-[#7c532b] font-thai font-medium text-center">
-                    กรอกรหัส 6 หลักที่ได้รับจากหัวหน้าห้อง
+                  <p className="text-sm sm:text-base text-[#7c532b] font-game-body font-medium text-center">
+                    Enter 6-digit room code from host
                   </p>
                 </div>
 
@@ -169,7 +169,7 @@ export default function JoinRoomScreen() {
                 />
 
                 {joinError && (
-                  <div className="w-full bg-[#7f1d1d]/90 text-[#fef2f2] border-2 border-[#b91c1c] px-4 py-2.5 rounded-xl text-center text-sm sm:text-base font-bold shadow-md font-thai">
+                  <div className="w-full bg-[#7f1d1d]/90 text-[#fef2f2] border-2 border-[#b91c1c] px-4 py-2.5 rounded-xl text-center text-sm sm:text-base font-bold shadow-md font-game-body">
                     ⚠ {joinError}
                   </div>
                 )}
@@ -177,25 +177,25 @@ export default function JoinRoomScreen() {
                 <button
                   onClick={handleJoinPrivate}
                   disabled={inputCode.trim().length !== 6}
-                  className="bg-[#b45309] hover:bg-[#d97706] disabled:bg-[#8B6F3A] disabled:opacity-50 disabled:cursor-not-allowed text-[#fffbeb] font-bold text-xl sm:text-2xl px-12 sm:px-16 py-3 sm:py-3.5 rounded-2xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#382503] shadow-[0_5px_0px_#2a1b12] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 uppercase tracking-wide relative overflow-hidden font-thai mt-1"
+                  className="bg-[#b45309] hover:bg-[#d97706] disabled:bg-[#8B6F3A] disabled:opacity-50 disabled:cursor-not-allowed text-[#fffbeb] font-bold text-base sm:text-lg px-12 sm:px-16 py-3 sm:py-3.5 rounded-2xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#382503] shadow-[0_5px_0px_#2a1b12] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 uppercase tracking-wide relative overflow-hidden font-bungee mt-1"
                   style={{ textShadow: "2px 2px 0px #000" }}
                 >
                   <span className="absolute inset-0 border-t-2 border-l-2 border-white/20 rounded-xl pointer-events-none" />
-                  <span className="relative z-10">เข้าร่วมห้อง (JOIN) ➔</span>
+                  <span className="relative z-10">JOIN LOBBY ➔</span>
                 </button>
               </div>
             ) : (
               /* === Public Lobby Tab === */
-              <div className="w-full flex flex-col gap-3">
+              <div className="w-full flex flex-col gap-3 font-game-body">
                 <div className="flex items-center justify-between px-1">
                   <p
-                    className="text-xl sm:text-2xl md:text-3xl text-[#4a2408] font-bold font-thai tracking-wide"
+                    className="text-lg sm:text-xl text-[#4a2408] uppercase tracking-wide font-bungee"
                     style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.4)' }}
                   >
-                    ห้องสาธารณะ (Open Rooms)
+                    OPEN ROOMS
                   </p>
-                  <button className="text-xs sm:text-sm md:text-base font-bold text-[#7c532b] hover:text-[#5c2e0b] tracking-wide transition-colors font-thai">
-                    ↻ รีเฟรช
+                  <button className="text-xs sm:text-sm font-bold text-[#7c532b] hover:text-[#5c2e0b] tracking-wider uppercase transition-colors font-game-sub">
+                    ↻ REFRESH
                   </button>
                 </div>
 
@@ -219,13 +219,13 @@ export default function JoinRoomScreen() {
                           <span className="text-xl sm:text-2xl font-bold text-[#382503] uppercase tracking-wider font-pixel leading-none">
                             {room.host}'s Room
                           </span>
-                          <span className="text-xs sm:text-sm text-[#7c532b] font-thai font-medium mt-0.5">
-                            {room.players}/2 คน (กำลังรอ)
+                          <span className="text-xs text-[#7c532b] font-game-body font-medium mt-0.5">
+                            {room.players}/2 Explorers (Waiting)
                           </span>
                         </div>
                       </div>
-                      <span className="text-base sm:text-lg font-bold text-[#b45309] group-hover:text-[#d97706] tracking-wide transition-colors font-thai">
-                        เข้าร่วม →
+                      <span className="text-sm sm:text-base font-bold text-[#b45309] group-hover:text-[#d97706] tracking-wider uppercase transition-colors font-game-sub">
+                        JOIN →
                       </span>
                     </div>
                   ))}

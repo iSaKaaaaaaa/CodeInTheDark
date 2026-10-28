@@ -14,13 +14,13 @@ import GameBoard from "../components/driver/GameBoard";
 import ChatBox from "../components/driver/ChatBox";
 import BlockCodePanel from "../components/driver/BlockCodePanel";
 
-/* ─── Reusable parchment tutorial card (ลดขนาดฟอนต์ลง 15-20% ให้สบายตา) ─── */
+/* ─── Reusable parchment tutorial card ─── */
 function TutorialCard({
   title,
   titleColor = '#ea580c',
   titleBorder = '#7c2d12',
   children,
-  buttonText = 'ถัดไป ➔',
+  buttonText = 'NEXT ➔',
   onNext,
   disabled = false,
   className = '',
@@ -35,7 +35,7 @@ function TutorialCard({
   className?: string;
 }) {
   return (
-    <div className={`pointer-events-auto max-w-[490px] w-[92vw] mx-auto shadow-[0_20px_50px_rgba(0,0,0,0.8)] rounded-xl ${className}`}>
+    <div className={`pointer-events-auto max-w-[500px] w-[92vw] mx-auto shadow-[0_20px_50px_rgba(0,0,0,0.85)] rounded-xl ${className} font-game-body`}>
       {/* Wooden frame top */}
       <div className="mx-2 h-4 sm:h-5 rounded-t-md relative" style={{
         background: 'linear-gradient(180deg, #8B5E3C 0%, #6B3F1F 40%, #5C2E18 100%)',
@@ -52,9 +52,9 @@ function TutorialCard({
         boxShadow: 'inset 0 0 30px rgba(139,99,49,0.15), inset 0 0 60px rgba(139,99,49,0.08), 4px 0 8px rgba(0,0,0,0.2), -4px 0 8px rgba(0,0,0,0.2), 0 4px 12px rgba(0,0,0,0.3)',
       }}>
         <div className="absolute inset-0 pointer-events-none" style={{ boxShadow: 'inset 0 0 40px rgba(101,67,33,0.12)' }} />
-        <div className="relative z-10 flex flex-col items-center gap-2.5 sm:gap-3.5 font-pixel">
+        <div className="relative z-10 flex flex-col items-center gap-2.5 sm:gap-3.5">
           {/* Title badge */}
-          <span className="inline-block font-bold text-white text-xl sm:text-2xl px-5 py-1.5 rounded-xl border-2 uppercase tracking-wider font-thai" style={{
+          <span className="inline-block font-bold text-white text-base sm:text-lg md:text-xl px-4 py-1 rounded-xl border-2 uppercase tracking-wider font-game-sub" style={{
             background: titleColor, borderColor: titleBorder,
             boxShadow: `0 3px 0 ${titleBorder}`, textShadow: '1.5px 1px 0 #000',
           }}>
@@ -62,7 +62,7 @@ function TutorialCard({
           </span>
           {/* Content */}
           <div
-            className="text-sm sm:text-base md:text-lg font-semibold text-[#382503] leading-relaxed text-center w-full font-thai tracking-normal"
+            className="text-xs sm:text-sm md:text-base font-semibold text-[#382503] leading-relaxed text-center w-full font-game-body tracking-normal"
             style={{ textShadow: "0.5px 0.5px 0px rgba(255,255,255,0.6)" }}
           >
             {children}
@@ -71,7 +71,7 @@ function TutorialCard({
           <button
             onClick={onNext}
             disabled={disabled}
-            className={`mt-1 font-bold text-lg sm:text-xl px-8 py-2 rounded-xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 uppercase tracking-wider transition-all font-thai ${
+            className={`mt-1 font-bold text-sm sm:text-base px-6 py-2 rounded-xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 uppercase tracking-wider transition-all font-game-sub ${
               disabled
                 ? 'bg-[#8B6F3A] border-[#5c2e0b] text-[#d4c9a8] shadow-none translate-y-1 cursor-not-allowed'
                 : 'bg-[#b45309] border-[#382503] text-white hover:bg-[#d97706] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none shadow-[0_4px_0_#2a1b12]'
@@ -95,9 +95,9 @@ function TutorialCard({
   );
 }
 
-/* ─── Inline badge helper (ลดขนาดฟอนต์ลง 15-20%) ─── */
+/* ─── Inline badge helper ─── */
 function Badge({ children, color = 'bg-blue-100 text-blue-800 border-blue-800' }: { children: React.ReactNode; color?: string }) {
-  return <span className={`inline-block ${color} border-2 px-2 py-0.5 rounded-md font-bold shadow-sm text-sm sm:text-base uppercase tracking-wide font-pixel`}>{children}</span>;
+  return <span className={`inline-block ${color} border-2 px-2 py-0.5 rounded-md font-bold shadow-sm text-xs sm:text-sm uppercase tracking-wide font-game-sub`}>{children}</span>;
 }
 
 const formatTime = (seconds: number) => {
@@ -111,7 +111,7 @@ export default function GameScreen() {
   const isHost = players.length > 0 ? players[0].username === username : role === 'driver';
 
   if (!serverMapData) {
-    return <div className="h-screen flex items-center justify-center text-white bg-black font-pixel text-2xl">Generating Map...</div>;
+    return <div className="h-screen flex items-center justify-center text-white bg-black font-game-sub text-2xl">Generating Map...</div>;
   }
   const mapData = serverMapData;
   const { walls: WALLS, start: START, goal: GOAL } = mapData;
@@ -137,6 +137,17 @@ export default function GameScreen() {
   useEffect(() => { isWinRef.current = isWin; isLoseRef.current = isLose; roleRef.current = role; }, [isWin, isLose, role]);
   useEffect(() => { availableQuotaRef.current = availableQuota; if (workspaceRef.current) workspaceRef.current.options.maxBlocks = availableQuota; }, [availableQuota]);
 
+  // Calculate human-readable coordinate string for goal (e.g. "G1", "F8")
+  const goalCoord = useMemo(() => {
+    const colLabels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M"];
+    const goalInnerX = GOAL.x - 1;
+    const goalInnerY = GOAL.y - 1;
+    if (goalInnerX >= 0 && goalInnerX < 13 && goalInnerY >= 0 && goalInnerY < 13) {
+      return `${colLabels[goalInnerX]}${goalInnerY + 1}`;
+    }
+    return `(${GOAL.x},${GOAL.y})`;
+  }, [GOAL.x, GOAL.y]);
+
   const {
     tutorialStep,
     setTutorialStep,
@@ -149,10 +160,23 @@ export default function GameScreen() {
     dragDone,
     runDone,
     chatDone,
+    trapDone,
+    hasTraps,
     onTutorialBlockDragged,
     onTutorialRunPressed,
     onTutorialChatSent,
-  } = useTutorial({ socket, role });
+    validateTutorialChat,
+  } = useTutorial({
+    socket,
+    role,
+    goalCoord,
+    playerPos: { x: playerX, y: playerY },
+    walls: WALLS,
+    traps: mapData.traps,
+  });
+  const driverTotal = hasTraps ? 4 : 3;
+  const dragNum = hasTraps ? 3 : 2;
+  const runNum = hasTraps ? 4 : 3;
 
   useGameTimer({ socket, role, setRole, tutorialStepRef, isWinRef, isLoseRef, workspaceRef, availableQuotaRef, setIsLose, setLoseReason, setShowSwapAlert, setBlocksLeft, setExecutionError, setDungeonTimeLeft, setSwapTimeLeft });
   useGameSync({ socket, role, setRole, workspaceRef, availableQuotaRef, setPlayerX, setPlayerY, setDirection, setBlocksLeft, setAvailableQuota, setIsWin, setIsLose, setLoseReason, setDungeonTimeLeft, setSwapTimeLeft, setShowSwapAlert, setExecutionError, setPanelKey });
@@ -192,12 +216,14 @@ export default function GameScreen() {
     setPanelKey,
   });
 
-  // เมื่อจบโหมดฝึกสอน (tutorialStep เปลี่ยนเป็น 99 จากโหมดทดลองเล่น) ให้รีเซ็ตตำแหน่งตัวละคร เวลา และจำนวนบล็อกกลับเป็นค่าเริ่มต้นเต็ม 100%
+  // Reset chat, character position, timers, and blocks when tutorial ends
+  const [chatResetSignal, setChatResetSignal] = useState(0);
   const prevTutorialStepRef = useRef(tutorialStep);
   useEffect(() => {
     const prev = prevTutorialStepRef.current;
     prevTutorialStepRef.current = tutorialStep;
     if (prev !== 99 && tutorialStep === 99 && (prev === 12 || prev === 22)) {
+      setChatResetSignal((n) => n + 1);
       setPlayerX(START.x);
       setPlayerY(START.y);
       setDirection("up");
@@ -238,7 +264,6 @@ export default function GameScreen() {
       }
       if (roleRef.current === "driver") {
         if (event.type === Blockly.Events.BLOCK_CREATE || event.type === Blockly.Events.BLOCK_DELETE || event.type === Blockly.Events.BLOCK_MOVE || event.type === Blockly.Events.BLOCK_CHANGE) {
-          // ตอนฝึกสอน (tutorialStep !== 99) ไม่หักลดจำนวนบล็อกที่เหลือ
           const isPractice = tutorialStepRef.current !== 99;
           const used = ws.getAllBlocks(false).length;
           const newBlocksLeft = isPractice ? MAX_BLOCKS : Math.max(0, availableQuotaRef.current - used);
@@ -266,7 +291,6 @@ export default function GameScreen() {
     }
   };
 
-  // สถานะความเร่งด่วนของเวลาเพื่อแสดงเอฟเฟกต์ภาพบนหน้าจอ (ทำงานเฉพาะตอนเริ่มเกมจริงแล้ว)
   const isPlaying = tutorialStep === 99 && !isWin && !isLose;
   const isStageWarning = isPlaying && dungeonTimeLeft <= 60 && dungeonTimeLeft > 30;
   const isStageCritical = isPlaying && dungeonTimeLeft <= 30 && dungeonTimeLeft > 10;
@@ -275,25 +299,27 @@ export default function GameScreen() {
 
   return (
     <div
-      className="w-full h-screen bg-cover bg-center flex flex-col font-pixel cursor-default relative overflow-x-hidden overflow-y-auto"
+      className="w-full h-screen bg-cover bg-center flex flex-col font-game-body cursor-default relative overflow-x-hidden overflow-y-auto"
       style={{ backgroundImage: "url('/ui/ingame.png')" }}
       onClick={handleScreenClick}
     >
-      {/* Tutorial Overlay — blackout เฉพาะขั้นตอน briefing (0, 1, 2, 3) แต่ในโหมดลงมือทำ (10, 11, 12, 20, 22) ให้เปิดโล่ง ไม่บังกระดาน */}
+      {/* Tutorial Overlay */}
       {(tutorialStep === 0 || tutorialStep === 1 || tutorialStep === 2 || tutorialStep === 3) && (
         <div className="fixed inset-0 z-[100] bg-black/75 pointer-events-auto backdrop-blur-sm transition-opacity duration-300" />
       )}
 
-      {/* Tutorial Modals — Positioned contextually */}
-      {(tutorialStep <= 5 || (tutorialStep >= 10 && tutorialStep <= 12) || (tutorialStep >= 20 && tutorialStep <= 22)) && (
-        <div className="fixed inset-0 z-[110] flex pointer-events-none font-pixel p-4 md:p-8">
+      {/* Tutorial Modals */}
+      {(tutorialStep <= 5 || (tutorialStep >= 10 && tutorialStep <= 13) || (tutorialStep >= 20 && tutorialStep <= 22)) && (
+        <div className="fixed inset-0 z-[110] flex pointer-events-none font-game-body p-4 md:p-8">
 
           {/* Step 0: Waiting for partner */}
           {tutorialStep === 0 && (
             <div className="absolute inset-0 flex items-center justify-center animate-in zoom-in-95 duration-300">
-              <TutorialCard title="รอเพื่อนร่วมทีม" buttonText="กำลังรอ..." onNext={() => {}} disabled={true}>
-                <p>คุณอ่านคำแนะนำเบื้องต้นเรียบร้อยแล้ว</p>
-                <p className="mt-3 text-[#8b6840] bg-[#f5e6c8] p-2.5 rounded-lg border-2 border-[#b8944f]/30 text-sm sm:text-base">กำลังรอเพื่อนร่วมทีมอ่านคำแนะนำเพื่อเริ่มพร้อมกัน...</p>
+              <TutorialCard title="WAITING FOR PARTNER" buttonText="WAITING..." onNext={() => {}} disabled={true}>
+                <p>You have completed the tutorial briefing.</p>
+                <p className="mt-3 text-[#8b6840] bg-[#f5e6c8] p-2.5 rounded-lg border-2 border-[#b8944f]/30 text-xs sm:text-sm">
+                  Waiting for your teammate to finish their briefing so you can start together...
+                </p>
               </TutorialCard>
             </div>
           )}
@@ -301,25 +327,25 @@ export default function GameScreen() {
           {/* Step 1: Welcome & Role Introduction */}
           {tutorialStep === 1 && (
             <div className="absolute inset-0 flex items-center justify-center animate-in zoom-in-95 duration-300">
-              <TutorialCard title="ยินดีต้อนรับ!" buttonText="ถัดไป ➔" onNext={() => setTutorialStep(2)}>
+              <TutorialCard title="WELCOME TO THE DUNGEON" buttonText="NEXT ➔" onNext={() => setTutorialStep(2)}>
                 {role === "driver" ? (
                   <>
-                    <p className="text-lg sm:text-xl">คุณคือ <Badge color="bg-blue-100 text-blue-800 border-blue-800">DRIVER (คนขับ)</Badge></p>
-                    <p className="mt-3 text-base sm:text-lg">คุณมีสิทธิ์<strong className="text-orange-700 mx-1">ลากบล็อกสั่งเดิน</strong> มองเห็นกับดักและเป้าหมาย แต่... <strong className="text-red-600">มองไม่เห็นกำแพง!</strong></p>
-                    <p className="mt-2.5 text-sm sm:text-base text-[#78350f] bg-[#f5e6c8] p-2.5 rounded-lg border-2 border-[#b8944f]/40">
-                      เพื่อนของคุณ (Navigator) จะเป็นคนมองเห็นกำแพงและบอกทางให้
+                    <p className="text-base sm:text-lg">You are the <Badge color="bg-blue-100 text-blue-800 border-blue-800">DRIVER</Badge></p>
+                    <p className="mt-2 text-xs sm:text-sm">You control <strong className="text-orange-700">Code Movement Blocks</strong>, see traps and the goal flag. But... <strong className="text-red-600">you cannot see stone walls!</strong></p>
+                    <p className="mt-2 text-xs sm:text-sm text-[#78350f] bg-[#f5e6c8] p-2 rounded-lg border-2 border-[#b8944f]/40">
+                      Your teammate (Navigator) sees all walls and must guide you via Chat.
                     </p>
                   </>
                 ) : (
                   <>
-                    <p className="text-lg sm:text-xl">คุณคือ <Badge color="bg-sky-100 text-sky-800 border-sky-600">NAVIGATOR (ผู้นำทาง)</Badge></p>
-                    <p className="mt-3 text-base sm:text-lg">คุณมองเห็น<strong className="text-sky-700 mx-1">กำแพงทั้งหมด</strong> แต่... <strong className="text-red-600">มองไม่เห็นกับดักและเป้าหมาย!</strong></p>
-                    <p className="mt-2.5 text-sm sm:text-base text-[#78350f] bg-[#f5e6c8] p-2.5 rounded-lg border-2 border-[#b8944f]/40">
-                      หน้าที่หลักของคุณคือดูแผนที่และพิมพ์บอกทาง Driver ในแชท!
+                    <p className="text-base sm:text-lg">You are the <Badge color="bg-sky-100 text-sky-800 border-sky-600">NAVIGATOR</Badge></p>
+                    <p className="mt-2 text-xs sm:text-sm">You see <strong className="text-sky-700">All Stone Walls</strong>, but... <strong className="text-red-600">you cannot see traps or the goal flag!</strong></p>
+                    <p className="mt-2 text-xs sm:text-sm text-[#78350f] bg-[#f5e6c8] p-2 rounded-lg border-2 border-[#b8944f]/40">
+                      Your mission is to read the maze layout and guide the Driver via Chat.
                     </p>
                   </>
                 )}
-                <p className="mt-3 text-[#ea580c] font-bold text-lg sm:text-xl">สองคนต้องร่วมมือกันเพื่อพิชิตด่าน!</p>
+                <p className="mt-2.5 text-[#ea580c] font-bold text-sm sm:text-base font-game-sub">Cooperate closely to escape the dungeon!</p>
               </TutorialCard>
             </div>
           )}
@@ -327,23 +353,24 @@ export default function GameScreen() {
           {/* Step 2: Map Focus & Key Objective */}
           {tutorialStep === 2 && (
             <div className="absolute top-1/2 -translate-y-1/2 right-[2%] lg:right-[6%] xl:right-[10%] animate-in fade-in slide-in-from-right-8 duration-300">
-              <TutorialCard title="แผนที่และภารกิจ" titleColor="#2B6CB0" titleBorder="#1A365D" buttonText="เข้าใจแล้ว ➔" onNext={() => setTutorialStep(3)}>
+              <TutorialCard title="MAP & MISSION" titleColor="#2B6CB0" titleBorder="#1A365D" buttonText="GOT IT ➔" onNext={() => setTutorialStep(3)}>
                 {role === "driver" ? (
-                  <div className="space-y-2.5">
-                    <p className="text-lg sm:text-xl">สังเกต<Badge color="bg-green-100 text-green-800 border-green-800">ธงเป้าหมาย</Badge> ทางซ้าย!</p>
-                    <div className="bg-red-50/90 border-2 border-red-400 p-2.5 rounded-xl text-left text-sm sm:text-base text-red-900 font-semibold space-y-1">
-                      <p className="text-red-700 font-bold text-base sm:text-lg">สิ่งสำคัญที่สุด:</p>
-                      <p>มีเพียง <strong className="text-red-700">DRIVER เท่านั้นที่เห็นธงเป้าหมาย</strong> (Navigator มองไม่เห็น!)</p>
-                      <p>คุณต้องดูพิกัดตาราง (เช่น <span className="text-amber-800 font-bold">F8, J10</span>) แล้วพิมพ์บอกเพื่อนในแชทเสมอ!</p>
+                  <div className="space-y-2">
+                    <p className="text-sm sm:text-base">Look at the <Badge color="bg-green-100 text-green-800 border-green-800">GOAL FLAG</Badge> on the center map!</p>
+                    <div className="bg-red-50/90 border-2 border-red-400 p-2.5 rounded-xl text-left text-xs sm:text-sm text-red-900 font-semibold space-y-1">
+                      <p className="text-red-700 font-bold font-game-sub">CRITICAL RULE:</p>
+                      <p>Only the <strong className="text-red-700">DRIVER sees the Goal Flag</strong> (Navigator cannot see it!).</p>
+                      <p>Check the grid coordinate (e.g. <span className="text-amber-800 font-bold">{goalCoord}</span>) and always tell your Navigator in Chat!</p>
+                      <p>You also see <strong className="text-red-700">traps</strong>. Warn your Navigator, since stepping on one sends you back to start!</p>
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-2.5">
-                    <p className="text-lg sm:text-xl">สังเกต<Badge color="bg-amber-100 text-amber-900 border-amber-900">กำแพงหิน</Badge> และหมอกความมืด (Fog)</p>
-                    <div className="bg-amber-50/90 border-2 border-amber-400 p-2.5 rounded-xl text-left text-sm sm:text-base text-amber-950 font-semibold space-y-1">
-                      <p className="text-amber-800 font-bold text-base sm:text-lg">สิ่งสำคัญที่สุด:</p>
-                      <p>คุณมองเห็นกำแพงทั้งหมด แต่ <strong className="text-red-700">Driver ไม่เห็นกำแพงเลย!</strong></p>
-                      <p>ถ้าคุณไม่บอกทาง เพื่อนจะเดินชนกำแพงและทำให้เสียบล็อกฟรี!</p>
+                  <div className="space-y-2">
+                    <p className="text-sm sm:text-base">Notice the <Badge color="bg-amber-100 text-amber-900 border-amber-900">STONE WALLS</Badge> and Fog of War.</p>
+                    <div className="bg-amber-50/90 border-2 border-amber-400 p-2.5 rounded-xl text-left text-xs sm:text-sm text-amber-950 font-semibold space-y-1">
+                      <p className="text-amber-800 font-bold font-game-sub">CRITICAL RULE:</p>
+                      <p>You see every wall, but the <strong className="text-red-700">Driver sees zero walls!</strong></p>
+                      <p>If you do not guide them, they will collide with walls and waste code blocks.</p>
                     </div>
                   </div>
                 )}
@@ -351,25 +378,25 @@ export default function GameScreen() {
             </div>
           )}
 
-          {/* Step 3: 5-Second Digest / Transition Countdown */}
+          {/* Step 3: Transition Countdown */}
           {tutorialStep === 3 && (
             <div className="absolute inset-0 flex items-center justify-center animate-in zoom-in-95 duration-300">
               <TutorialCard
-                title="เตรียมพร้อม!"
+                title="GET READY!"
                 titleColor="#ea580c"
                 titleBorder="#9a3412"
-                buttonText="เริ่มทันที ➔"
+                buttonText="START NOW ➔"
                 onNext={startInteractiveImmediately}
               >
                 <div className="flex flex-col items-center gap-2">
-                  <p className="text-lg sm:text-xl font-bold text-[#5c2e0b]">
-                    เตรียมเข้าสู่โหมดทดลองเล่นใน
+                  <p className="text-sm sm:text-base font-bold text-[#5c2e0b] font-game-sub">
+                    Entering Practice Mode in
                   </p>
                   <span className="text-5xl sm:text-6xl font-bold text-red-600 drop-shadow-md animate-bounce font-pixel">
                     {countdown}
                   </span>
-                  <p className="text-sm sm:text-base text-[#78350f]">
-                    สำรวจแผนที่และเครื่องมือบนหน้าจอให้คุ้นเคย (ไม่เสียเวลาและบล็อกจริง)
+                  <p className="text-xs sm:text-sm text-[#78350f]">
+                    Explore your screen, test tools, and complete your role objectives (No time penalty).
                   </p>
                 </div>
               </TutorialCard>
@@ -377,65 +404,83 @@ export default function GameScreen() {
           )}
 
           {/* ─── DRIVER INTERACTIVE STEPS ─── */}
-          {/* Step 10 (Driver): Look at Goal & Type in Chat */}
           {tutorialStep === 10 && (
             <div className="absolute top-4 right-[2%] lg:right-[4%] max-w-[440px] animate-in fade-in slide-in-from-top-4 duration-300">
               <TutorialCard
-                title="ภารกิจ 1/3 (DRIVER)"
+                title={`MISSION 1/${driverTotal} (DRIVER)`}
                 titleColor="#2563eb"
                 titleBorder="#1e40af"
-                buttonText={chatDone ? "✓ เรียบร้อย" : "พิมพ์บอกพิกัดในแชท..."}
-                onNext={() => setTutorialStep(11)}
+                buttonText={chatDone ? "✓ COMPLETED" : "SEND GOAL COORD IN CHAT..."}
+                onNext={() => setTutorialStep(hasTraps ? 13 : 11)}
                 disabled={!chatDone}
               >
-                <p className="text-base sm:text-lg">
-                  สังเกตพิกัด <strong className="text-green-700">ธงเป้าหมาย</strong> บนแผนที่ทางซ้าย แล้วพิมพ์บอก Navigator ใน <Badge color="bg-white text-blue-700 border-gray-300">Chat Box</Badge> ด้านล่างขวา!
+                <p className="text-sm sm:text-base">
+                  Spot the <strong className="text-green-700">Goal Flag</strong> on the center map. Type its coordinate (<strong className="text-amber-800">{goalCoord}</strong>) in the <Badge color="bg-white text-blue-700 border-gray-300">Chat Box</Badge> on the left!
                 </p>
-                <p className="mt-1.5 text-xs sm:text-sm text-[#8b6840]">
-                  (ดูพิกัดตาราง <span className="text-red-700 font-bold">A-M, 1-13</span> แล้วพิมพ์ เช่น <strong className="text-amber-800">"ธงอยู่ที่..."</strong> แล้วกด Enter)
+                <p className="mt-1.5 text-xs text-[#8b6840]">
+                  (Type the coordinate, e.g. <strong className="text-amber-900">"{goalCoord}"</strong> or <strong className="text-amber-900">"Goal at {goalCoord}"</strong>, then press Enter)
                 </p>
               </TutorialCard>
             </div>
           )}
 
-          {/* Step 11 (Driver): Drag a Move Block */}
-          {tutorialStep === 11 && (
+          {/* Driver trap mission: only the Driver sees traps, so they must warn the Navigator */}
+          {tutorialStep === 13 && (
             <div className="absolute top-4 right-[2%] lg:right-[4%] max-w-[440px] animate-in fade-in slide-in-from-top-4 duration-300">
               <TutorialCard
-                title="ภารกิจ 2/3 (DRIVER)"
+                title={`MISSION 2/${driverTotal} (DRIVER)`}
+                titleColor="#dc2626"
+                titleBorder="#7f1d1d"
+                buttonText={trapDone ? "✓ TRAP REPORTED" : "SEND TRAP COORD IN CHAT..."}
+                onNext={() => setTutorialStep(11)}
+                disabled={!trapDone}
+              >
+                <p className="text-sm sm:text-base">
+                  Find a <Badge color="bg-red-100 text-red-800 border-red-800">TRAP</Badge> hole on the center map. Only <strong className="text-red-700">you</strong> can see traps. The Navigator cannot!
+                </p>
+                <p className="mt-1.5 text-xs text-[#8b6840]">
+                  Stepping on a trap sends you <strong className="text-red-700">back to start</strong>. Send its coordinate (e.g. <strong className="text-amber-900">"Trap at C5"</strong>) in Chat so your Navigator can route around it.
+                </p>
+              </TutorialCard>
+            </div>
+          )}
+
+          {tutorialStep === 11 && (
+            <div className="absolute top-16 md:top-20 left-[24%] md:left-[28%] lg:left-[32%] xl:left-[34%] max-w-[420px] pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-300">
+              <TutorialCard
+                title={`MISSION ${dragNum}/${driverTotal} (DRIVER)`}
                 titleColor="#d97706"
                 titleBorder="#b45309"
-                buttonText={dragDone ? "✓ ลากสำเร็จ!" : "ลากบล็อกเดิน..."}
+                buttonText={dragDone ? "✓ DRAGGED!" : "DRAG A MOVE BLOCK..."}
                 onNext={() => setTutorialStep(12)}
                 disabled={!dragDone}
               >
-                <p className="text-base sm:text-lg">
-                  ลากบล็อก <Badge color="bg-amber-100 text-amber-900 border-amber-900">Move</Badge> จากช่อง <strong>Toolbox</strong> (ซ้าย) มาวางใน <strong>Workspace</strong> (ขวา)
+                <p className="text-sm sm:text-base">
+                  Drag a <Badge color="bg-amber-100 text-amber-900 border-amber-900">Move</Badge> block from the <strong>Toolbox</strong> flyout into the <strong>Workspace</strong> on the right!
                 </p>
-                <p className="mt-1.5 text-xs sm:text-sm text-[#8b6840]">
-                  ลองคลิกลากบล็อกมาวางตอนนี้เลย! (ช่วงฝึกซ้อมจะไม่หักจำนวนบล็อกจริง)
+                <p className="mt-1.5 text-xs text-[#8b6840]">
+                  Practice dragging now! (Blocks are not consumed during practice).
                 </p>
               </TutorialCard>
             </div>
           )}
 
-          {/* Step 12 (Driver): Press Run ▶ & Click READY */}
           {tutorialStep === 12 && (
-            <div className="absolute top-4 right-[2%] lg:right-[4%] max-w-[440px] animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="absolute top-16 md:top-20 left-[24%] md:left-[28%] lg:left-[32%] xl:left-[34%] max-w-[420px] pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-300">
               <TutorialCard
-                title="ภารกิจ 3/3 (DRIVER)"
+                title={`MISSION ${runNum}/${driverTotal} (DRIVER)`}
                 titleColor="#16a34a"
                 titleBorder="#14532d"
-                buttonText={selfReady ? "กำลังรอเพื่อนร่วมทีม..." : (runDone ? "พร้อมเล่น (READY) ✓" : "กดปุ่ม RUN ▶")}
+                buttonText={selfReady ? "WAITING FOR TEAMMATE..." : (runDone ? "READY TO PLAY ✓" : "PRESS RUN PROGRAM ▶")}
                 onNext={markSelfReady}
                 disabled={!runDone || selfReady}
               >
-                <p className="text-base sm:text-lg">
-                  กดปุ่ม <Badge color="bg-orange-100 text-orange-900 border-orange-900">RUN ▶</Badge> ด้านล่างขวา เพื่อสั่งตัวละครเดินตามบล็อก!
+                <p className="text-sm sm:text-base">
+                  Click the <Badge color="bg-orange-100 text-orange-900 border-orange-900">RUN PROGRAM ▶</Badge> button on the right to test execution!
                 </p>
                 {runDone && (
-                  <p className="mt-2 text-green-700 font-bold text-base sm:text-lg">
-                    ยอดเยี่ยม! ตัวละครขยับแล้ว กดปุ่มพร้อมเล่นเพื่อเริ่มเกมจริง
+                  <p className="mt-2 text-green-700 font-bold text-sm sm:text-base font-game-sub">
+                    Excellent! Character moved. Press READY to start the real game.
                   </p>
                 )}
               </TutorialCard>
@@ -443,63 +488,62 @@ export default function GameScreen() {
           )}
 
           {/* ─── NAVIGATOR INTERACTIVE STEPS ─── */}
-          {/* Step 20 (Navigator): Incoming Mock Chat -> Reply */}
           {tutorialStep === 20 && (
             <div className="absolute top-4 right-[2%] lg:right-[4%] max-w-[440px] animate-in fade-in slide-in-from-top-4 duration-300">
               <TutorialCard
-                title="ภารกิจ 1/2 (NAVIGATOR)"
+                title="MISSION 1/2 (NAVIGATOR)"
                 titleColor="#0284c7"
                 titleBorder="#0369a1"
-                buttonText={chatDone ? "✓ ส่งข้อความแล้ว!" : "พิมพ์ตอบในแชท..."}
+                buttonText={chatDone ? "✓ MESSAGE SENT!" : "REPLY IN CHAT..."}
                 onNext={() => setTutorialStep(22)}
                 disabled={!chatDone}
               >
-                <p className="text-base sm:text-lg">
-                  Driver กำลังถามทางในแชท! ดูแผนที่ทางซ้าย แล้วพิมพ์บอกทางใน <Badge color="bg-white text-sky-700 border-sky-300">Chat Box</Badge> ด้านล่างขวา
+                <p className="text-sm sm:text-base">
+                  Your Driver is asking for directions in Chat! Inspect the map in the center and send safe path instructions in <Badge color="bg-white text-sky-700 border-sky-300">Chat Box</Badge> on the left.
                 </p>
-                <p className="mt-1.5 text-xs sm:text-sm text-[#8b6840]">
-                  (ลองพิมพ์บอกทาง เช่น <strong className="text-amber-800">"เดินขึ้น 2 ช่อง"</strong> หรือ <strong className="text-amber-800">"ระวังกำแพงข้างหน้า"</strong> แล้วกด Enter)
+                <p className="mt-1.5 text-xs text-[#8b6840]">
+                  (Inspect the maze and send an open direction like <strong className="text-amber-800">"Go Right"</strong> or <strong className="text-amber-800">"Move Down"</strong>. {hasTraps ? "The Driver reported a trap in chat, so avoid that tile too!" : ""})
                 </p>
               </TutorialCard>
             </div>
           )}
 
-          {/* Step 22 (Navigator): View-Only Explanation & READY */}
           {tutorialStep === 22 && (
             <div className="absolute top-4 right-[2%] lg:right-[4%] max-w-[440px] animate-in fade-in slide-in-from-top-4 duration-300">
               <TutorialCard
-                title="ภารกิจ 2/2 (NAVIGATOR)"
+                title="MISSION 2/2 (NAVIGATOR)"
                 titleColor="#0284c7"
                 titleBorder="#0369a1"
-                buttonText={selfReady ? "กำลังรอเพื่อนร่วมทีม..." : "พร้อมเล่น (READY) ✓"}
+                buttonText={selfReady ? "WAITING FOR TEAMMATE..." : "READY TO PLAY ✓"}
                 onNext={markSelfReady}
                 disabled={selfReady}
               >
-                <p className="text-base sm:text-lg">
-                  สังเกตพื้นที่เขียนโค้ดด้านบนของคุณเป็น <Badge color="bg-amber-100 text-amber-900 border-amber-900">VIEW ONLY</Badge> เพื่อคอยตรวจดูโค้ดที่ Driver วาง
+                <p className="text-sm sm:text-base">
+                  Notice that the code panel on the right is marked <Badge color="bg-amber-100 text-amber-900 border-amber-900">VIEW ONLY</Badge> so you can audit the Driver's code in real time.
                 </p>
-                <p className="mt-1.5 text-xs sm:text-sm text-[#8b6840]">
-                  คุณจะสลับบทบาทเป็น Driver ทุกๆ 2 นาที! เมื่อพร้อมแล้วกดปุ่มด้านล่างได้เลย
+                <p className="mt-1.5 text-xs text-[#8b6840]">
+                  Roles swap every 2 minutes! When ready, click READY below.
                 </p>
               </TutorialCard>
             </div>
           )}
 
-          {/* Step 5: Time to Swap (Top Center) */}
+          {/* Step 5: Role Swap Explainer */}
           {tutorialStep === 5 && (
             <div className="absolute top-[15%] left-1/2 -translate-x-1/2 animate-in fade-in slide-in-from-top-8 duration-300">
-              <TutorialCard title="เวลาสลับบทบาท" titleColor="#eab308" titleBorder="#a16207" buttonText="เข้าใจแล้ว ➔" onNext={() => setTutorialStep(99)}>
-                <p className="text-base sm:text-lg">สังเกตหลอด <Badge color="bg-green-100 text-green-800 border-green-700">ROLE SWAP</Badge> ด้านบน!</p>
-                <p className="mt-2.5 text-base sm:text-lg">เมื่อเวลาหมด คุณและเพื่อนจะ <Badge color="bg-orange-100 text-orange-800 border-orange-800">สลับบทบาทกัน</Badge></p>
-                <p className="mt-2.5 text-base sm:text-lg">และระวังเวลา <Badge color="bg-red-100 text-red-700 border-red-400">STAGE TIME (5 นาที)</Badge> ถ้าหมดก่อนถึงธงจะแพ้ทันที!</p>
+              <TutorialCard title="ROLE SWAP SYSTEM" titleColor="#eab308" titleBorder="#a16207" buttonText="GOT IT ➔" onNext={() => setTutorialStep(99)}>
+                <p className="text-sm sm:text-base">Watch the <Badge color="bg-green-100 text-green-800 border-green-700">ROLE SWAP</Badge> timer at the top!</p>
+                <p className="mt-2 text-sm sm:text-base">When it reaches zero, you and your partner <Badge color="bg-orange-100 text-orange-800 border-orange-800">SWAP ROLES</Badge> instantly.</p>
+                <p className="mt-2 text-sm sm:text-base">Keep an eye on <Badge color="bg-red-100 text-red-700 border-red-400">STAGE TIME (5 MIN)</Badge>. If it runs out, you lose!</p>
               </TutorialCard>
             </div>
           )}
         </div>
       )}
 
-      {/* Game Layout — Map Left 62-65%, Toolbox & Chat Right 35-38% (70:30) */}
-      <div className="w-full max-w-[1750px] mx-auto flex flex-col flex-1 p-2 md:p-3 lg:p-4 gap-2 md:gap-3 relative min-h-0 font-pixel">
+      {/* ─── 3-COLUMN GAME LAYOUT: CHAT (LEFT) | MAP (CENTER) | TOOLBOX (RIGHT) ─── */}
+      <div className="w-full max-w-[1780px] mx-auto flex flex-col flex-1 p-2 md:p-3 lg:p-3.5 gap-2 md:gap-2.5 relative min-h-0 font-game-body">
+        {/* Top Header */}
         <div className={`shrink-0 transition-all duration-300 ${tutorialStep === 5 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-xl pointer-events-none bg-black/50' : ''}`}>
           <GameHeader
             role={role === "driver" ? "DRIVER" : "NAVIGATOR"}
@@ -511,10 +555,26 @@ export default function GameScreen() {
           />
         </div>
 
-        <div className="flex flex-1 gap-3 md:gap-4 w-full items-stretch min-h-0">
-          {/* Left Column: Game Board ONLY (~62% - 65% width, full height) */}
-          <div className={`flex-[6.3] min-w-0 flex flex-col min-h-0 transition-all duration-300 ${
-            (tutorialStep === 2 || tutorialStep === 10)
+        {/* 3-Column Work Area */}
+        <div className="flex flex-col lg:flex-row flex-1 gap-2.5 md:gap-3 w-full items-stretch min-h-0">
+          {/* COLUMN 1 (LEFT): CHAT PANEL (~23% width) */}
+          <div className={`w-full lg:flex-[2.3] xl:flex-[2.1] min-w-0 flex flex-col min-h-0 transition-all duration-300 ${
+            (tutorialStep === 10 || tutorialStep === 13 || tutorialStep === 20)
+              ? 'relative z-[105] ring-4 ring-purple-400/90 shadow-[0_0_30px_rgba(168,85,247,0.5)] rounded-2xl'
+              : ''
+          }`}>
+            <ChatBox
+              onTutorialChatSent={onTutorialChatSent}
+              onValidateTutorialChat={validateTutorialChat}
+              isTutorialActive={tutorialStep === 10 || tutorialStep === 13 || tutorialStep === 20}
+              mockMessage={mockMessage}
+              resetSignal={chatResetSignal}
+            />
+          </div>
+
+          {/* COLUMN 2 (CENTER): MAP VIEW (~51% width) */}
+          <div className={`w-full lg:flex-[5.1] xl:flex-[5.3] min-w-0 flex flex-col min-h-0 transition-all duration-300 ${
+            (tutorialStep === 2 || tutorialStep === 10 || tutorialStep === 13)
               ? 'relative z-[105] ring-4 ring-amber-400/90 shadow-[0_0_35px_rgba(251,191,36,0.5)] rounded-[20px]'
               : ''
           }`}>
@@ -531,79 +591,64 @@ export default function GameScreen() {
             />
           </div>
 
-          {/* Right Column: BlockCodePanel (~70% height) + ChatBox (~30% height) */}
-          <div className="flex-[3.7] min-w-0 flex flex-col gap-2 md:gap-3 min-h-0">
-            {/* Top: BlockCodePanel (70% height) */}
-            <div className={`flex-[7] min-h-0 flex flex-col transition-all duration-300 ${
-              (tutorialStep === 11 || tutorialStep === 12 || tutorialStep === 22)
-                ? 'relative z-[105] ring-3 ring-yellow-400/90 shadow-[0_0_30px_rgba(250,204,21,0.45)] rounded-2xl'
-                : ''
-            }`}>
-              <BlockCodePanel
-                key={panelKey}
-                blocksLeft={blocksLeft}
-                maxBlocks={MAX_BLOCKS}
-                onReady={handleWorkspaceReady}
-                onRun={role === "driver" ? (() => { runProgram(); onTutorialRunPressed(); }) : undefined}
-                readOnly={role !== "driver"}
-                executionError={executionError}
-              />
-            </div>
-
-            {/* Bottom: ChatBox (30% height) */}
-            <div className={`flex-[3] min-h-0 flex flex-col transition-all duration-300 ${
-              (tutorialStep === 10 || tutorialStep === 20)
-                ? 'relative z-[105] ring-3 ring-purple-400/90 shadow-[0_0_25px_rgba(168,85,247,0.45)] rounded-2xl'
-                : ''
-            }`}>
-              <ChatBox
-                onTutorialChatSent={onTutorialChatSent}
-                mockMessage={mockMessage}
-              />
-            </div>
+          {/* COLUMN 3 (RIGHT): TOOLBOX & WORKSPACE (~26% width) */}
+          <div className={`w-full lg:flex-[2.6] xl:flex-[2.6] min-w-0 flex flex-col min-h-0 transition-all duration-300 ${
+            (tutorialStep === 11 || tutorialStep === 12 || tutorialStep === 22)
+              ? 'relative z-[105] ring-3 ring-yellow-400/90 shadow-[0_0_30px_rgba(250,204,21,0.5)] rounded-2xl'
+              : ''
+          }`}>
+            <BlockCodePanel
+              key={panelKey}
+              blocksLeft={blocksLeft}
+              maxBlocks={MAX_BLOCKS}
+              onReady={handleWorkspaceReady}
+              onRun={role === "driver" ? (() => { runProgram(); onTutorialRunPressed(); }) : undefined}
+              readOnly={role !== "driver"}
+              executionError={executionError}
+            />
           </div>
         </div>
       </div>
 
-      {/* Win overlay */}
+      {/* ─── VICTORY OVERLAY ─── */}
       {isWin && (() => {
         const blocksUsed = MAX_BLOCKS - blocksLeft;
         const timeUsed = DUNGEON_TIME - dungeonTimeLeft;
         const star2 = blocksUsed < 40;
         const star3 = timeUsed < 240;
         return (
-          <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[120] backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="fixed inset-0 bg-black/85 flex items-center justify-center z-[120] backdrop-blur-sm animate-in fade-in duration-300 font-game-body">
             <div className="relative inline-block max-w-[90vw]">
-              <img src="/ui/win_bg.png" alt="Victory Background" className="w-[800px] max-w-full h-auto drop-shadow-[0_0_30px_rgba(217,119,6,0.6)]" />
+              <img src="/ui/win_bg.png" alt="Victory Background" className="w-[800px] max-w-full h-auto drop-shadow-[0_0_35px_rgba(217,119,6,0.6)]" />
               <div className="absolute inset-0 flex flex-col items-center">
-                <h2 className="absolute top-[10%] text-4xl sm:text-5xl md:text-6xl font-thai font-bold text-white tracking-wide" style={{ textShadow: "-3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 6px 0px rgba(0,0,0,0.8)" }}>
-                  ชัยชนะ (VICTORY)
+                <h2 className="absolute top-[9%] text-3xl sm:text-4xl md:text-5xl font-game-sub font-bold text-white tracking-widest uppercase" style={{ textShadow: "-3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 6px 0px rgba(0,0,0,0.8)" }}>
+                  VICTORY ACHIEVED!
                 </h2>
                 <div className="absolute top-[32%] flex flex-col items-center justify-center w-full">
                   <div className="flex items-end justify-center gap-6 md:gap-10">
                     <div className="flex flex-col items-center">
-                      <span className="text-6xl md:text-7xl drop-shadow-[0_6px_6px_rgba(0,0,0,0.8)]">⭐</span>
-                      <span className="text-[#fde68a] text-sm md:text-base font-bold mt-2 font-thai tracking-wide" style={{ textShadow: "1px 1px 0 #000" }}>ผ่านด่านสำเร็จ</span>
+                      <span className="text-5xl md:text-6xl drop-shadow-[0_6px_6px_rgba(0,0,0,0.8)]">⭐</span>
+                      <span className="text-[#fde68a] text-xs md:text-sm font-bold mt-2 font-game-sub uppercase tracking-wider" style={{ textShadow: "1px 1px 0 #000" }}>Stage Cleared</span>
                     </div>
                     <div className="flex flex-col items-center mb-6">
-                      <span className={`text-7xl md:text-8xl drop-shadow-[0_6px_6px_rgba(0,0,0,0.8)] ${star2 ? '' : 'opacity-30 grayscale'}`}>⭐</span>
-                      <span className={`text-sm md:text-base font-bold mt-2 font-thai tracking-wide ${star2 ? 'text-[#fde68a]' : 'text-gray-400'}`} style={{ textShadow: "1px 1px 0 #000" }}>{"ใช้ไม่ถึง 40 บล็อก"}</span>
+                      <span className={`text-6xl md:text-7xl drop-shadow-[0_6px_6px_rgba(0,0,0,0.8)] ${star2 ? '' : 'opacity-30 grayscale'}`}>⭐</span>
+                      <span className={`text-xs md:text-sm font-bold mt-2 font-game-sub uppercase tracking-wider ${star2 ? 'text-[#fde68a]' : 'text-gray-400'}`} style={{ textShadow: "1px 1px 0 #000" }}>Under 40 Blocks</span>
                     </div>
                     <div className="flex flex-col items-center">
-                      <span className={`text-6xl md:text-7xl drop-shadow-[0_6px_6px_rgba(0,0,0,0.8)] ${star3 ? '' : 'opacity-30 grayscale'}`}>⭐</span>
-                      <span className={`text-sm md:text-base font-bold mt-2 font-thai tracking-wide ${star3 ? 'text-[#fde68a]' : 'text-gray-400'}`} style={{ textShadow: "1px 1px 0 #000" }}>{"ใช้เวลาไม่ถึง 4 นาที"}</span>
+                      <span className={`text-5xl md:text-6xl drop-shadow-[0_6px_6px_rgba(0,0,0,0.8)] ${star3 ? '' : 'opacity-30 grayscale'}`}>⭐</span>
+                      <span className={`text-xs md:text-sm font-bold mt-2 font-game-sub uppercase tracking-wider ${star3 ? 'text-[#fde68a]' : 'text-gray-400'}`} style={{ textShadow: "1px 1px 0 #000" }}>Under 4 Minutes</span>
                     </div>
                   </div>
                 </div>
-                <div className="absolute bottom-[20%] flex gap-4 md:gap-6 w-full justify-center px-8 font-thai">
-                  <button className="bg-[#78716c] border-[3px] border-[#44403c] text-white font-bold py-2 md:py-3 px-6 md:px-10 text-lg md:text-xl rounded-full hover:bg-[#57534e] active:scale-95 transition-all shadow-[0_4px_0_#44403c] active:shadow-none active:translate-y-1" onClick={leaveStage}>ออกจากด่าน</button>
+                <div className="absolute bottom-[20%] flex gap-3 md:gap-5 w-full justify-center px-8 font-game-sub">
+                  <button className="bg-[#78716c] border-[3px] border-[#44403c] text-white font-bold py-2 md:py-2.5 px-5 md:px-8 text-sm md:text-base rounded-full hover:bg-[#57534e] active:scale-95 transition-all shadow-[0_4px_0_#44403c] uppercase tracking-wider" onClick={leaveStage}>Leave</button>
                   {isHost ? (
                     <>
-                      <button className="bg-transparent border-[3px] border-[#B28B29] text-white font-bold py-2 md:py-3 px-6 md:px-8 text-lg md:text-xl rounded-full hover:bg-white/20 active:scale-95 transition-all shadow-md" onClick={resetGameToNewStart}>เล่นใหม่</button>
-                      <button className="bg-[#ea580c] border-[3px] border-[#c2410c] text-white font-bold py-2 md:py-3 px-6 md:px-10 text-lg md:text-xl rounded-full hover:bg-[#c2410c] active:scale-95 transition-all shadow-[0_4px_0_#9a3412] active:shadow-none active:translate-y-1" onClick={startGame}>ด่านถัดไป ➔</button>
+                      <button className="bg-transparent border-[3px] border-[#B28B29] text-white font-bold py-2 md:py-2.5 px-5 md:px-7 text-sm md:text-base rounded-full hover:bg-white/20 active:scale-95 transition-all shadow-md uppercase tracking-wider" onClick={resetGameToNewStart}>Play Again</button>
+                      <button className="bg-[#ea580c] border-[3px] border-[#c2410c] text-white font-bold py-2 md:py-2.5 px-6 md:px-9 text-sm md:text-base rounded-full hover:bg-[#c2410c] active:scale-95 transition-all shadow-[0_4px_0_#9a3412] uppercase tracking-wider" onClick={startGame}>Next Stage ➔</button>
                     </>
                   ) : (
-                    <div className="bg-[#ea580c]/50 border-[3px] border-[#c2410c] text-white font-bold py-2 md:py-3 px-6 md:px-10 text-lg md:text-xl rounded-full shadow-md flex items-center">รอหัวหน้าห้อง...</div>
+                    <div className="bg-[#ea580c]/50 border-[3px] border-[#c2410c] text-white font-bold py-2 md:py-2.5 px-5 md:px-8 text-sm md:text-base rounded-full shadow-md flex items-center font-game-sub uppercase tracking-wider">Awaiting Host...</div>
                   )}
                 </div>
               </div>
@@ -612,29 +657,29 @@ export default function GameScreen() {
         );
       })()}
 
-      {/* Lose overlay */}
+      {/* ─── DEFEAT OVERLAY ─── */}
       {isLose && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[120] backdrop-blur-sm animate-in fade-in duration-300">
+        <div className="fixed inset-0 bg-black/85 flex items-center justify-center z-[120] backdrop-blur-sm animate-in fade-in duration-300 font-game-body">
           <div className="relative inline-block max-w-[90vw] grayscale-[0.2]">
-            <img src="/ui/win_bg.png" alt="Defeat Background" className="w-[800px] max-w-full h-auto drop-shadow-[0_0_30px_rgba(220,38,38,0.6)]" />
+            <img src="/ui/win_bg.png" alt="Defeat Background" className="w-[800px] max-w-full h-auto drop-shadow-[0_0_35px_rgba(220,38,38,0.6)]" />
             <div className="absolute inset-0 flex flex-col items-center">
-              <h2 className="absolute top-[10%] text-4xl sm:text-5xl md:text-6xl font-thai font-bold text-red-500 tracking-wide" style={{ textShadow: "-3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 6px 0px rgba(0,0,0,0.8)" }}>
-                พ่ายแพ้ (DEFEAT)
+              <h2 className="absolute top-[9%] text-3xl sm:text-4xl md:text-5xl font-game-sub font-bold text-red-500 tracking-widest uppercase" style={{ textShadow: "-3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 6px 0px rgba(0,0,0,0.8)" }}>
+                DEFEAT
               </h2>
               <div className="absolute top-[40%] flex flex-col items-center justify-center w-full px-12">
-                <p className="text-2xl sm:text-3xl md:text-4xl font-thai font-bold text-white text-center leading-relaxed" style={{ textShadow: "-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000" }}>
-                  {loseReason === "time" ? "หมดเวลาสำรวจ!" : "บล็อกคำสั่งหมด!"}
+                <p className="text-xl sm:text-2xl md:text-3xl font-game-sub font-bold text-white text-center leading-relaxed uppercase tracking-wider" style={{ textShadow: "-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000" }}>
+                  {loseReason === "time" ? "TIME EXPIRED!" : "OUT OF BLOCKS!"}
                 </p>
-                <p className="text-lg sm:text-xl md:text-2xl font-thai text-gray-300 mt-3 text-center" style={{ textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" }}>
-                  {loseReason === "time" ? "เวลาในดันเจี้ยนหมดลงแล้ว" : "คุณใช้บล็อกคำสั่งจนหมดแล้ว"}
+                <p className="text-sm sm:text-base md:text-lg font-game-body text-gray-300 mt-2 text-center" style={{ textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" }}>
+                  {loseReason === "time" ? "Dungeon exploration time ran out." : "You have exhausted all allowable command blocks."}
                 </p>
               </div>
-              <div className="absolute bottom-[20%] flex gap-4 md:gap-8 w-full justify-center px-8 font-thai">
-                <button className="bg-[#78716c] border-[3px] border-[#44403c] text-white font-bold py-2 md:py-3 px-6 md:px-10 text-lg md:text-xl rounded-full hover:bg-[#57534e] active:scale-95 transition-all shadow-[0_4px_0_#44403c] active:shadow-none active:translate-y-1" onClick={leaveStage}>ออกจากด่าน</button>
+              <div className="absolute bottom-[20%] flex gap-3 md:gap-6 w-full justify-center px-8 font-game-sub">
+                <button className="bg-[#78716c] border-[3px] border-[#44403c] text-white font-bold py-2 md:py-2.5 px-5 md:px-8 text-sm md:text-base rounded-full hover:bg-[#57534e] active:scale-95 transition-all shadow-[0_4px_0_#44403c] uppercase tracking-wider" onClick={leaveStage}>Leave</button>
                 {isHost ? (
-                  <button className="bg-[#ea580c] border-[3px] border-[#c2410c] text-white font-bold py-2 md:py-3 px-8 md:px-12 text-lg md:text-xl rounded-full hover:bg-[#c2410c] active:scale-95 transition-all shadow-[0_4px_0_#9a3412] active:shadow-none active:translate-y-1" onClick={resetGameToNewStart}>ลองใหม่</button>
+                  <button className="bg-[#ea580c] border-[3px] border-[#c2410c] text-white font-bold py-2 md:py-2.5 px-6 md:px-10 text-sm md:text-base rounded-full hover:bg-[#c2410c] active:scale-95 transition-all shadow-[0_4px_0_#9a3412] uppercase tracking-wider" onClick={resetGameToNewStart}>Retry</button>
                 ) : (
-                  <div className="bg-[#dc2626]/50 border-[3px] border-[#991b1b] text-white font-bold py-2 md:py-3 px-6 md:px-10 text-lg md:text-xl rounded-full shadow-md flex items-center">รอหัวหน้าห้อง...</div>
+                  <div className="bg-[#dc2626]/50 border-[3px] border-[#991b1b] text-white font-bold py-2 md:py-2.5 px-5 md:px-8 text-sm md:text-base rounded-full shadow-md flex items-center font-game-sub uppercase tracking-wider">Awaiting Host...</div>
                 )}
               </div>
             </div>
@@ -642,7 +687,7 @@ export default function GameScreen() {
         </div>
       )}
 
-      {/* ─── VISUAL TIME URGENCY EFFECTS (เรียบง่าย ใช้แสงขอบจอ ไม่ใช้ไอคอนรกตา) ─── */}
+      {/* ─── URGENCY GLOW EFFECTS ─── */}
       {isStageWarning && (
         <div
           className="fixed inset-0 pointer-events-none z-[84] transition-opacity duration-500"
@@ -668,14 +713,13 @@ export default function GameScreen() {
         />
       )}
 
-      {/* Swap Alert — Tactile Dimensional Parchment Banner (เรียบง่าย ไม่ตกบรรทัด บทบาทเด่นชัดโดยไม่ใช้ไอคอน) */}
+      {/* ─── ROLE SWAP BANNER ─── */}
       {showSwapAlert && (
-        <div className="fixed inset-0 pointer-events-none flex items-center justify-center z-[130] animate-in zoom-in-95 duration-200 p-4">
+        <div className="fixed inset-0 pointer-events-none flex items-center justify-center z-[130] animate-in zoom-in-95 duration-200 p-4 font-game-body">
           <div className="relative w-full max-w-2xl">
-            {/* Ambient drop shadow */}
             <div className="absolute -inset-3 bg-black/60 rounded-3xl blur-2xl pointer-events-none" />
 
-            {/* Top Wooden Frame with Brass Rivets */}
+            {/* Wooden top frame */}
             <div
               className="relative z-10 mx-3 h-6 sm:h-7 rounded-t-md"
               style={{
@@ -711,21 +755,19 @@ export default function GameScreen() {
                   "inset 0 0 35px rgba(139, 99, 49, 0.25), 4px 0 10px rgba(0,0,0,0.25), -4px 0 10px rgba(0,0,0,0.25), 0 8px 24px rgba(0,0,0,0.4)",
               }}
             >
-              <span className="text-xs sm:text-sm font-pixel font-bold text-[#7c532b] tracking-[0.25em] uppercase">
+              <span className="text-xs sm:text-sm font-game-sub font-bold text-[#7c532b] tracking-[0.25em] uppercase">
                 SYSTEM ANNOUNCEMENT
               </span>
 
-              {/* หัวข้ออยู่บรรทัดเดียวกัน ไม่ตัดคำตกบรรทัด */}
               <h2
-                className="text-2xl sm:text-3xl md:text-4xl font-thai font-bold text-[#5c2e18] tracking-wide whitespace-nowrap"
+                className="text-2xl sm:text-3xl md:text-4xl font-game-sub font-bold text-[#5c2e18] tracking-wider uppercase whitespace-nowrap"
                 style={{ textShadow: "1px 1px 0 rgba(255,255,255,0.5)" }}
               >
-                สลับบทบาท (ROLE SWAP)
+                ROLE SWAP!
               </h2>
 
               <div className="w-28 h-0.5 bg-[#8B5E3C]/40 my-1" />
 
-              {/* แถบเน้นบทบาทใหม่ — เรียบง่าย ไม่มีไอคอน แต่ใหญ่และตัดสีชัดเจนบนกระดาษ */}
               <div
                 className={`mt-1 px-6 sm:px-8 py-2.5 rounded-xl border-2 shadow-md ${
                   role === "driver"
@@ -734,21 +776,21 @@ export default function GameScreen() {
                 }`}
               >
                 <p
-                  className="text-2xl sm:text-3xl md:text-4xl font-thai font-bold tracking-wide whitespace-nowrap"
+                  className="text-xl sm:text-2xl md:text-3xl font-game-sub font-bold tracking-wider uppercase whitespace-nowrap"
                   style={{ textShadow: "2px 2px 0 rgba(0,0,0,0.45)" }}
                 >
-                  {role === "driver" ? "คุณคือ DRIVER (คนขับ)" : "คุณคือ NAVIGATOR (ผู้นำทาง)"}
+                  {role === "driver" ? "YOU ARE NOW DRIVER" : "YOU ARE NOW NAVIGATOR"}
                 </p>
               </div>
 
-              <p className="text-base sm:text-lg md:text-xl font-thai font-semibold text-[#4a2408] mt-1">
+              <p className="text-sm sm:text-base md:text-lg font-game-body font-semibold text-[#4a2408] mt-1">
                 {role === "driver"
-                  ? "ถึงตาคุณเขียนโค้ดและควบคุมการเคลื่อนที่"
-                  : "ถึงตาคุณดูแผนที่และส่งข้อความนำทางเพื่อนร่วมทีม"}
+                  ? "Your turn to write code blocks and execute movement."
+                  : "Your turn to read the maze map and guide your teammate."}
               </p>
             </div>
 
-            {/* Bottom Wooden Frame */}
+            {/* Bottom wooden frame */}
             <div
               className="relative z-10 mx-3 h-6 sm:h-7 rounded-b-md"
               style={{

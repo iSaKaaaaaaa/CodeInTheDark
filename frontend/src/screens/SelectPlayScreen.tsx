@@ -80,17 +80,17 @@ export default function SelectPlayScreen() {
             boxShadow: 'inset 0 0 45px rgba(101,67,33,0.15)',
           }} />
 
-          <div className="flex flex-col items-center gap-4 sm:gap-5">
+          <div className="flex flex-col items-center gap-4 sm:gap-5 font-game-body">
             {/* Heading */}
             <div className="flex flex-col items-center gap-1.5 text-center">
               <h3
-                className="text-2xl sm:text-3xl text-[#3d1f0f] font-bold font-thai tracking-wide"
+                className="text-2xl sm:text-3xl text-[#3d1f0f] font-bungee uppercase tracking-wide"
                 style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.5)' }}
               >
-                เลือกเส้นทางการผจญภัย
+                SELECT MODE
               </h3>
-              <p className="text-sm sm:text-base text-[#5c2e0b] font-thai font-medium tracking-wide">
-                สร้างห้องเล่นกับเพื่อน หรือกรอกรหัสเพื่อเข้าร่วม
+              <p className="text-sm sm:text-base text-[#5c2e0b] font-game-body font-medium tracking-wide">
+                Choose how you want to play
               </p>
             </div>
 
@@ -102,7 +102,7 @@ export default function SelectPlayScreen() {
             </div>
 
             {/* Buttons */}
-            <div className="w-full flex flex-col gap-3.5 sm:gap-4">
+            <div className="w-full flex flex-col gap-3.5 sm:gap-4 font-game-body">
               {/* Create Room */}
               <button
                 onClick={() => createRoom()}
@@ -119,11 +119,11 @@ export default function SelectPlayScreen() {
                   </svg>
                 </div>
                 <div className="flex flex-col items-start gap-0.5 min-w-0">
-                  <span className="text-lg sm:text-xl md:text-2xl font-bold text-[#2a1306] font-thai tracking-wide" style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.4)' }}>
-                    สร้างห้องใหม่ (Create Room)
+                  <span className="text-base sm:text-lg md:text-xl font-bungee text-[#2a1306] uppercase tracking-wide" style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.4)' }}>
+                    HOST GAME
                   </span>
-                  <span className="text-xs sm:text-sm md:text-base text-[#5c2e0b] font-thai font-medium text-left leading-snug">
-                    สร้างห้องใหม่สำหรับเล่นร่วมกับเพื่อน
+                  <span className="text-xs sm:text-sm md:text-base text-[#5c2e0b] font-game-body font-medium text-left leading-snug">
+                    Create room for 2 players
                   </span>
                 </div>
               </button>
@@ -145,11 +145,11 @@ export default function SelectPlayScreen() {
                   </svg>
                 </div>
                 <div className="flex flex-col items-start gap-0.5 min-w-0">
-                  <span className="text-lg sm:text-xl md:text-2xl font-bold text-[#2a1306] font-thai tracking-wide" style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.4)' }}>
-                    เข้าร่วมห้อง (Join Room)
+                  <span className="text-base sm:text-lg md:text-xl font-bungee text-[#2a1306] uppercase tracking-wide" style={{ textShadow: '1px 1px 0 rgba(255,255,255,0.4)' }}>
+                    JOIN GAME
                   </span>
-                  <span className="text-xs sm:text-sm md:text-base text-[#5c2e0b] font-thai font-medium text-left leading-snug">
-                    กรอกรหัส 6 หลักเพื่อเข้าร่วมห้องของเพื่อน
+                  <span className="text-xs sm:text-sm md:text-base text-[#5c2e0b] font-game-body font-medium text-left leading-snug">
+                    Enter 6-digit room code
                   </span>
                 </div>
               </button>

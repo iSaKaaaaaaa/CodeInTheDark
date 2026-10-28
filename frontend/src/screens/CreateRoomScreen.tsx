@@ -37,10 +37,10 @@ export default function CreateRoomScreen() {
 
       {/* Title */}
       <h2
-        className="text-[#fde68a] text-3xl sm:text-4xl md:text-5xl mb-2.5 sm:mb-3.5 uppercase text-center relative z-10 font-bold tracking-widest font-thai"
-        style={{ textShadow: "4px 4px 0px #2a1b12, -2px -2px 0px #2a1b12, 2px -2px 0px #2a1b12, -2px 2px 0px #2a1b12, 0 5px 10px rgba(0,0,0,0.8)" }}
+        className="text-[#fde68a] text-4xl sm:text-5xl md:text-6xl mb-2.5 sm:mb-3.5 uppercase text-center relative z-10 font-bold tracking-widest font-pixel"
+        style={{ textShadow: "4px 4px 0px #2a1b12, -2px -2px 0px #2a1b12, 2px -2px 0px #2a1b12, -2px 2px 0px #2a1b12, 0 6px 10px rgba(0,0,0,0.8)" }}
       >
-        ห้องรอผู้เล่น (Lobby)
+        LOBBY
       </h2>
 
       {/* Main Panel (+30% larger than 470px -> 580px) */}
@@ -105,7 +105,7 @@ export default function CreateRoomScreen() {
             ←
           </button>
 
-          <div className="flex flex-col items-center gap-3.5 sm:gap-4">
+          <div className="flex flex-col items-center gap-3.5 sm:gap-4 font-game-body">
             {/* Room Name + Code */}
             <div className="flex flex-col items-center gap-1.5">
               <p
@@ -115,8 +115,8 @@ export default function CreateRoomScreen() {
                 {roomName}
               </p>
               <div className="flex items-center gap-3 sm:gap-3.5 bg-[#ecd29d]/70 px-5 py-2 rounded-xl border-2 border-[#b8944f]/60 shadow-inner">
-                <span className="text-sm sm:text-base text-[#7c532b] font-bold font-thai">
-                  รหัสห้อง (CODE):
+                <span className="text-xs sm:text-sm text-[#7c532b] font-bold font-game-sub uppercase tracking-wider">
+                  ROOM CODE:
                 </span>
                 <span
                   className="text-3xl sm:text-4xl md:text-5xl text-[#382503] font-bold tracking-[0.24em] uppercase font-pixel"
@@ -126,8 +126,8 @@ export default function CreateRoomScreen() {
                 </span>
                 <button
                   onClick={handleCopyCode}
-                  className="relative bg-[#5c2e0b] hover:bg-[#7a3f12] text-[#fde68a] w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-b-[3px] border-r-[3px] border-t-2 border-l-2 border-[#382503] shadow-[0_3px_0px_#2a1b12] active:translate-y-[3px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 flex items-center justify-center text-lg sm:text-xl font-bold"
-                  title="คัดลอกรหัสห้อง (Copy Code)"
+                  className="relative bg-[#5c2e0b] hover:bg-[#7a3f12] text-[#fde68a] w-9 h-9 sm:w-10 sm:h-10 rounded-xl border-b-[3px] border-r-[3px] border-t-2 border-l-2 border-[#382503] shadow-[0_3px_0px_#2a1b12] active:translate-y-[3px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 flex items-center justify-center text-lg sm:text-xl font-bold cursor-pointer"
+                  title="Copy Code"
                 >
                   <span className="absolute inset-0 border-t border-l border-white/10 rounded-lg pointer-events-none" />
                   {copied ? "✓" : "⎘"}
@@ -137,28 +137,28 @@ export default function CreateRoomScreen() {
 
             {/* Visibility Toggle */}
             {isHost && (
-              <div className="flex items-center gap-1.5 p-1 rounded-xl border-2 border-[#5c2e0b]/40 shadow-inner" style={{
+              <div className="flex items-center gap-1.5 p-1 rounded-xl border-2 border-[#5c2e0b]/40 shadow-inner font-game-sub" style={{
                 background: 'linear-gradient(135deg, rgba(244,222,179,0.7) 0%, rgba(222,194,140,0.7) 100%)',
               }}>
                 <button
                   onClick={() => setIsPublic(false)}
-                  className={`px-5 sm:px-6 py-2 rounded-lg text-sm sm:text-base font-bold tracking-wide transition-all duration-150 font-thai ${
+                  className={`px-5 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-150 ${
                     !isPublic
                       ? 'bg-[#5c2e0b] text-[#fde68a] shadow-md border border-[#382503]'
                       : 'text-[#7c532b] hover:text-[#5c2e0b]'
                   }`}
                 >
-                  ส่วนตัว (Private)
+                  PRIVATE
                 </button>
                 <button
                   onClick={() => setIsPublic(true)}
-                  className={`px-5 sm:px-6 py-2 rounded-lg text-sm sm:text-base font-bold tracking-wide transition-all duration-150 font-thai ${
+                  className={`px-5 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-150 ${
                     isPublic
                       ? 'bg-[#5c2e0b] text-[#fde68a] shadow-md border border-[#382503]'
                       : 'text-[#7c532b] hover:text-[#5c2e0b]'
                   }`}
                 >
-                  สาธารณะ (Public)
+                  PUBLIC
                 </button>
               </div>
             )}
@@ -171,13 +171,13 @@ export default function CreateRoomScreen() {
             </div>
 
             {/* Players Section */}
-            <div className="w-full flex flex-col gap-2.5 sm:gap-3">
+            <div className="w-full flex flex-col gap-2.5 sm:gap-3 font-game-body">
               <div className="flex items-center justify-between px-1">
-                <span className="text-sm sm:text-base text-[#7c532b] font-bold font-thai">
-                  ผู้เล่น ({players.length > 0 ? players.length : 1}/2 คน)
+                <span className="text-xs sm:text-sm text-[#7c532b] font-bold font-game-sub uppercase tracking-wider">
+                  PLAYERS ({players.length > 0 ? players.length : 1}/2)
                 </span>
-                <span className="text-xs sm:text-sm text-[#7c532b] font-thai font-medium">
-                  ต้องมี 2 คนเพื่อเริ่มเกม
+                <span className="text-xs text-[#7c532b] font-game-body font-medium">
+                  Need 2 players to start
                 </span>
               </div>
 
@@ -197,20 +197,20 @@ export default function CreateRoomScreen() {
                     <span className="text-2xl sm:text-3xl font-bold text-[#382503] uppercase tracking-wider font-pixel leading-none">
                       {players.length > 0 ? players[0].username : username || "HOST"}
                     </span>
-                    <span className="text-xs sm:text-sm text-[#7c532b] font-thai font-medium mt-0.5">
-                      ผู้สร้างห้อง
+                    <span className="text-xs text-[#7c532b] font-game-sub font-semibold mt-0.5 uppercase tracking-wide">
+                      Room Host
                     </span>
                   </div>
                 </div>
                 <span
-                  className="text-sm sm:text-base font-bold px-3.5 py-1 rounded-lg font-thai"
+                  className="text-xs sm:text-sm font-bold px-3 py-1 rounded-lg font-game-sub uppercase tracking-wider"
                   style={{
                     color: '#9B2C2C',
                     background: 'rgba(155, 44, 44, 0.12)',
                     border: '2px solid rgba(155, 44, 44, 0.35)',
                   }}
                 >
-                  หัวหน้าห้อง
+                  HOST
                 </span>
               </div>
 
@@ -240,29 +240,29 @@ export default function CreateRoomScreen() {
                         <span className="text-2xl sm:text-3xl font-bold text-[#382503] uppercase tracking-wider font-pixel leading-none">
                           {players[1].username}
                         </span>
-                        <span className="text-xs sm:text-sm text-[#2B6CB0] font-thai font-medium mt-0.5">
-                          ผู้เล่นคนที่ 2
+                        <span className="text-xs text-[#2B6CB0] font-game-sub font-semibold mt-0.5 uppercase tracking-wide">
+                          Player 2
                         </span>
                       </div>
                     </div>
                     <span
-                      className="text-sm sm:text-base font-bold px-3.5 py-1 rounded-lg font-thai"
+                      className="text-xs sm:text-sm font-bold px-3 py-1 rounded-lg font-game-sub uppercase tracking-wider"
                       style={{
                         color: '#2B6CB0',
                         background: 'rgba(43, 108, 176, 0.12)',
                         border: '2px solid rgba(43, 108, 176, 0.35)',
                       }}
                     >
-                      ผู้เล่นคนที่ 2
+                      READY
                     </span>
                   </>
                 ) : (
                   <div className="w-full flex flex-col items-center py-2 sm:py-2.5 gap-1">
-                    <span className="text-lg sm:text-xl md:text-2xl text-[#7c532b] font-bold font-thai tracking-wide animate-pulse">
-                      กำลังรอผู้เล่นคนที่ 2 เข้าร่วม...
+                    <span className="text-base sm:text-lg md:text-xl text-[#7c532b] font-bold font-game-sub uppercase tracking-wider animate-pulse">
+                      Waiting for Player 2 to join...
                     </span>
-                    <span className="text-xs sm:text-sm text-[#9a7047] font-thai font-medium">
-                      {isPublic ? 'เปิดสาธารณะในรายชื่อห้อง' : 'แชร์รหัส 6 หลักด้านบนให้เพื่อนเพื่อเข้าร่วม'}
+                    <span className="text-xs text-[#9a7047] font-game-body font-medium">
+                      {isPublic ? 'Open in public room list' : 'Share 6-digit room code with your friend'}
                     </span>
                   </div>
                 )}
@@ -282,20 +282,20 @@ export default function CreateRoomScreen() {
                 <button
                   onClick={startGame}
                   disabled={players.length < 2}
-                  className="bg-[#b45309] hover:bg-[#d97706] disabled:bg-[#8B6F3A] disabled:opacity-50 disabled:cursor-not-allowed text-[#fffbeb] font-bold text-xl sm:text-2xl px-12 sm:px-16 py-3 sm:py-3.5 rounded-2xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#382503] shadow-[0_5px_0px_#2a1b12] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 uppercase tracking-wide relative overflow-hidden font-thai"
+                  className="bg-[#b45309] hover:bg-[#d97706] disabled:bg-[#8B6F3A] disabled:opacity-50 disabled:cursor-not-allowed text-[#fffbeb] font-bold text-base sm:text-lg px-12 sm:px-16 py-3 sm:py-3.5 rounded-2xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#382503] shadow-[0_5px_0px_#2a1b12] active:translate-y-[4px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75 uppercase tracking-wide relative overflow-hidden font-bungee"
                   style={{ textShadow: "2px 2px 0px #000" }}
                 >
                   <span className="absolute inset-0 border-t-2 border-l-2 border-white/20 rounded-xl pointer-events-none" />
-                  <span className="relative z-10">เริ่มเกม (START) ➔</span>
+                  <span className="relative z-10">START GAME ➔</span>
                 </button>
               ) : (
                 <div
-                  className="px-10 sm:px-14 py-3 rounded-2xl text-lg sm:text-xl font-bold uppercase tracking-wider text-center border-2 border-[#5c2e0b]/40 text-[#7c532b] font-thai shadow-inner"
+                  className="px-10 sm:px-14 py-3 rounded-2xl text-base sm:text-lg font-bold uppercase tracking-wider text-center border-2 border-[#5c2e0b]/40 text-[#7c532b] shadow-inner font-game-sub"
                   style={{
                     background: 'linear-gradient(135deg, rgba(244,222,179,0.6) 0%, rgba(222,194,140,0.6) 100%)',
                   }}
                 >
-                  รอหัวหน้าห้องเริ่มเกม...
+                  Waiting for host to start...
                 </div>
               )}
             </div>

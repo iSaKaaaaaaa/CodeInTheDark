@@ -67,7 +67,6 @@ export function useGameSync({
       if (state.executionError !== undefined) setExecutionError(state.executionError);
 
       if (state.roleSwapped) {
-        setRole("driver");
         setExecutionError(null);
         if (workspaceRef.current) {
           workspaceRef.current.clear();
@@ -128,15 +127,16 @@ export function useGameSync({
   useEffect(() => {
     if (!socket) return;
     const onRoleSwap = (data: { newRole: "driver" | "navigator" }) => {
+      // Immediately switch role so the swap alert banner displays the player's true new role
+      setRole(data.newRole);
       setShowSwapAlert(true);
+      setExecutionError(null);
+      if (workspaceRef.current) {
+        workspaceRef.current.clear();
+        setBlocksLeft(availableQuotaRef.current);
+      }
       setTimeout(() => {
-        setRole(data.newRole);
         setShowSwapAlert(false);
-        setExecutionError(null);
-        if (workspaceRef.current) {
-          workspaceRef.current.clear();
-          setBlocksLeft(availableQuotaRef.current);
-        }
       }, 3000);
     };
     socket.on("role_swap", onRoleSwap);

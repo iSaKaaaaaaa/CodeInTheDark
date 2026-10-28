@@ -2,18 +2,38 @@
 
 /* วิธีการสร้างฟอนต์แบบใหม่ของ Tailwind v4 */
 @theme {
-  --font-pixel: "VT323", "Prompt", "Chakra Petch", sans-serif;
+  --font-pixel: "VT323", "Chakra Petch", sans-serif;
+  --font-display: "Press Start 2P", "VT323", cursive;
+  --font-subhead: "Chakra Petch", sans-serif;
+  --font-body: "Prompt", "Chakra Petch", sans-serif;
   --font-thai: "Prompt", "Chakra Petch", sans-serif;
+  --font-bungee: "Bungee", sans-serif;
 }
 
 body {
   margin: 0;
   padding: 0;
-  font-family: var(--font-pixel);
+  font-family: var(--font-body);
+}
+
+.font-bungee {
+  font-family: "Bungee", sans-serif !important;
+}
+
+.font-game-title {
+  font-family: "Press Start 2P", "VT323", cursive !important;
+}
+
+.font-game-sub {
+  font-family: "Chakra Petch", sans-serif !important;
+}
+
+.font-game-body {
+  font-family: "Prompt", "Chakra Petch", sans-serif !important;
 }
 
 .font-thai {
-  font-family: var(--font-thai) !important;
+  font-family: var(--font-body) !important;
 }
 
 /* --- การปรับแต่งสไตล์ Blockly ให้เข้ากับธีมพิกเซลอียิปต์โบราณ --- */
