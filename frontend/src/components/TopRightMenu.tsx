@@ -38,26 +38,38 @@ export default function TopRightMenu({ inline = false }: TopRightMenuProps) {
     return null;
   }
 
-  // Inline mode in GameHeader: stacked vertically to save horizontal space
+  // Inline mode in GameHeader: solid tactile buttons without border frame, stretched flush with STAGE TIME
   if (inline) {
+    const muted = isMuted || volume === 0;
+    const iconSizeStyle = {
+      width: "clamp(15px, min(1.3vw, 2.2vh), 20px)",
+      height: "clamp(15px, min(1.3vw, 2.2vh), 20px)",
+    };
+    const btnWidthStyle = {
+      width: "clamp(34px, min(2.8vw, 4.8vh), 48px)",
+      minHeight: "clamp(28px, 3.8vh, 40px)",
+    };
+
     return (
-      <div className="flex flex-col items-center justify-center gap-1 relative font-game-body">
+      <div className="self-stretch flex flex-col justify-between gap-1.5 relative font-game-body shrink-0">
         {/* Volume Button */}
-        <div className="relative">
+        <div className="relative flex-1 flex">
           <button
+            type="button"
             onClick={() => setShowVolumePopup((prev) => !prev)}
-            className={`w-7 h-7 sm:w-8 sm:h-8 ${
-              isMuted || volume === 0 ? "bg-[#5c2e0b]" : "bg-[#b45309] hover:bg-[#d97706]"
-            } border-b-[2.5px] border-r-[2.5px] border-t-[1.5px] border-l-[1.5px] border-[#382503] rounded-lg flex items-center justify-center text-white text-sm shadow-[0_2px_0px_#2a1b12] active:translate-y-[2px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75`}
+            style={btnWidthStyle}
+            className={`flex-1 border-0 outline-none rounded-xl flex items-center justify-center transition-all duration-150 cursor-pointer active:translate-y-[2px] ${
+              muted
+                ? "bg-gradient-to-b from-[#57534e] to-[#3f3b37] hover:from-[#6b6661] hover:to-[#4f4a45] text-stone-200 shadow-[0_3px_0_#1c1917,0_4px_10px_rgba(0,0,0,0.45)] active:shadow-[0_1px_0_#1c1917]"
+                : "bg-gradient-to-b from-[#d97706] to-[#b45309] hover:from-[#f59e0b] hover:to-[#c2410c] text-[#fffbeb] shadow-[0_3px_0_#451a03,0_4px_10px_rgba(0,0,0,0.45)] active:shadow-[0_1px_0_#451a03]"
+            }`}
             title="Audio Volume"
           >
-            <div className="drop-shadow-md flex items-center justify-center">
-              {isMuted || volume === 0 ? (
-                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg>
-              ) : (
-                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-              )}
-            </div>
+            {muted ? (
+              <svg xmlns="http://www.w3.org/2000/svg" style={iconSizeStyle} className="drop-shadow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="22" x2="16" y1="9" y2="15"/><line x1="16" x2="22" y1="9" y2="15"/></svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" style={iconSizeStyle} className="drop-shadow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+            )}
           </button>
 
           {/* Volume Slider Popover */}
@@ -82,6 +94,7 @@ export default function TopRightMenu({ inline = false }: TopRightMenuProps) {
                 className="w-full accent-amber-500 cursor-pointer h-2 bg-black/60 rounded-lg"
               />
               <button
+                type="button"
                 onClick={toggleMute}
                 className="w-full text-xs font-game-sub font-bold py-1.5 bg-amber-700/80 hover:bg-amber-600 rounded-lg text-white border border-amber-900 transition-colors uppercase tracking-wider"
               >
@@ -93,13 +106,13 @@ export default function TopRightMenu({ inline = false }: TopRightMenuProps) {
 
         {/* Leave Stage Button */}
         <button
-          className="w-7 h-7 sm:w-8 sm:h-8 bg-[#991b1b] hover:bg-[#b91c1c] border-b-[2.5px] border-r-[2.5px] border-t-[1.5px] border-l-[1.5px] border-[#450a0a] rounded-lg flex items-center justify-center text-white text-sm shadow-[0_2px_0px_#450a0a] active:translate-y-[2px] active:border-b-0 active:border-r-0 active:shadow-none transition-all duration-75"
+          type="button"
+          style={btnWidthStyle}
+          className="flex-1 border-0 outline-none bg-gradient-to-b from-[#dc2626] to-[#991b1b] hover:from-[#ef4444] hover:to-[#b91c1c] rounded-xl flex items-center justify-center text-white shadow-[0_3px_0_#450a0a,0_4px_10px_rgba(0,0,0,0.45)] active:translate-y-[2px] active:shadow-[0_1px_0_#450a0a] transition-all duration-150 cursor-pointer"
           onClick={() => setShowConfirm(true)}
           title="Leave Stage"
         >
-          <div className="drop-shadow-md flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>
-          </div>
+          <svg xmlns="http://www.w3.org/2000/svg" style={iconSizeStyle} className="drop-shadow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
         </button>
 
         {/* Confirmation Modal */}
@@ -112,7 +125,7 @@ export default function TopRightMenu({ inline = false }: TopRightMenuProps) {
                   <div className="w-12 h-12 rounded-full bg-red-100 border-2 border-red-800 flex items-center justify-center text-red-800">
                     <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
                   </div>
-                  <h3 className="text-xl sm:text-2xl text-red-800 font-bold font-game-sub uppercase tracking-wider">
+                  <h3 className="text-lg sm:text-xl text-red-800 font-bold font-bungee uppercase tracking-wide">
                     Leave Stage?
                   </h3>
                   <p className="text-center text-sm sm:text-base text-[#5c2e0b] font-game-body font-medium leading-relaxed">
@@ -238,7 +251,7 @@ export default function TopRightMenu({ inline = false }: TopRightMenuProps) {
                 <div className="w-12 h-12 rounded-full bg-red-100 border-2 border-red-800 flex items-center justify-center text-red-800">
                   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
                 </div>
-                <h3 className="text-xl sm:text-2xl text-red-800 font-bold font-game-sub uppercase tracking-wider">
+                <h3 className="text-lg sm:text-xl text-red-800 font-bold font-bungee uppercase tracking-wide">
                   {isGame ? "Leave Stage?" : "Confirm Logout?"}
                 </h3>
                 <p className="text-center text-sm sm:text-base text-[#5c2e0b] font-game-body font-medium leading-relaxed">

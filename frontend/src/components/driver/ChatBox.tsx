@@ -128,25 +128,34 @@ export default function ChatBox({
   }, [messages]);
 
   return (
-    <div className="h-full flex-1 bg-black/90 rounded-2xl border-4 border-[#382503] p-2.5 sm:p-3 flex flex-col shadow-2xl min-h-0 shrink-0 font-game-body">
+    <div
+      style={{ containerType: "inline-size" }}
+      className="w-full h-full flex-1 bg-black/90 rounded-2xl border-4 border-[#382503] p-2 sm:p-3 flex flex-col shadow-2xl min-h-0 shrink-0 font-game-body"
+    >
       {/* Header bar */}
-      <div className="flex items-center justify-between mb-1 pb-1 border-b border-[#5c2e0b]/50">
+      <div className="flex items-center justify-between mb-1.5 pb-1 border-b border-[#5c2e0b]/50 shrink-0">
         <span
-          className="text-[#fde68a] font-bold text-base sm:text-lg md:text-xl tracking-wider uppercase flex items-center gap-2 font-game-sub"
-          style={{ textShadow: "1px 1px 0px #000" }}
+          className="text-[#fde68a] font-bold tracking-wider uppercase flex items-center gap-2 font-game-sub leading-tight"
+          style={{
+            fontSize: "clamp(18px, 6.95cqw, 27.7px)",
+            textShadow: "1px 1px 0px #000",
+          }}
         >
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span
+            className="rounded-full bg-emerald-400 animate-pulse shrink-0"
+            style={{ width: "clamp(10px, 3.45cqw, 13.8px)", height: "clamp(10px, 3.45cqw, 13.8px)" }}
+          />
           CHAT LOG
-        </span>
-        <span className="text-gray-400 text-xs sm:text-sm tracking-wide font-game-sub">
-          DRIVER ↔ NAVIGATOR
         </span>
       </div>
 
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto mb-2 flex flex-col gap-1.5 pr-1 min-h-0">
+      <div className="flex-1 overflow-y-auto mb-2 flex flex-col gap-2 pr-1 min-h-0">
         {messages.length === 0 && (
-          <div className="flex-1 flex flex-col items-center justify-center text-center p-4 text-gray-500 font-game-sub text-xs sm:text-sm italic">
+          <div
+            className="flex-1 flex flex-col items-center justify-center text-center p-3 text-gray-500 font-game-sub italic leading-relaxed"
+            style={{ fontSize: "clamp(15px, 5.15cqw, 21px)" }}
+          >
             <span>No messages yet.</span>
             <span>Coordinate with your partner to solve the dungeon!</span>
           </div>
@@ -162,15 +171,24 @@ export default function ChatBox({
             return (
               <div
                 key={index}
-                className="bg-amber-950/70 border border-amber-500/70 rounded-lg p-2 my-0.5 shadow-md shrink-0 break-words"
+                className="bg-amber-950/70 border border-amber-500/70 rounded-lg p-2.5 my-0.5 shadow-md shrink-0 break-words"
               >
-                <div className="flex items-center gap-1.5 font-game-sub font-bold text-amber-400 text-[11px] uppercase tracking-wider mb-0.5">
-                  <span className="bg-amber-500 text-black px-1.5 py-0.2 rounded font-black text-[9px]">
+                <div
+                  className="flex items-center gap-1.5 font-game-sub font-bold text-amber-400 uppercase tracking-wider mb-1 flex-wrap"
+                  style={{ fontSize: "clamp(13.9px, 4.6cqw, 18.5px)" }}
+                >
+                  <span
+                    className="bg-amber-500 text-black px-1.5 py-0.5 rounded font-black leading-none"
+                    style={{ fontSize: "clamp(13.2px, 4.2cqw, 16.7px)" }}
+                  >
                     SYS
                   </span>
                   <span>SYSTEM NOTIFICATION</span>
                 </div>
-                <div className="text-amber-100 text-xs sm:text-sm font-semibold leading-relaxed">
+                <div
+                  className="text-amber-100 font-semibold leading-snug"
+                  style={{ fontSize: "clamp(16.2px, 5.45cqw, 21.5px)" }}
+                >
                   {msg.text}
                 </div>
               </div>
@@ -181,17 +199,19 @@ export default function ChatBox({
           return (
             <div
               key={index}
-              className={`text-xs sm:text-sm font-medium leading-snug shrink-0 break-words py-1 px-2.5 rounded-lg border ${
+              style={{ fontSize: "clamp(16.2px, 5.55cqw, 22.5px)" }}
+              className={`font-medium leading-snug shrink-0 break-words py-1.5 px-2.5 rounded-lg border ${
                 isMock
                   ? "bg-amber-950/40 border-amber-700/50 text-amber-100"
                   : isMe
-                    ? "bg-sky-950/50 border-sky-600/50 text-sky-100 ml-2"
-                    : "bg-[#251508]/70 border-[#8B5E3C]/60 text-orange-100 mr-2"
+                    ? "bg-sky-950/50 border-sky-600/50 text-sky-100 ml-1.5"
+                    : "bg-[#251508]/70 border-[#8B5E3C]/60 text-orange-100 mr-1.5"
               }`}
             >
-              <div className="flex items-center justify-between gap-1 mb-0.5">
+              <div className="flex items-center justify-between gap-1.5 mb-1 flex-wrap">
                 <span
-                  className={`font-game-sub font-bold text-[11px] uppercase tracking-wide px-1.5 py-0.2 rounded ${
+                  style={{ fontSize: "clamp(13.9px, 4.6cqw, 18.5px)" }}
+                  className={`font-game-sub font-bold uppercase tracking-wide px-1.5 py-0.5 rounded leading-tight ${
                     isMock
                       ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
                       : isMe
@@ -203,12 +223,18 @@ export default function ChatBox({
                   {isMe && " (YOU)"}
                 </span>
                 {msg.timestamp && (
-                  <span className="text-[10px] text-gray-500 font-game-sub">
+                  <span
+                    className="text-gray-500 font-game-sub"
+                    style={{ fontSize: "clamp(13.2px, 4.05cqw, 16.7px)" }}
+                  >
                     {msg.timestamp}
                   </span>
                 )}
               </div>
-              <div className="text-gray-100 font-game-body text-xs sm:text-sm">
+              <div
+                className="text-gray-100 font-game-body"
+                style={{ fontSize: "clamp(16.2px, 5.55cqw, 22.5px)" }}
+              >
                 {msg.text}
               </div>
             </div>
@@ -224,8 +250,12 @@ export default function ChatBox({
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder="Type instructions, coordinates, or warnings..."
-        className="bg-black/80 border-2 border-[#5c2e0b] focus:border-amber-400 rounded-xl px-3 py-2 text-white text-xs sm:text-sm md:text-base font-semibold outline-none transition-colors placeholder:text-gray-500 shrink-0 tracking-wide font-game-body"
-        style={{ textShadow: "1px 1px 0 #000" }}
+        className="w-full min-w-0 bg-black/80 border-2 border-[#5c2e0b] focus:border-amber-400 rounded-xl text-white font-semibold outline-none transition-colors placeholder:text-gray-500 placeholder:text-[0.76em] placeholder:tracking-normal shrink-0 tracking-wide font-game-body"
+        style={{
+          fontSize: "clamp(14.5px, 4.85cqw, 20.2px)",
+          padding: "clamp(8px, 2.5cqw, 12px) clamp(9.5px, 3.1cqw, 15px)",
+          textShadow: "1px 1px 0 #000",
+        }}
       />
     </div>
   );

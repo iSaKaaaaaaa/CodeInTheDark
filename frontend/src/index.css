@@ -8,6 +8,19 @@
   --font-body: "Prompt", "Chakra Petch", sans-serif;
   --font-thai: "Prompt", "Chakra Petch", sans-serif;
   --font-bungee: "Bungee", sans-serif;
+
+  /* Global type scale (~21% above Tailwind default; reduced ~10% from the previous +35% bump).
+     Line-heights are unitless ratios in Tailwind v4, so they scale automatically. */
+  --text-xs: 0.91rem;
+  --text-sm: 1.06rem;
+  --text-base: 1.215rem;
+  --text-lg: 1.37rem;
+  --text-xl: 1.52rem;
+  --text-2xl: 1.82rem;
+  --text-3xl: 2.28rem;
+  --text-4xl: 2.565rem;
+  --text-5xl: 3.24rem;
+  --text-6xl: 3.87rem;
 }
 
 body {
@@ -44,9 +57,9 @@ body {
 .blocklyToolboxContents,
 .blocklyTreeLabel {
   font-family: "VT323", "Prompt", "Chakra Petch", sans-serif !important;
-  font-size: 18px !important;
+  font-size: 15pt !important; /* must match theme fontStyle.size in BlocklyEditor so blocks fit their text */
   font-weight: 600 !important;
-  letter-spacing: 0.2px !important;
+  letter-spacing: 0.25px !important;
 }
 
 /* ซ่อนกรอบแถบเครื่องมือดั้งเดิม (เนื่องจากใช้ flyoutToolbox) */
@@ -54,17 +67,9 @@ body {
   display: none !important;
 }
 
-/* ขยายแถบ Toolbox (Flyout) ให้กว้างขึ้นเป็น 185px (md: 200px) เพื่อไม่ให้บล็อกล้น */
-.blocklyFlyout,
-.blocklyFlyoutBackground {
-  width: 185px !important;
-}
-
-@media (min-width: 768px) {
-  .blocklyFlyout,
-  .blocklyFlyoutBackground {
-    width: 200px !important;
-  }
+/* Fallback --flyout-w; BlockCodePanel overrides this dynamically from flyout.getWidth() */
+:root {
+  --flyout-w: 155px;
 }
 
 .blocklyFlyoutBackground {
@@ -115,9 +120,9 @@ body {
 .blocklyText {
   fill: #382503 !important;
   font-family: "VT323", "Prompt", "Chakra Petch", sans-serif !important;
-  font-size: 18px !important;
+  font-size: 15pt !important;
   font-weight: 600 !important;
-  letter-spacing: 0.2px !important;
+  letter-spacing: 0.25px !important;
 }
 
 /* เฉพาะสัญลักษณ์ลูกศรบอกทิศทางที่เป็นสีขาว */
@@ -132,15 +137,15 @@ body {
   filter: drop-shadow(0px 0px 8px rgba(14, 165, 233, 0.8)) !important;
 }
 
-/* เลื่อนถังขยะขึ้นมาอยู่ด้านบนปุ่ม RUN PROGRAM เพื่อไม่ให้ซ้อนทับกัน */
+/* ตำแหน่งและขนาดของถังขยะคำนวณใน BlocklyEditor.tsx โดยตรงเพื่อไม่ให้ขยับเพี้ยนเวลาเปิดฝาหรือย่อจอ */
 .blocklyTrash {
-  translate: 0 -80px;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)) brightness(1.3) saturate(1.2);
-  opacity: 0.9;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.55)) brightness(1.3) saturate(1.2);
+  opacity: 0.85 !important;
+  transition: filter 0.15s ease, opacity 0.15s ease;
 }
 
 .blocklyTrash:hover {
-  filter: drop-shadow(0 0 8px rgba(234,88,12,0.6)) brightness(1.5) saturate(1.4);
-  opacity: 1;
+  filter: drop-shadow(0 0 8px rgba(234, 88, 12, 0.65)) brightness(1.5) saturate(1.4);
+  opacity: 1 !important;
 }
 

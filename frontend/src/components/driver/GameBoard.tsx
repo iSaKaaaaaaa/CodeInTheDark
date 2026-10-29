@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import type { CSSProperties } from "react";
 
 const PLAYER_SPRITES: Record<string, string> = {
   up: "/sprites/player_back.png",
@@ -68,25 +69,39 @@ export default function GameBoard({
 
   return (
     <div className="flex-1 relative w-full h-full min-h-0 flex flex-col items-center justify-center p-2 overflow-hidden">
-      {/* Wrapper นี้ควบคุมขนาดให้พอดีกับความสูงหรือความกว้างของหน้าจอ โดยคง aspect-ratio ไว้ */}
-      <div className="relative flex-1 min-h-0 flex items-center justify-center w-full p-1">
+      {/* Wrapper นี้ควบคุมขนาดให้พอดีกับความสูงหรือความกว้างของหน้าจอ โดยคง aspect-ratio 1:1 ไว้เสมอ */}
+      <div
+        className="relative flex-1 w-full h-full min-h-0 flex items-center justify-center p-1 overflow-hidden"
+        style={{ containerType: "size" }}
+      >
         <div
-          className="relative flex-col items-center justify-center h-full max-h-full max-w-full"
-          style={{
-            aspectRatio: "1 / 1",
-            paddingTop: "2.75rem", // เผื่อที่ให้ Header พิกัด A-M
-            paddingLeft: "2.75rem", // เผื่อที่ให้ Sidebar พิกัด 1-13
-          }}
+          className="relative flex-col items-center justify-center"
+          style={
+            {
+              width: "min(100cqw, 100cqh)",
+              height: "min(100cqw, 100cqh)",
+              aspectRatio: "1 / 1",
+              "--coord-gutter": "clamp(26px, 7.2cqmin, 50px)",
+              paddingTop: "var(--coord-gutter)", // เผื่อที่ให้ Header พิกัด A-M ตามสัดส่วนกระดานจริง
+              paddingLeft: "var(--coord-gutter)", // เผื่อที่ให้ Sidebar พิกัด 1-13 ตามสัดส่วนกระดานจริง
+            } as CSSProperties
+          }
         >
           {/* Top-Left Corner Coordinate Badge — แสดงพิกัดตัวละคร หรือพิกัดเมาส์ที่ชี้ */}
-          <div className="absolute top-0 left-0 w-[2.75rem] h-[2.75rem] flex items-center justify-center p-1 font-pixel">
+          <div
+            className="absolute top-0 left-0 flex items-center justify-center p-0.5 sm:p-1 font-pixel"
+            style={{ width: "var(--coord-gutter)", height: "var(--coord-gutter)" }}
+          >
             <div
-              className={`w-full h-full rounded-lg border-2 border-[#572e18] flex items-center justify-center font-bold text-base sm:text-lg transition-all shadow-md ${
+              className={`w-full h-full rounded-lg border-2 border-[#572e18] flex items-center justify-center font-bold leading-none transition-all shadow-md ${
                 hoveredCoord
                   ? "bg-amber-400 text-[#2a1306] scale-105 ring-2 ring-amber-300"
                   : "bg-[#d2a356] text-[#2a1306]"
               }`}
-              style={{ textShadow: "1px 1px 0 rgba(255,255,255,0.6)" }}
+              style={{
+                fontSize: "clamp(10px, 2.7cqmin, 19px)",
+                textShadow: "1px 1px 0 rgba(255,255,255,0.6)",
+              }}
               title={hoveredCoord ? "Cursor Coordinate" : "Your Position"}
             >
               {hoveredCoord
@@ -96,22 +111,31 @@ export default function GameBoard({
           </div>
 
           {/* แถบตัวอักษรบอกพิกัดด้านบน (A-M) */}
-          <div className="absolute top-0 left-[2.75rem] right-0 h-[2.75rem] flex items-center justify-center font-pixel">
-            <div className="w-[86.666%] h-9 md:h-10 bg-[#d2a356] border-4 border-[#572e18] text-[#2a1306] rounded-lg flex justify-around items-center shadow-lg z-10 px-1">
+          <div
+            className="absolute top-0 right-0 flex items-center justify-center font-pixel"
+            style={{ left: "var(--coord-gutter)", height: "var(--coord-gutter)" }}
+          >
+            <div
+              className="w-[86.666%] bg-[#d2a356] border-2 md:border-[3px] border-[#572e18] text-[#2a1306] rounded-lg flex justify-around items-center shadow-lg z-10 px-0.5"
+              style={{ height: "clamp(20px, 5.8cqmin, 42px)" }}
+            >
               {COL_LABELS.map((lbl, idx) => {
                 const isColActive = hoveredCoord?.x === idx;
                 const isPlayerCol = playerInnerX === idx;
                 return (
                   <span
                     key={idx}
-                    className={`flex-1 text-center text-lg sm:text-xl md:text-2xl font-bold leading-none select-none tracking-tight transition-all duration-150 ${
+                    className={`flex-1 text-center font-bold leading-none select-none tracking-tight transition-all duration-150 ${
                       isColActive
-                        ? "text-red-700 font-black scale-125 bg-amber-200/90 rounded py-0.5 shadow-sm"
+                        ? "text-red-700 font-black scale-115 bg-amber-200/90 rounded py-0.5 shadow-sm"
                         : isPlayerCol
                           ? "text-[#5c2e0b] bg-amber-300/80 rounded py-0.5 font-black ring-1 ring-[#5c2e0b]/40"
                           : ""
                     }`}
-                    style={{ textShadow: "1px 1px 0 rgba(255,255,255,0.6)" }}
+                    style={{
+                      fontSize: "clamp(10px, 3.5cqmin, 24px)",
+                      textShadow: "1px 1px 0 rgba(255,255,255,0.6)",
+                    }}
                   >
                     {lbl}
                   </span>
@@ -121,22 +145,31 @@ export default function GameBoard({
           </div>
 
           {/* แถบตัวเลขบอกพิกัดด้านซ้าย (1-13) */}
-          <div className="absolute left-0 top-[2.75rem] bottom-0 w-[2.75rem] flex items-center justify-end pr-1 font-pixel">
-            <div className="h-[86.666%] w-9 md:w-10 bg-[#d2a356] border-4 border-[#572e18] text-[#2a1306] rounded-lg flex flex-col justify-around items-center shadow-lg z-10 py-1">
+          <div
+            className="absolute left-0 bottom-0 flex items-center justify-end pr-0.5 sm:pr-1 font-pixel"
+            style={{ top: "var(--coord-gutter)", width: "var(--coord-gutter)" }}
+          >
+            <div
+              className="h-[86.666%] bg-[#d2a356] border-2 md:border-[3px] border-[#572e18] text-[#2a1306] rounded-lg flex flex-col justify-around items-center shadow-lg z-10 py-0.5"
+              style={{ width: "clamp(20px, 5.8cqmin, 42px)" }}
+            >
               {ROW_LABELS.map((lbl, idx) => {
                 const isRowActive = hoveredCoord?.y === idx;
                 const isPlayerRow = playerInnerY === idx;
                 return (
                   <span
                     key={idx}
-                    className={`flex-1 flex items-center justify-center text-lg sm:text-xl md:text-2xl font-bold leading-none select-none transition-all duration-150 ${
+                    className={`flex-1 flex items-center justify-center font-bold leading-none select-none transition-all duration-150 ${
                       isRowActive
-                        ? "text-red-700 font-black scale-125 bg-amber-200/90 rounded px-1 shadow-sm"
+                        ? "text-red-700 font-black scale-115 bg-amber-200/90 rounded px-0.5 shadow-sm"
                         : isPlayerRow
-                          ? "text-[#5c2e0b] bg-amber-300/80 rounded px-1 font-black ring-1 ring-[#5c2e0b]/40"
+                          ? "text-[#5c2e0b] bg-amber-300/80 rounded px-0.5 font-black ring-1 ring-[#5c2e0b]/40"
                           : ""
                     }`}
-                    style={{ textShadow: "1px 1px 0 rgba(255,255,255,0.6)" }}
+                    style={{
+                      fontSize: "clamp(10px, 3.5cqmin, 24px)",
+                      textShadow: "1px 1px 0 rgba(255,255,255,0.6)",
+                    }}
                   >
                     {lbl}
                   </span>
@@ -280,38 +313,70 @@ export default function GameBoard({
       </div>
 
       {/* Prominent Coordinates Status Bar */}
-      <div className="mt-1.5 w-full max-w-[540px] flex items-center justify-between bg-[#2a1306]/95 border-2 border-[#b8944f] rounded-xl px-4 py-2 shadow-xl backdrop-blur-md font-pixel shrink-0 text-base sm:text-lg">
-        <div className="flex items-center gap-2">
-          <span className="text-[#d5bba2] text-xs sm:text-sm font-game-sub uppercase tracking-wider font-semibold">POS:</span>
+      <div
+        style={{
+          padding: "clamp(5px, 0.7vh, 8px) clamp(10px, 1.2vw, 18px)",
+        }}
+        className="mt-1.5 w-full max-w-[640px] flex items-center justify-between gap-2 bg-[#2a1306]/95 border-2 border-[#b8944f] rounded-xl shadow-xl backdrop-blur-md font-pixel shrink-0"
+      >
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <span
-            className="text-emerald-400 font-bold tracking-wider text-xl sm:text-2xl font-pixel bg-black/60 px-2.5 py-0.5 rounded-lg border border-emerald-500/50 shadow-inner"
-            style={{ textShadow: "1px 1px 0 #000" }}
+            style={{ fontSize: "clamp(10px, min(0.95vw, 1.6vh), 15px)" }}
+            className="text-[#d5bba2] font-game-sub uppercase tracking-wider font-semibold"
+          >
+            POS:
+          </span>
+          <span
+            className="text-emerald-400 font-bold tracking-wider font-pixel bg-black/60 px-2 py-0.5 rounded-lg border border-emerald-500/50 shadow-inner leading-none"
+            style={{
+              fontSize: "clamp(14px, min(1.55vw, 2.6vh), 24px)",
+              textShadow: "1px 1px 0 #000",
+            }}
           >
             {playerCoordStr}
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-[#d5bba2] text-xs sm:text-sm font-game-sub uppercase tracking-wider font-semibold">GOAL:</span>
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          <span
+            style={{ fontSize: "clamp(10px, min(0.95vw, 1.6vh), 15px)" }}
+            className="text-[#d5bba2] font-game-sub uppercase tracking-wider font-semibold"
+          >
+            GOAL:
+          </span>
           {role === "navigator" ? (
-            <span className="text-sky-300 font-game-sub text-xs sm:text-sm font-medium bg-black/60 px-2.5 py-1 rounded-lg border border-sky-500/40 uppercase tracking-wide">
+            <span
+              style={{ fontSize: "clamp(10px, min(0.9vw, 1.5vh), 14px)" }}
+              className="text-sky-300 font-game-sub font-medium bg-black/60 px-2 py-0.5 rounded-lg border border-sky-500/40 uppercase tracking-wide whitespace-nowrap"
+            >
               Awaiting Driver
             </span>
           ) : (
             <span
-              className="text-amber-300 font-bold tracking-wider text-xl sm:text-2xl font-pixel bg-black/60 px-2.5 py-0.5 rounded-lg border border-amber-500/50 shadow-inner"
-              style={{ textShadow: "1px 1px 0 #000" }}
+              className="text-amber-300 font-bold tracking-wider font-pixel bg-black/60 px-2 py-0.5 rounded-lg border border-amber-500/50 shadow-inner leading-none"
+              style={{
+                fontSize: "clamp(14px, min(1.55vw, 2.6vh), 24px)",
+                textShadow: "1px 1px 0 #000",
+              }}
             >
               {goalCoordStr}
             </span>
           )}
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-[#d5bba2] text-xs sm:text-sm font-game-sub uppercase tracking-wider font-semibold">CURSOR:</span>
+        <div className="flex items-center gap-1.5 sm:gap-2">
           <span
-            className="text-sky-300 font-bold tracking-wider text-xl sm:text-2xl font-pixel bg-black/60 px-2.5 py-0.5 rounded-lg border border-sky-500/50 min-w-[2.75rem] text-center shadow-inner"
-            style={{ textShadow: "1px 1px 0 #000" }}
+            style={{ fontSize: "clamp(10px, min(0.95vw, 1.6vh), 15px)" }}
+            className="text-[#d5bba2] font-game-sub uppercase tracking-wider font-semibold"
+          >
+            CURSOR:
+          </span>
+          <span
+            className="text-sky-300 font-bold tracking-wider font-pixel bg-black/60 px-2 py-0.5 rounded-lg border border-sky-500/50 min-w-[2.4rem] text-center shadow-inner leading-none"
+            style={{
+              fontSize: "clamp(14px, min(1.55vw, 2.6vh), 24px)",
+              textShadow: "1px 1px 0 #000",
+            }}
           >
             {hoveredCoord ? `${COL_LABELS[hoveredCoord.x]}${ROW_LABELS[hoveredCoord.y]}` : "--"}
           </span>

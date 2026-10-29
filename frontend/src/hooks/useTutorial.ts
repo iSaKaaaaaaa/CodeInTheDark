@@ -5,8 +5,11 @@ interface UseTutorialOptions {
   socket: Socket | null;
   role: "driver" | "navigator" | null;
   goalCoord?: string;
+  /** Where the goal sits, e.g. "near the top-right corner" (see describeArea) */
+  goalArea?: string;
   playerPos?: { x: number; y: number };
   walls?: { x: number; y: number }[];
+/** Hazards = every tile only the Driver can see (traps, spikes, rocks). */
   traps?: { x: number; y: number }[];
 }
 
@@ -39,7 +42,7 @@ function toCoord(x: number, y: number): string {
  *  99  = Tutorial completed!
  */
 
-export function useTutorial({ socket, role, goalCoord, playerPos, walls, traps }: UseTutorialOptions) {
+export function useTutorial({ socket, role, goalCoord, goalArea, playerPos, walls, traps }: UseTutorialOptions) {
   const [tutorialStep, setTutorialStep] = useState(() => {
     return localStorage.getItem("tutorialCompleted") === "true" ? 0 : 1;
   });
@@ -106,12 +109,12 @@ export function useTutorial({ socket, role, goalCoord, playerPos, walls, traps }
       const t = setTimeout(() => {
         setMockMessage({
           sender: "[SYSTEM]",
-          text: `[TUTORIAL] Check the center map for the green Goal Flag (${goalCoord || "A-M, 1-13"}), then send its coordinate in Chat!`,
+          text: `[TUTORIAL] Find the red Goal Flag${goalArea ? ` (${goalArea})` : ""} at ${goalCoord || "A-M, 1-13"}, then send its coordinate in Chat!`,
         });
       }, 400);
       return () => clearTimeout(t);
     }
-  }, [tutorialStep, role, goalCoord]);
+  }, [tutorialStep, role, goalCoord, goalArea]);
 
   // Driver Step 13: Prompt driver to spot a trap
   useEffect(() => {
@@ -119,7 +122,7 @@ export function useTutorial({ socket, role, goalCoord, playerPos, walls, traps }
       const t = setTimeout(() => {
         setMockMessage({
           sender: "[SYSTEM]",
-          text: "[TUTORIAL] The Navigator cannot see traps! Find a trap hole on the center map and send its coordinate in Chat.",
+          text: "[TUTORIAL] The Navigator cannot see hazards! Find any trap, spike or rock on the map and send its coordinate in Chat.",
         });
       }, 400);
       return () => clearTimeout(t);
@@ -159,7 +162,7 @@ export function useTutorial({ socket, role, goalCoord, playerPos, walls, traps }
         setMockMessage({
           sender: "Driver (AI Partner)",
           text: hasTraps
-            ? `I cannot see the walls! I can see a trap at ${trapCoord}. Which way is safe to move?`
+            ? `I cannot see the walls! I can see a hazard at ${trapCoord}. Which way is safe to move?`
             : "I cannot see the walls! Which way is safe to move? Any obstacles ahead?",
         });
       }, 500);
@@ -209,7 +212,7 @@ export function useTutorial({ socket, role, goalCoord, playerPos, walls, traps }
       } else {
         return {
           valid: false,
-          feedback: `Incorrect coordinate! Look at the green flag on the map (Coordinate: ${target || "A-M, 1-13"}) and send it to your partner.`,
+          feedback: `Incorrect coordinate! The flag is ${goalArea || "somewhere on the map"}. Read the column letter and row number from the map edge (hint: ${target || "A-M, 1-13"}) and send it to your partner.`,
         };
       }
     }
@@ -225,7 +228,7 @@ export function useTutorial({ socket, role, goalCoord, playerPos, walls, traps }
       }
       return {
         valid: false,
-        feedback: `That is not a trap! Look for the hole sprite on the map and send its coordinate (e.g. ${coords[0] || "C5"}).`,
+        feedback: "That tile is not a hazard! Look for a trap, spike or rock on the map and send its coordinate (column letter + row number).",
       };
     }
 
@@ -291,7 +294,7 @@ export function useTutorial({ socket, role, goalCoord, playerPos, walls, traps }
         const suggestion = openOptions.length > 0 ? ` (Safe paths: ${openOptions.join(" or ")})` : "";
         return {
           valid: false,
-          feedback: `Moving ${blockedDirections.join(" / ")} is blocked by a wall or trap! Check the map for an open path${suggestion}.`,
+          feedback: `Moving ${blockedDirections.join(" / ")} is blocked by a wall or hazard! Check the map for an open path${suggestion}.`,
         };
       }
 
@@ -308,7 +311,7 @@ export function useTutorial({ socket, role, goalCoord, playerPos, walls, traps }
     }
 
     return { valid: true };
-  }, [goalCoord]);
+  }, [goalCoord, goalArea]);
 
   // Callbacks for GameScreen
   const onTutorialBlockDragged = useCallback(() => {

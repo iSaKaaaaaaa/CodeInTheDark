@@ -29,7 +29,7 @@ export default function SelectPlayScreen() {
       </div>
 
       {/* Panel (+30% larger than 460px -> 580px) */}
-      <div className="relative w-[min(94vw,580px)] mx-auto z-10">
+      <div className="relative w-[min(94vw,680px)] mx-auto z-10">
         {/* Outer glow */}
         <div className="absolute -inset-3.5 bg-[#f59e0b]/15 rounded-3xl blur-2xl pointer-events-none" />
 

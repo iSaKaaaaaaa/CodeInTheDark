@@ -1,10 +1,16 @@
 import { Router } from "express";
 import { getAllLogs, getLogByFileName } from "./chatLog";
+import { getPublicRooms } from "./roomManager";
 
 const router = Router();
 
 router.get("/", (_, res) => {
   res.send("Server running");
+});
+
+// Public rooms waiting for a second player (private rooms are never listed)
+router.get("/api/rooms/public", (_, res) => {
+  res.json(getPublicRooms());
 });
 
 // API ดู chat logs ทั้งหมด

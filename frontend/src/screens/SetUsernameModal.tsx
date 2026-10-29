@@ -36,7 +36,7 @@ export default function SetUsernameModal() {
     <div
       className="absolute inset-0 bg-black/60 z-50 flex flex-col items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300 ease-in-out font-pixel cursor-default"
     >
-      <div className="flex flex-col items-center justify-center gap-4 sm:gap-6 w-full max-w-[520px]">
+      <div className="flex flex-col items-center justify-center gap-4 sm:gap-6 w-full max-w-[620px]">
         {/* Title */}
         <h2
           className="text-[#fde68a] text-4xl sm:text-5xl md:text-6xl uppercase text-center relative z-10 font-bold tracking-widest leading-tight whitespace-nowrap"

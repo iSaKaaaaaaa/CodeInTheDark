@@ -49,16 +49,17 @@ export default function GameHeader({
   const stageProgress = Math.max(0, Math.min(100, (dungeonTimeLeft / 300) * 100));
 
   return (
-    <header className="w-full flex flex-col lg:flex-row items-center justify-between gap-3 font-game-body">
+    <header className="w-full flex flex-col md:flex-row items-center justify-between gap-2 md:gap-3 font-game-body">
       {/* ─── LEFT & CENTER GROUP: ROLE + SWAP COUNTDOWN BAR ─── */}
-      <div className="w-full lg:w-auto flex flex-col sm:flex-row items-start sm:items-center gap-3 md:gap-5 flex-1 min-w-0">
+      <div className="w-full md:w-auto flex flex-col sm:flex-row items-start sm:items-center gap-2 md:gap-3.5 lg:gap-5 flex-1 min-w-0">
         {/* Role Title & Objective */}
-        <div className="flex flex-col items-start shrink-0 px-1">
+        <div className="flex flex-col items-start shrink-0 px-1 max-w-full">
           <h1
-            className={`text-3xl sm:text-4xl md:text-5xl font-bold uppercase tracking-wider font-pixel leading-none ${
+            className={`font-bold uppercase tracking-wider font-pixel leading-none ${
               isDriver ? "text-[#fbbf24]" : "text-[#38bdf8]"
             }`}
             style={{
+              fontSize: "clamp(24px, min(3vw, 5vh), 48px)",
               textShadow: isDriver
                 ? "-2px -2px 0 #451a03, 2px -2px 0 #451a03, -2px 2px 0 #451a03, 2px 2px 0 #451a03, 0 4px 0 #9a3412, 0 6px 12px rgba(0,0,0,0.9)"
                 : "-2px -2px 0 #082f49, 2px -2px 0 #082f49, -2px 2px 0 #082f49, 2px 2px 0 #082f49, 0 4px 0 #0369a1, 0 6px 12px rgba(0,0,0,0.9)",
@@ -67,20 +68,26 @@ export default function GameHeader({
             {role}
           </h1>
 
-          <div className="mt-1 flex items-center gap-2">
+          <div className="mt-1 flex items-center gap-1.5 sm:gap-2 flex-wrap">
             <span
-              className={`px-2 py-0.5 rounded-md font-game-sub font-bold text-xs uppercase border ${
+              className={`px-1.5 py-0.5 rounded-md font-game-sub font-bold uppercase border leading-none ${
                 isDriver
                   ? "bg-amber-500/20 text-amber-200 border-amber-400/70"
                   : "bg-sky-500/20 text-sky-200 border-sky-400/70"
               }`}
-              style={{ textShadow: "1px 1px 0 #000" }}
+              style={{
+                fontSize: "clamp(9.5px, min(0.8vw, 1.4vh), 13px)",
+                textShadow: "1px 1px 0 #000",
+              }}
             >
               {isDriver ? "DRIVER" : "NAVIGATOR"}
             </span>
             <span
-              className="text-xs sm:text-sm font-game-body font-medium text-gray-200/95"
-              style={{ textShadow: "1px 1px 0 #000" }}
+              className="font-game-body font-medium text-gray-200/95 leading-tight"
+              style={{
+                fontSize: "clamp(11px, min(1vw, 1.75vh), 17px)",
+                textShadow: "1px 1px 0 #000",
+              }}
             >
               {isDriver
                 ? "Code movement blocks & press RUN"
@@ -91,37 +98,48 @@ export default function GameHeader({
 
         {/* Role Swap Countdown Bar (colored by current role) */}
         <div
-          className={`w-full sm:w-auto flex-1 max-w-[380px] border-2 rounded-xl px-4 py-2 backdrop-blur-sm flex flex-col justify-center gap-1.5 transition-all duration-300 ${swapTheme.box} ${
+          style={{ padding: "clamp(5px, 0.85vh, 9px) clamp(10px, 1.1vw, 16px)" }}
+          className={`w-full sm:w-auto flex-1 max-w-[450px] min-w-[170px] border-2 rounded-xl backdrop-blur-sm flex flex-col justify-center gap-1 transition-all duration-300 ${swapTheme.box} ${
             isSwapUrgent ? "animate-pulse" : ""
           }`}
         >
           {/* Top Label & Timer */}
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-center gap-1.5 font-game-sub">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-1.5 font-game-sub min-w-0">
               <span
-                className={`text-xs sm:text-sm font-bold tracking-wide uppercase whitespace-nowrap ${swapTheme.label}`}
+                style={{ fontSize: "clamp(11px, min(1vw, 1.75vh), 16.5px)" }}
+                className={`font-bold tracking-wide uppercase whitespace-nowrap ${swapTheme.label}`}
               >
                 ROLE SWAP IN:
               </span>
               {isSwapUrgent && (
-                <span className={`${swapTheme.soon} text-xs font-black animate-pulse uppercase whitespace-nowrap`}>
+                <span
+                  style={{ fontSize: "clamp(9.5px, min(0.8vw, 1.4vh), 12.5px)" }}
+                  className={`${swapTheme.soon} font-black animate-pulse uppercase whitespace-nowrap`}
+                >
                   (SWAPPING SOON)
                 </span>
               )}
             </div>
 
             <span
-              className={`font-pixel font-bold text-2xl sm:text-3xl tracking-wider leading-none ${swapTheme.time} ${
+              className={`font-pixel font-bold tracking-wider leading-none shrink-0 ${swapTheme.time} ${
                 isSwapUrgent ? "animate-pulse" : ""
               }`}
-              style={{ textShadow: swapTheme.shadow }}
+              style={{
+                fontSize: "clamp(18px, min(1.9vw, 3.3vh), 31px)",
+                textShadow: swapTheme.shadow,
+              }}
             >
               {swapTime}
             </span>
           </div>
 
           {/* Progress Bar Track & Fill */}
-          <div className="w-full h-2.5 bg-black/85 rounded-full border border-white/10 overflow-hidden relative shadow-inner">
+          <div
+            style={{ height: "clamp(6px, 0.9vh, 10px)" }}
+            className="w-full bg-black/85 rounded-full border border-white/10 overflow-hidden relative shadow-inner"
+          >
             <div
               className={`h-full rounded-full transition-all duration-1000 linear ${swapTheme.bar} ${
                 isSwapUrgent ? "animate-pulse" : ""
@@ -133,11 +151,11 @@ export default function GameHeader({
       </div>
 
       {/* ─── RIGHT GROUP: STAGE TIME & UTILITY CONTROLS ─── */}
-      <div className="flex items-center justify-end gap-2.5 sm:gap-3.5 shrink-0">
+      <div className="flex items-stretch justify-end gap-2 sm:gap-2.5 shrink-0">
         {/* Blocks Left Counter */}
         {blocksLeft !== undefined && (
-          <div className="bg-[#140b06]/95 border-2 border-[#8B5E3C]/80 rounded-xl px-3 py-1.5 shadow-xl backdrop-blur-md flex flex-col items-center justify-center min-w-[76px]">
-            <span className="text-[#fde68a] text-[10px] font-bold font-game-sub uppercase tracking-wider leading-none mb-0.5">
+          <div className="bg-[#140b06]/95 border-2 border-[#8B5E3C]/80 rounded-xl px-3 py-1.5 shadow-xl backdrop-blur-md flex flex-col items-center justify-center min-w-[72px]">
+            <span className="text-[#fde68a] text-xs font-bold font-game-sub uppercase tracking-wider leading-none mb-0.5">
               BLOCKS LEFT
             </span>
             <span
@@ -151,7 +169,11 @@ export default function GameHeader({
 
         {/* Stage Time Box (Green -> Yellow -> Orange -> Red) */}
         <div
-          className={`border-2 rounded-2xl px-6 sm:px-8 py-2 backdrop-blur-md flex flex-col items-center justify-center min-w-[200px] sm:min-w-[230px] md:min-w-[250px] transition-all duration-300 relative overflow-hidden ${
+          style={{
+            minWidth: "clamp(124px, 13vw, 225px)",
+            padding: "clamp(5px, 0.8vh, 9px) clamp(12px, 1.4vw, 26px)",
+          }}
+          className={`border-2 rounded-2xl backdrop-blur-md flex flex-col items-center justify-center transition-all duration-300 relative overflow-hidden ${
             isStageFinal || isStageCritical
               ? "bg-red-950/95 border-red-500 shadow-[0_0_24px_rgba(239,68,68,0.8)] animate-pulse"
               : isStageWarning
@@ -162,7 +184,8 @@ export default function GameHeader({
           }`}
         >
           <span
-            className={`text-xs font-bold font-game-sub uppercase tracking-wider leading-none mb-1 whitespace-nowrap ${
+            style={{ fontSize: "clamp(10.5px, min(0.9vw, 1.6vh), 15px)" }}
+            className={`font-bold font-game-sub uppercase tracking-wider leading-none mb-1 whitespace-nowrap ${
               isStageFinal || isStageCritical
                 ? "text-red-200"
                 : isStageWarning
@@ -178,7 +201,7 @@ export default function GameHeader({
           </span>
 
           <span
-            className={`text-3xl sm:text-4xl font-pixel font-bold tracking-[0.08em] leading-none text-center transition-colors duration-200 ${
+            className={`font-pixel font-bold tracking-[0.08em] leading-none text-center transition-colors duration-200 ${
               isStageFinal || isStageCritical
                 ? "text-red-300 animate-pulse"
                 : isStageWarning
@@ -188,6 +211,7 @@ export default function GameHeader({
                     : "text-white"
             }`}
             style={{
+              fontSize: "clamp(21px, min(2.3vw, 3.9vh), 38px)",
               textShadow:
                 isStageFinal || isStageCritical
                   ? "2px 2px 0px #450a0a, 3px 3px 0px #000"
@@ -202,7 +226,10 @@ export default function GameHeader({
           </span>
 
           {/* Stage Progress Bar */}
-          <div className="w-full h-1.5 bg-black/80 rounded-full overflow-hidden mt-1.5 border border-white/10">
+          <div
+            style={{ height: "clamp(4px, 0.65vh, 6px)" }}
+            className="w-full bg-black/80 rounded-full overflow-hidden mt-1.5 border border-white/10"
+          >
             <div
               className={`h-full rounded-full transition-all duration-1000 linear ${
                 isStageFinal || isStageCritical

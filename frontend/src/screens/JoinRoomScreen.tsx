@@ -1,18 +1,43 @@
-import { useState } from "react";
-import { useSocketStore } from "../store/useSocketStore";
+import { useCallback, useEffect, useState } from "react";
+import { useSocketStore, getBackendUrl } from "../store/useSocketStore";
 import TopRightMenu from "../components/TopRightMenu";
 
-// Mock public rooms — replace with real data when backend supports it
-const MOCK_PUBLIC_ROOMS = [
-  { code: '482917', host: 'Pharaoh_X', players: 1 },
-  { code: '731058', host: 'SandWalker', players: 1 },
-  { code: '295634', host: 'DarkCoder', players: 1 },
-];
+interface PublicRoom {
+  code: string;
+  host: string;
+  players: number;
+}
 
 export default function JoinRoomScreen() {
   const { setScreen, joinRoom, joinError } = useSocketStore();
   const [inputCode, setInputCode] = useState('');
   const [tab, setTab] = useState<'code' | 'public'>('code');
+  const [publicRooms, setPublicRooms] = useState<PublicRoom[]>([]);
+  const [loadingRooms, setLoadingRooms] = useState(false);
+  const [roomsError, setRoomsError] = useState(false);
+
+  // Ask the server which rooms are public and still waiting for a 2nd player
+  const loadPublicRooms = useCallback(async () => {
+    setLoadingRooms(true);
+    setRoomsError(false);
+    try {
+      const res = await fetch(`${getBackendUrl()}/api/rooms/public`);
+      if (!res.ok) throw new Error('bad status');
+      setPublicRooms(await res.json());
+    } catch {
+      setRoomsError(true);
+    } finally {
+      setLoadingRooms(false);
+    }
+  }, []);
+
+  // Load when the tab opens, then auto-refresh every 5s while it stays open
+  useEffect(() => {
+    if (tab !== 'public') return;
+    loadPublicRooms();
+    const id = setInterval(loadPublicRooms, 5000);
+    return () => clearInterval(id);
+  }, [tab, loadPublicRooms]);
 
   const handleJoinPrivate = () => {
     if (inputCode.trim().length === 6) {
@@ -46,7 +71,7 @@ export default function JoinRoomScreen() {
       </h2>
 
       {/* Main Panel (+30% larger than 460px -> 560px) */}
-      <div className="relative w-[min(94vw,560px)] mx-auto z-10">
+      <div className="relative w-[min(94vw,660px)] mx-auto z-10">
         {/* Outer glow */}
         <div className="absolute -inset-3.5 bg-[#f59e0b]/15 rounded-3xl blur-2xl pointer-events-none" />
 
@@ -163,7 +188,7 @@ export default function JoinRoomScreen() {
                   value={inputCode}
                   onChange={(e) => setInputCode(e.target.value.replace(/\D/g, ''))}
                   onKeyDown={handleKeyDown}
-                  className="w-full max-w-[310px] bg-[#fef3c7] p-3 sm:p-4 rounded-2xl border-3 border-[#5c2e0b] text-[#382503] font-pixel text-4xl sm:text-5xl font-bold text-center tracking-[0.32em] outline-none focus:bg-white focus:border-[#b45309] focus:ring-4 focus:ring-[#f59e0b]/40 shadow-inner transition-colors placeholder:text-[#8b4513]/35 placeholder:tracking-[0.24em]"
+                  className="w-full max-w-[390px] bg-[#fef3c7] p-3 sm:p-4 rounded-2xl border-3 border-[#5c2e0b] text-[#382503] font-pixel text-4xl sm:text-5xl font-bold text-center tracking-[0.32em] outline-none focus:bg-white focus:border-[#b45309] focus:ring-4 focus:ring-[#f59e0b]/40 shadow-inner transition-colors placeholder:text-[#8b4513]/35 placeholder:tracking-[0.24em]"
                   placeholder="000000"
                   autoFocus
                 />
@@ -194,14 +219,30 @@ export default function JoinRoomScreen() {
                   >
                     OPEN ROOMS
                   </p>
-                  <button className="text-xs sm:text-sm font-bold text-[#7c532b] hover:text-[#5c2e0b] tracking-wider uppercase transition-colors font-game-sub">
+                  <button
+                    onClick={loadPublicRooms}
+                    className="text-xs sm:text-sm font-bold text-[#7c532b] hover:text-[#5c2e0b] tracking-wider uppercase transition-colors font-game-sub"
+                  >
                     ↻ REFRESH
                   </button>
                 </div>
 
                 {/* Room List */}
                 <div className="w-full flex flex-col gap-2.5 max-h-[260px] overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#B8944F transparent' }}>
-                  {MOCK_PUBLIC_ROOMS.map((room) => (
+                  {joinError && (
+                    <div className="w-full bg-[#7f1d1d]/90 text-[#fef2f2] border-2 border-[#b91c1c] px-4 py-2 rounded-xl text-center text-sm font-bold">
+                      ⚠ {joinError}
+                    </div>
+                  )}
+                  {roomsError && (
+                    <p className="text-center text-sm font-semibold text-[#9B2C2C] py-4">Could not load rooms. Try REFRESH.</p>
+                  )}
+                  {!roomsError && !loadingRooms && publicRooms.length === 0 && (
+                    <p className="text-center text-sm sm:text-base font-semibold text-[#7c532b] py-6">
+                      No public rooms right now.<br />Ask a friend for a code, or host your own!
+                    </p>
+                  )}
+                  {publicRooms.map((room) => (
                     <div
                       key={room.code}
                       className="w-full flex items-center justify-between px-4 sm:px-5 py-3 sm:py-3.5 rounded-2xl border-2 border-[#5c2e0b]/45 hover:border-[#b45309] transition-all cursor-pointer group shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0.5"
@@ -224,8 +265,11 @@ export default function JoinRoomScreen() {
                           </span>
                         </div>
                       </div>
-                      <span className="text-sm sm:text-base font-bold text-[#b45309] group-hover:text-[#d97706] tracking-wider uppercase transition-colors font-game-sub">
-                        JOIN →
+                      <span
+                        className="shrink-0 bg-[#b45309] group-hover:bg-[#d97706] text-[#fffbeb] font-bold text-sm sm:text-base px-4 sm:px-5 py-2 rounded-xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#382503] shadow-[0_3px_0_#2a1b12] group-active:translate-y-[3px] group-active:border-b-0 group-active:border-r-0 group-active:shadow-none tracking-wider uppercase transition-all font-game-sub"
+                        style={{ textShadow: "1px 1px 0 #000" }}
+                      >
+                        JOIN ➔
                       </span>
                     </div>
                   ))}

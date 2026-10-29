@@ -3,10 +3,9 @@ import { useSocketStore } from "../store/useSocketStore";
 import TopRightMenu from "../components/TopRightMenu";
 
 export default function CreateRoomScreen() {
-  const { username, roomCode, role, players, leaveRoom, createRoom, startGame } = useSocketStore();
+  const { username, roomCode, role, players, leaveRoom, createRoom, startGame, isPublic, setRoomVisibility } = useSocketStore();
   const isHost = players.length > 0 ? players[0].username === username : role === 'driver';
   const [copied, setCopied] = useState(false);
-  const [isPublic, setIsPublic] = useState(false);
 
   useEffect(() => {
     if (!roomCode && role === 'driver') {
@@ -44,7 +43,7 @@ export default function CreateRoomScreen() {
       </h2>
 
       {/* Main Panel (+30% larger than 470px -> 580px) */}
-      <div className="relative w-[min(94vw,580px)] mx-auto z-10">
+      <div className="relative w-[min(94vw,680px)] mx-auto z-10">
         {/* Outer glow */}
         <div className="absolute -inset-3.5 bg-[#f59e0b]/15 rounded-3xl blur-2xl pointer-events-none" />
 
@@ -141,7 +140,7 @@ export default function CreateRoomScreen() {
                 background: 'linear-gradient(135deg, rgba(244,222,179,0.7) 0%, rgba(222,194,140,0.7) 100%)',
               }}>
                 <button
-                  onClick={() => setIsPublic(false)}
+                  onClick={() => setRoomVisibility(false)}
                   className={`px-5 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-150 ${
                     !isPublic
                       ? 'bg-[#5c2e0b] text-[#fde68a] shadow-md border border-[#382503]'
@@ -151,7 +150,7 @@ export default function CreateRoomScreen() {
                   PRIVATE
                 </button>
                 <button
-                  onClick={() => setIsPublic(true)}
+                  onClick={() => setRoomVisibility(true)}
                   className={`px-5 sm:px-6 py-2 rounded-lg text-xs sm:text-sm font-bold uppercase tracking-wider transition-all duration-150 ${
                     isPublic
                       ? 'bg-[#5c2e0b] text-[#fde68a] shadow-md border border-[#382503]'

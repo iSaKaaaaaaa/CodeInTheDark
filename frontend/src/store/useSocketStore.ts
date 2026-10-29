@@ -7,7 +7,7 @@ import axios from 'axios';
 
 export type ScreenState = 'landing' | 'login' | 'set_username' | 'select' | 'create' | 'join' | 'game';
 
-const getBackendUrl = () => {
+export const getBackendUrl = () => {
   if (import.meta.env.VITE_BACKEND_URL) {
     return import.meta.env.VITE_BACKEND_URL;
   }
@@ -38,6 +38,7 @@ interface SocketState {
   role: 'driver' | 'navigator' | null;
   currentScreen: ScreenState;
   players: { username: string; role: string }[];
+  isPublic: boolean;
   mapData: {
     map: string[];
     walls: { x: number; y: number }[];
@@ -54,6 +55,7 @@ interface SocketState {
   volume: number;
 
   setScreen: (screen: ScreenState) => void;
+  setRoomVisibility: (isPublic: boolean) => void;
   setUsername: (username: string) => void;
   setRole: (role: 'driver' | 'navigator') => void;
 
@@ -87,6 +89,7 @@ export const useSocketStore = create<SocketState>()(
       role: null,
       currentScreen: 'landing',
       players: [],
+      isPublic: false,
       mapData: null,
       dungeonTimeLeft: DUNGEON_TIME,
       swapTimeLeft: SWAP_TIME,
@@ -95,6 +98,10 @@ export const useSocketStore = create<SocketState>()(
       volume: 15,
 
       setScreen: (screen) => set({ currentScreen: screen }),
+      // Ask the server to change visibility; UI updates when the server echoes "room_visibility"
+      setRoomVisibility: (isPublic) => {
+        get().socket?.emit('set_room_visibility', { isPublic });
+      },
       setUsername: (username) => set({ username }),
       setDungeonTimeLeft: (time) => set((state) => ({ dungeonTimeLeft: typeof time === 'function' ? time(state.dungeonTimeLeft) : time })),
       setSwapTimeLeft: (time) => set((state) => ({ swapTimeLeft: typeof time === 'function' ? time(state.swapTimeLeft) : time })),
@@ -173,6 +180,10 @@ export const useSocketStore = create<SocketState>()(
           set({ players: users });
         });
 
+        socket.on('room_visibility', (data: { isPublic: boolean }) => {
+          set({ isPublic: data.isPublic });
+        });
+
         socket.on('start_game', (mapData: any) => {
           set({ currentScreen: 'game', mapData, dungeonTimeLeft: DUNGEON_TIME, swapTimeLeft: SWAP_TIME });
         });
@@ -183,7 +194,7 @@ export const useSocketStore = create<SocketState>()(
 
         socket.on('room_destroyed', (data: { reason: string }) => {
           socket.disconnect();
-          set({ socket: null, roomCode: '', role: null, players: [], currentScreen: 'select', mapData: null });
+          set({ socket: null, roomCode: '', role: null, players: [], isPublic: false, currentScreen: 'select', mapData: null });
           alert(data.reason || "Your partner has disconnected.");
         });
 
@@ -191,7 +202,7 @@ export const useSocketStore = create<SocketState>()(
           set({ coins: data.coins });
         });
 
-        set({ socket, roomCode: generatedCode, role: 'driver', players: [] });
+        set({ socket, roomCode: generatedCode, role: 'driver', players: [], isPublic: false });
       },
 
       joinRoom: (roomCode) => {
@@ -217,6 +228,10 @@ export const useSocketStore = create<SocketState>()(
           set({ players: users });
         });
 
+        socket.on('room_visibility', (data: { isPublic: boolean }) => {
+          set({ isPublic: data.isPublic });
+        });
+
         socket.on('start_game', (mapData: any) => {
           set({ currentScreen: 'game', mapData, dungeonTimeLeft: DUNGEON_TIME, swapTimeLeft: SWAP_TIME });
         });
@@ -227,7 +242,7 @@ export const useSocketStore = create<SocketState>()(
 
         socket.on('room_destroyed', (data: { reason: string }) => {
           socket.disconnect();
-          set({ socket: null, roomCode: '', role: null, players: [], currentScreen: 'select', mapData: null });
+          set({ socket: null, roomCode: '', role: null, players: [], isPublic: false, currentScreen: 'select', mapData: null });
           alert(data.reason || "Your partner has disconnected.");
         });
 
@@ -235,7 +250,7 @@ export const useSocketStore = create<SocketState>()(
           set({ coins: data.coins });
         });
 
-        set({ socket, roomCode, role: 'navigator', players: [] });
+        set({ socket, roomCode, role: 'navigator', players: [], isPublic: false });
       },
 
       startGame: () => {
@@ -250,7 +265,7 @@ export const useSocketStore = create<SocketState>()(
         if (socket) {
           socket.disconnect();
         }
-        set({ socket: null, roomCode: '', role: null, currentScreen: 'select', players: [] });
+        set({ socket: null, roomCode: '', role: null, currentScreen: 'select', players: [], isPublic: false });
       },
 
       leaveStage: () => {
@@ -298,6 +313,10 @@ export const useSocketStore = create<SocketState>()(
 
         newSocket.on('room_users', (users) => {
           set({ players: users });
+        });
+
+        newSocket.on('room_visibility', (data: { isPublic: boolean }) => {
+          set({ isPublic: data.isPublic });
         });
 
         newSocket.on('start_game', (mapData: any) => {

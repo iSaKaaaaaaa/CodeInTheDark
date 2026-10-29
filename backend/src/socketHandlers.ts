@@ -2,7 +2,8 @@ import { Server, Socket } from "socket.io";
 import { ChatLogEntry } from "./types";
 import {
   addUserToRoom, removeUserFromRoom, getUser,
-  hasRoom, getPlayerNamesInRoom, getUserListForRoom, isRoomEmpty, getRoomUsers
+  hasRoom, getPlayerNamesInRoom, getUserListForRoom, isRoomEmpty, getRoomUsers,
+  createRoomMeta, getRoomMeta, setRoomPublic, setRoomStarted, isRoomFull
 } from "./roomManager";
 import {
   initChatLog, addChatEntry, saveChatLog, deleteChatLog, addRunAttempt, reinitChatLog, getRunAttemptCount
@@ -20,9 +21,15 @@ export function registerSocketHandlers(io: Server) {
         socket.emit("join_error", "Room not found or invalid code.");
         return;
       }
+      if (role === "navigator" && isRoomFull(roomCode)) {
+        socket.emit("join_error", "Room is full.");
+        return;
+      }
 
+      const isNewRoom = !hasRoom(roomCode);
       socket.join(roomCode);
       addUserToRoom(socket.id, { roomCode, role, username });
+      if (isNewRoom) createRoomMeta(roomCode, socket.id, username);
       initChatLog(roomCode);
 
       console.log(`User ${username} (${socket.id}) joined room ${roomCode} as ${role}`);
@@ -31,9 +38,20 @@ export function registerSocketHandlers(io: Server) {
 
       const usersInRoom = getUserListForRoom(roomCode);
       io.to(roomCode).emit("room_users", usersInRoom);
+      socket.emit("room_visibility", { isPublic: getRoomMeta(roomCode)?.isPublic ?? false });
 
       if (roomMaps.has(roomCode)) {
         socket.emit("start_game", roomMaps.get(roomCode));
+      }
+    });
+
+    // Host toggles PUBLIC / PRIVATE (server ignores anyone who is not the host)
+    socket.on("set_room_visibility", ({ isPublic }: { isPublic: boolean }) => {
+      const user = getUser(socket.id);
+      if (!user) return;
+      const result = setRoomPublic(user.roomCode, socket.id, !!isPublic);
+      if (result !== null) {
+        io.to(user.roomCode).emit("room_visibility", { isPublic: result });
       }
     });
 
@@ -55,6 +73,7 @@ export function registerSocketHandlers(io: Server) {
       if (user) {
         const mapData = generateMap(15, 15);
         roomMaps.set(user.roomCode, mapData);
+        setRoomStarted(user.roomCode, true);
         io.to(user.roomCode).emit("start_game", mapData);
       }
     });
@@ -160,7 +179,9 @@ export function registerSocketHandlers(io: Server) {
       if (user) {
         saveChatLog(user.roomCode, getPlayerNamesInRoom(user.roomCode), undefined, roomMaps.get(user.roomCode));
         roomMaps.delete(user.roomCode);
+        setRoomStarted(user.roomCode, false);
         io.to(user.roomCode).emit("return_to_lobby");
+        io.to(user.roomCode).emit("room_visibility", { isPublic: getRoomMeta(user.roomCode)?.isPublic ?? false });
       }
     });
 

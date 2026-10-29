@@ -5,6 +5,7 @@ import { useSocketStore } from "../store/useSocketStore";
 import { MAX_BLOCKS, DUNGEON_TIME, SWAP_TIME } from "../constants/game";
 
 import { useTutorial } from "../hooks/useTutorial";
+import { describeArea } from "../utils/mapLocation";
 import { useGameTimer } from "../hooks/useGameTimer";
 import { useGameSync } from "../hooks/useGameSync";
 import { useGameMovement } from "../hooks/useGameMovement";
@@ -35,7 +36,7 @@ function TutorialCard({
   className?: string;
 }) {
   return (
-    <div className={`pointer-events-auto max-w-[500px] w-[92vw] mx-auto shadow-[0_20px_50px_rgba(0,0,0,0.85)] rounded-xl ${className} font-game-body`}>
+    <div className={`pointer-events-auto max-w-[600px] w-[92vw] mx-auto shadow-[0_20px_50px_rgba(0,0,0,0.85)] rounded-xl ${className} font-game-body`}>
       {/* Wooden frame top */}
       <div className="mx-2 h-4 sm:h-5 rounded-t-md relative" style={{
         background: 'linear-gradient(180deg, #8B5E3C 0%, #6B3F1F 40%, #5C2E18 100%)',
@@ -54,7 +55,7 @@ function TutorialCard({
         <div className="absolute inset-0 pointer-events-none" style={{ boxShadow: 'inset 0 0 40px rgba(101,67,33,0.12)' }} />
         <div className="relative z-10 flex flex-col items-center gap-2.5 sm:gap-3.5">
           {/* Title badge */}
-          <span className="inline-block font-bold text-white text-base sm:text-lg md:text-xl px-4 py-1 rounded-xl border-2 uppercase tracking-wider font-game-sub" style={{
+          <span className="inline-block font-bold text-white text-sm sm:text-base md:text-lg px-4 py-1.5 rounded-xl border-2 uppercase tracking-wide font-bungee text-center" style={{
             background: titleColor, borderColor: titleBorder,
             boxShadow: `0 3px 0 ${titleBorder}`, textShadow: '1.5px 1px 0 #000',
           }}>
@@ -148,6 +149,15 @@ export default function GameScreen() {
     return `(${GOAL.x},${GOAL.y})`;
   }, [GOAL.x, GOAL.y]);
 
+  // Where the goal sits (corner / edge / middle) so hints work wherever the flag is
+  const goalArea = useMemo(() => describeArea(GOAL.x, GOAL.y), [GOAL.x, GOAL.y]);
+
+  // Every Driver-only obstacle (any type) counts for the hazard mission
+  const hazards = useMemo(
+    () => [...(mapData.traps || []), ...(mapData.spikes || []), ...(mapData.rocks || [])],
+    [mapData.traps, mapData.spikes, mapData.rocks]
+  );
+
   const {
     tutorialStep,
     setTutorialStep,
@@ -170,9 +180,10 @@ export default function GameScreen() {
     socket,
     role,
     goalCoord,
+    goalArea,
     playerPos: { x: playerX, y: playerY },
     walls: WALLS,
-    traps: mapData.traps,
+    traps: hazards,
   });
   const driverTotal = hasTraps ? 4 : 3;
   const dragNum = hasTraps ? 3 : 2;
@@ -259,8 +270,13 @@ export default function GameScreen() {
     workspaceRef.current = ws;
     ws.options.maxBlocks = availableQuotaRef.current;
     ws.addChangeListener((event) => {
-      if (event.type === Blockly.Events.BLOCK_CREATE) {
-        onTutorialBlockDragged();
+      // Quest 2 passes only after the block is DROPPED in the workspace (not just picked up).
+      // BLOCK_CREATE fires as soon as the drag starts, so wait for the drag to end,
+      // then confirm the block survived (dropping on the toolbox/trash deletes it).
+      if (event.type === Blockly.Events.BLOCK_DRAG && !(event as Blockly.Events.BlockDrag).isStart) {
+        setTimeout(() => {
+          if (ws.getAllBlocks(false).length > 0) onTutorialBlockDragged();
+        }, 0);
       }
       if (roleRef.current === "driver") {
         if (event.type === Blockly.Events.BLOCK_CREATE || event.type === Blockly.Events.BLOCK_DELETE || event.type === Blockly.Events.BLOCK_MOVE || event.type === Blockly.Events.BLOCK_CHANGE) {
@@ -299,7 +315,7 @@ export default function GameScreen() {
 
   return (
     <div
-      className="w-full h-screen bg-cover bg-center flex flex-col font-game-body cursor-default relative overflow-x-hidden overflow-y-auto"
+      className="w-full min-h-screen md:h-screen md:max-h-screen bg-cover bg-center flex flex-col font-game-body cursor-default relative overflow-x-hidden overflow-y-auto md:overflow-hidden"
       style={{ backgroundImage: "url('/ui/ingame.png')" }}
       onClick={handleScreenClick}
     >
@@ -331,7 +347,7 @@ export default function GameScreen() {
                 {role === "driver" ? (
                   <>
                     <p className="text-base sm:text-lg">You are the <Badge color="bg-blue-100 text-blue-800 border-blue-800">DRIVER</Badge></p>
-                    <p className="mt-2 text-xs sm:text-sm">You control <strong className="text-orange-700">Code Movement Blocks</strong>, see traps and the goal flag. But... <strong className="text-red-600">you cannot see stone walls!</strong></p>
+                    <p className="mt-2 text-xs sm:text-sm">You control <strong className="text-orange-700">Code Movement Blocks</strong>, see hazards and the goal flag. But... <strong className="text-red-600">you cannot see stone walls!</strong></p>
                     <p className="mt-2 text-xs sm:text-sm text-[#78350f] bg-[#f5e6c8] p-2 rounded-lg border-2 border-[#b8944f]/40">
                       Your teammate (Navigator) sees all walls and must guide you via Chat.
                     </p>
@@ -339,7 +355,7 @@ export default function GameScreen() {
                 ) : (
                   <>
                     <p className="text-base sm:text-lg">You are the <Badge color="bg-sky-100 text-sky-800 border-sky-600">NAVIGATOR</Badge></p>
-                    <p className="mt-2 text-xs sm:text-sm">You see <strong className="text-sky-700">All Stone Walls</strong>, but... <strong className="text-red-600">you cannot see traps or the goal flag!</strong></p>
+                    <p className="mt-2 text-xs sm:text-sm">You see <strong className="text-sky-700">All Stone Walls</strong>, but... <strong className="text-red-600">you cannot see hazards or the goal flag!</strong></p>
                     <p className="mt-2 text-xs sm:text-sm text-[#78350f] bg-[#f5e6c8] p-2 rounded-lg border-2 border-[#b8944f]/40">
                       Your mission is to read the maze layout and guide the Driver via Chat.
                     </p>
@@ -356,12 +372,12 @@ export default function GameScreen() {
               <TutorialCard title="MAP & MISSION" titleColor="#2B6CB0" titleBorder="#1A365D" buttonText="GOT IT ➔" onNext={() => setTutorialStep(3)}>
                 {role === "driver" ? (
                   <div className="space-y-2">
-                    <p className="text-sm sm:text-base">Look at the <Badge color="bg-green-100 text-green-800 border-green-800">GOAL FLAG</Badge> on the center map!</p>
+                    <p className="text-sm sm:text-base">Look at the <Badge color="bg-red-100 text-red-800 border-red-800">GOAL FLAG</Badge> on the map! It may be in a corner or along an edge.</p>
                     <div className="bg-red-50/90 border-2 border-red-400 p-2.5 rounded-xl text-left text-xs sm:text-sm text-red-900 font-semibold space-y-1">
                       <p className="text-red-700 font-bold font-game-sub">CRITICAL RULE:</p>
                       <p>Only the <strong className="text-red-700">DRIVER sees the Goal Flag</strong> (Navigator cannot see it!).</p>
                       <p>Check the grid coordinate (e.g. <span className="text-amber-800 font-bold">{goalCoord}</span>) and always tell your Navigator in Chat!</p>
-                      <p>You also see <strong className="text-red-700">traps</strong>. Warn your Navigator, since stepping on one sends you back to start!</p>
+                      <p>You also see <strong className="text-red-700">hazards</strong> (traps, spikes, rocks). Warn your Navigator about them!</p>
                     </div>
                   </div>
                 ) : (
@@ -405,7 +421,7 @@ export default function GameScreen() {
 
           {/* ─── DRIVER INTERACTIVE STEPS ─── */}
           {tutorialStep === 10 && (
-            <div className="absolute top-4 right-[2%] lg:right-[4%] max-w-[440px] animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="absolute top-4 right-[2%] lg:right-[4%] max-w-[540px] animate-in fade-in slide-in-from-top-4 duration-300">
               <TutorialCard
                 title={`MISSION 1/${driverTotal} (DRIVER)`}
                 titleColor="#2563eb"
@@ -415,7 +431,7 @@ export default function GameScreen() {
                 disabled={!chatDone}
               >
                 <p className="text-sm sm:text-base">
-                  Spot the <strong className="text-green-700">Goal Flag</strong> on the center map. Type its coordinate (<strong className="text-amber-800">{goalCoord}</strong>) in the <Badge color="bg-white text-blue-700 border-gray-300">Chat Box</Badge> on the left!
+                  Spot the <strong className="text-red-700">Goal Flag</strong> on the map (it is {goalArea}). Type its coordinate (<strong className="text-amber-800">{goalCoord}</strong>) in the <Badge color="bg-white text-blue-700 border-gray-300">Chat Box</Badge> on the left!
                 </p>
                 <p className="mt-1.5 text-xs text-[#8b6840]">
                   (Type the coordinate, e.g. <strong className="text-amber-900">"{goalCoord}"</strong> or <strong className="text-amber-900">"Goal at {goalCoord}"</strong>, then press Enter)
@@ -426,27 +442,27 @@ export default function GameScreen() {
 
           {/* Driver trap mission: only the Driver sees traps, so they must warn the Navigator */}
           {tutorialStep === 13 && (
-            <div className="absolute top-4 right-[2%] lg:right-[4%] max-w-[440px] animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="absolute top-4 right-[2%] lg:right-[4%] max-w-[540px] animate-in fade-in slide-in-from-top-4 duration-300">
               <TutorialCard
                 title={`MISSION 2/${driverTotal} (DRIVER)`}
                 titleColor="#dc2626"
                 titleBorder="#7f1d1d"
-                buttonText={trapDone ? "✓ TRAP REPORTED" : "SEND TRAP COORD IN CHAT..."}
+                buttonText={trapDone ? "✓ HAZARD REPORTED" : "SEND HAZARD COORD IN CHAT..."}
                 onNext={() => setTutorialStep(11)}
                 disabled={!trapDone}
               >
                 <p className="text-sm sm:text-base">
-                  Find a <Badge color="bg-red-100 text-red-800 border-red-800">TRAP</Badge> hole on the center map. Only <strong className="text-red-700">you</strong> can see traps. The Navigator cannot!
+                  Find a <Badge color="bg-red-100 text-red-800 border-red-800">HAZARD</Badge> on the map (a trap, spike or rock). Only <strong className="text-red-700">you</strong> can see them. The Navigator cannot!
                 </p>
                 <p className="mt-1.5 text-xs text-[#8b6840]">
-                  Stepping on a trap sends you <strong className="text-red-700">back to start</strong>. Send its coordinate (e.g. <strong className="text-amber-900">"Trap at C5"</strong>) in Chat so your Navigator can route around it.
+                  Hazards can hurt you or block your way. Send the coordinate of one (column letter + row number) in Chat so your Navigator can route around it.
                 </p>
               </TutorialCard>
             </div>
           )}
 
           {tutorialStep === 11 && (
-            <div className="absolute top-16 md:top-20 left-[24%] md:left-[28%] lg:left-[32%] xl:left-[34%] max-w-[420px] pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="absolute top-16 md:top-20 left-[24%] md:left-[28%] lg:left-[32%] xl:left-[34%] max-w-[520px] pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-300">
               <TutorialCard
                 title={`MISSION ${dragNum}/${driverTotal} (DRIVER)`}
                 titleColor="#d97706"
@@ -466,7 +482,7 @@ export default function GameScreen() {
           )}
 
           {tutorialStep === 12 && (
-            <div className="absolute top-16 md:top-20 left-[24%] md:left-[28%] lg:left-[32%] xl:left-[34%] max-w-[420px] pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="absolute top-16 md:top-20 left-[24%] md:left-[28%] lg:left-[32%] xl:left-[34%] max-w-[520px] pointer-events-auto animate-in fade-in slide-in-from-top-4 duration-300">
               <TutorialCard
                 title={`MISSION ${runNum}/${driverTotal} (DRIVER)`}
                 titleColor="#16a34a"
@@ -489,7 +505,7 @@ export default function GameScreen() {
 
           {/* ─── NAVIGATOR INTERACTIVE STEPS ─── */}
           {tutorialStep === 20 && (
-            <div className="absolute top-4 right-[2%] lg:right-[4%] max-w-[440px] animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="absolute top-4 right-[2%] lg:right-[4%] max-w-[540px] animate-in fade-in slide-in-from-top-4 duration-300">
               <TutorialCard
                 title="MISSION 1/2 (NAVIGATOR)"
                 titleColor="#0284c7"
@@ -502,14 +518,14 @@ export default function GameScreen() {
                   Your Driver is asking for directions in Chat! Inspect the map in the center and send safe path instructions in <Badge color="bg-white text-sky-700 border-sky-300">Chat Box</Badge> on the left.
                 </p>
                 <p className="mt-1.5 text-xs text-[#8b6840]">
-                  (Inspect the maze and send an open direction like <strong className="text-amber-800">"Go Right"</strong> or <strong className="text-amber-800">"Move Down"</strong>. {hasTraps ? "The Driver reported a trap in chat, so avoid that tile too!" : ""})
+                  (Inspect the maze and send an open direction like <strong className="text-amber-800">"Go Right"</strong> or <strong className="text-amber-800">"Move Down"</strong>. {hasTraps ? "The Driver reported a hazard in chat, so avoid that tile too!" : ""})
                 </p>
               </TutorialCard>
             </div>
           )}
 
           {tutorialStep === 22 && (
-            <div className="absolute top-4 right-[2%] lg:right-[4%] max-w-[440px] animate-in fade-in slide-in-from-top-4 duration-300">
+            <div className="absolute top-4 right-[2%] lg:right-[4%] max-w-[540px] animate-in fade-in slide-in-from-top-4 duration-300">
               <TutorialCard
                 title="MISSION 2/2 (NAVIGATOR)"
                 titleColor="#0284c7"
@@ -542,7 +558,7 @@ export default function GameScreen() {
       )}
 
       {/* ─── 3-COLUMN GAME LAYOUT: CHAT (LEFT) | MAP (CENTER) | TOOLBOX (RIGHT) ─── */}
-      <div className="w-full max-w-[1780px] mx-auto flex flex-col flex-1 p-2 md:p-3 lg:p-3.5 gap-2 md:gap-2.5 relative min-h-0 font-game-body">
+      <div className="w-full mx-auto flex flex-col flex-1 p-2 md:p-3 lg:p-3.5 gap-2 md:gap-2.5 relative min-h-0 font-game-body">
         {/* Top Header */}
         <div className={`shrink-0 transition-all duration-300 ${tutorialStep === 5 ? 'relative z-[105] ring-4 ring-white/60 shadow-[0_0_30px_rgba(255,255,255,0.4)] rounded-xl pointer-events-none bg-black/50' : ''}`}>
           <GameHeader
@@ -556,9 +572,9 @@ export default function GameScreen() {
         </div>
 
         {/* 3-Column Work Area */}
-        <div className="flex flex-col lg:flex-row flex-1 gap-2.5 md:gap-3 w-full items-stretch min-h-0">
-          {/* COLUMN 1 (LEFT): CHAT PANEL (~23% width) */}
-          <div className={`w-full lg:flex-[2.3] xl:flex-[2.1] min-w-0 flex flex-col min-h-0 transition-all duration-300 ${
+        <div className="flex flex-col md:flex-row flex-1 gap-2 md:gap-2.5 lg:gap-3 w-full items-stretch min-h-0">
+          {/* COLUMN 1 (LEFT): CHAT PANEL (~22% width) */}
+          <div className={`w-full max-md:min-h-[220px] md:h-full md:min-h-0 md:max-h-full md:flex-[2.2] xl:flex-[2.1] min-w-0 flex flex-col transition-all duration-300 ${
             (tutorialStep === 10 || tutorialStep === 13 || tutorialStep === 20)
               ? 'relative z-[105] ring-4 ring-purple-400/90 shadow-[0_0_30px_rgba(168,85,247,0.5)] rounded-2xl'
               : ''
@@ -573,7 +589,7 @@ export default function GameScreen() {
           </div>
 
           {/* COLUMN 2 (CENTER): MAP VIEW (~51% width) */}
-          <div className={`w-full lg:flex-[5.1] xl:flex-[5.3] min-w-0 flex flex-col min-h-0 transition-all duration-300 ${
+          <div className={`w-full max-md:h-[min(100vw,460px)] md:h-full md:min-h-0 md:max-h-full md:flex-[5.0] xl:flex-[5.2] min-w-0 flex flex-col transition-all duration-300 ${
             (tutorialStep === 2 || tutorialStep === 10 || tutorialStep === 13)
               ? 'relative z-[105] ring-4 ring-amber-400/90 shadow-[0_0_35px_rgba(251,191,36,0.5)] rounded-[20px]'
               : ''
@@ -591,8 +607,8 @@ export default function GameScreen() {
             />
           </div>
 
-          {/* COLUMN 3 (RIGHT): TOOLBOX & WORKSPACE (~26% width) */}
-          <div className={`w-full lg:flex-[2.6] xl:flex-[2.6] min-w-0 flex flex-col min-h-0 transition-all duration-300 ${
+          {/* COLUMN 3 (RIGHT): TOOLBOX & WORKSPACE (~27% width) */}
+          <div className={`w-full max-md:h-[360px] md:h-full md:min-h-0 md:max-h-full md:flex-[2.8] xl:flex-[2.7] min-w-0 flex flex-col transition-all duration-300 ${
             (tutorialStep === 11 || tutorialStep === 12 || tutorialStep === 22)
               ? 'relative z-[105] ring-3 ring-yellow-400/90 shadow-[0_0_30px_rgba(250,204,21,0.5)] rounded-2xl'
               : ''
@@ -621,7 +637,7 @@ export default function GameScreen() {
             <div className="relative inline-block max-w-[90vw]">
               <img src="/ui/win_bg.png" alt="Victory Background" className="w-[800px] max-w-full h-auto drop-shadow-[0_0_35px_rgba(217,119,6,0.6)]" />
               <div className="absolute inset-0 flex flex-col items-center">
-                <h2 className="absolute top-[9%] text-3xl sm:text-4xl md:text-5xl font-game-sub font-bold text-white tracking-widest uppercase" style={{ textShadow: "-3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 6px 0px rgba(0,0,0,0.8)" }}>
+                <h2 className="absolute top-[9%] text-2xl sm:text-3xl md:text-4xl font-bungee font-bold text-white tracking-wide uppercase" style={{ textShadow: "-3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 6px 0px rgba(0,0,0,0.8)" }}>
                   VICTORY ACHIEVED!
                 </h2>
                 <div className="absolute top-[32%] flex flex-col items-center justify-center w-full">
@@ -663,11 +679,11 @@ export default function GameScreen() {
           <div className="relative inline-block max-w-[90vw] grayscale-[0.2]">
             <img src="/ui/win_bg.png" alt="Defeat Background" className="w-[800px] max-w-full h-auto drop-shadow-[0_0_35px_rgba(220,38,38,0.6)]" />
             <div className="absolute inset-0 flex flex-col items-center">
-              <h2 className="absolute top-[9%] text-3xl sm:text-4xl md:text-5xl font-game-sub font-bold text-red-500 tracking-widest uppercase" style={{ textShadow: "-3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 6px 0px rgba(0,0,0,0.8)" }}>
+              <h2 className="absolute top-[9%] text-2xl sm:text-3xl md:text-4xl font-bungee font-bold text-red-500 tracking-wide uppercase" style={{ textShadow: "-3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 6px 0px rgba(0,0,0,0.8)" }}>
                 DEFEAT
               </h2>
               <div className="absolute top-[40%] flex flex-col items-center justify-center w-full px-12">
-                <p className="text-xl sm:text-2xl md:text-3xl font-game-sub font-bold text-white text-center leading-relaxed uppercase tracking-wider" style={{ textShadow: "-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000" }}>
+                <p className="text-lg sm:text-xl md:text-2xl font-bungee font-bold text-white text-center leading-relaxed uppercase tracking-wide" style={{ textShadow: "-2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000" }}>
                   {loseReason === "time" ? "TIME EXPIRED!" : "OUT OF BLOCKS!"}
                 </p>
                 <p className="text-sm sm:text-base md:text-lg font-game-body text-gray-300 mt-2 text-center" style={{ textShadow: "-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000" }}>
@@ -760,7 +776,7 @@ export default function GameScreen() {
               </span>
 
               <h2
-                className="text-2xl sm:text-3xl md:text-4xl font-game-sub font-bold text-[#5c2e18] tracking-wider uppercase whitespace-nowrap"
+                className="text-2xl sm:text-3xl md:text-4xl font-bungee font-bold text-[#5c2e18] tracking-wide uppercase whitespace-nowrap"
                 style={{ textShadow: "1px 1px 0 rgba(255,255,255,0.5)" }}
               >
                 ROLE SWAP!
@@ -776,7 +792,7 @@ export default function GameScreen() {
                 }`}
               >
                 <p
-                  className="text-xl sm:text-2xl md:text-3xl font-game-sub font-bold tracking-wider uppercase whitespace-nowrap"
+                  className="text-lg sm:text-xl md:text-2xl font-bungee font-bold tracking-wide uppercase whitespace-nowrap"
                   style={{ textShadow: "2px 2px 0 rgba(0,0,0,0.45)" }}
                 >
                   {role === "driver" ? "YOU ARE NOW DRIVER" : "YOU ARE NOW NAVIGATOR"}
