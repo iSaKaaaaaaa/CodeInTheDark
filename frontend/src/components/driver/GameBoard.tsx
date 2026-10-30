@@ -81,7 +81,7 @@ export default function GameBoard({
               width: "min(100cqw, 100cqh)",
               height: "min(100cqw, 100cqh)",
               aspectRatio: "1 / 1",
-              "--coord-gutter": "clamp(26px, 7.2cqmin, 50px)",
+              "--coord-gutter": "clamp(30px, 8.3cqmin, 57px)",
               paddingTop: "var(--coord-gutter)", // เผื่อที่ให้ Header พิกัด A-M ตามสัดส่วนกระดานจริง
               paddingLeft: "var(--coord-gutter)", // เผื่อที่ให้ Sidebar พิกัด 1-13 ตามสัดส่วนกระดานจริง
             } as CSSProperties
@@ -99,7 +99,7 @@ export default function GameBoard({
                   : "bg-[#d2a356] text-[#2a1306]"
               }`}
               style={{
-                fontSize: "clamp(10px, 2.7cqmin, 19px)",
+                fontSize: "clamp(11.5px, 3.1cqmin, 22px)",
                 textShadow: "1px 1px 0 rgba(255,255,255,0.6)",
               }}
               title={hoveredCoord ? "Cursor Coordinate" : "Your Position"}
@@ -117,7 +117,7 @@ export default function GameBoard({
           >
             <div
               className="w-[86.666%] bg-[#d2a356] border-2 md:border-[3px] border-[#572e18] text-[#2a1306] rounded-lg flex justify-around items-center shadow-lg z-10 px-0.5"
-              style={{ height: "clamp(20px, 5.8cqmin, 42px)" }}
+              style={{ height: "clamp(23px, 6.7cqmin, 48px)" }}
             >
               {COL_LABELS.map((lbl, idx) => {
                 const isColActive = hoveredCoord?.x === idx;
@@ -133,7 +133,7 @@ export default function GameBoard({
                           : ""
                     }`}
                     style={{
-                      fontSize: "clamp(10px, 3.5cqmin, 24px)",
+                      fontSize: "clamp(11.5px, 4cqmin, 27.6px)",
                       textShadow: "1px 1px 0 rgba(255,255,255,0.6)",
                     }}
                   >
@@ -151,7 +151,7 @@ export default function GameBoard({
           >
             <div
               className="h-[86.666%] bg-[#d2a356] border-2 md:border-[3px] border-[#572e18] text-[#2a1306] rounded-lg flex flex-col justify-around items-center shadow-lg z-10 py-0.5"
-              style={{ width: "clamp(20px, 5.8cqmin, 42px)" }}
+              style={{ width: "clamp(23px, 6.7cqmin, 48px)" }}
             >
               {ROW_LABELS.map((lbl, idx) => {
                 const isRowActive = hoveredCoord?.y === idx;
@@ -167,7 +167,7 @@ export default function GameBoard({
                           : ""
                     }`}
                     style={{
-                      fontSize: "clamp(10px, 3.5cqmin, 24px)",
+                      fontSize: "clamp(11.5px, 4cqmin, 27.6px)",
                       textShadow: "1px 1px 0 rgba(255,255,255,0.6)",
                     }}
                   >
@@ -315,13 +315,13 @@ export default function GameBoard({
       {/* Prominent Coordinates Status Bar */}
       <div
         style={{
-          padding: "clamp(5px, 0.7vh, 8px) clamp(10px, 1.2vw, 18px)",
+          padding: "clamp(6px, 0.8vh, 9.5px) clamp(11px, 1.4vw, 21px)",
         }}
-        className="mt-1.5 w-full max-w-[640px] flex items-center justify-between gap-2 bg-[#2a1306]/95 border-2 border-[#b8944f] rounded-xl shadow-xl backdrop-blur-md font-pixel shrink-0"
+        className="mt-1.5 w-full max-w-[736px] flex items-center justify-between gap-2 bg-[#2a1306]/95 border-2 border-[#b8944f] rounded-xl shadow-xl backdrop-blur-md font-pixel shrink-0"
       >
         <div className="flex items-center gap-1.5 sm:gap-2">
           <span
-            style={{ fontSize: "clamp(10px, min(0.95vw, 1.6vh), 15px)" }}
+            style={{ fontSize: "clamp(11.5px, min(1.09vw, 1.84vh), 17.3px)" }}
             className="text-[#d5bba2] font-game-sub uppercase tracking-wider font-semibold"
           >
             POS:
@@ -329,7 +329,7 @@ export default function GameBoard({
           <span
             className="text-emerald-400 font-bold tracking-wider font-pixel bg-black/60 px-2 py-0.5 rounded-lg border border-emerald-500/50 shadow-inner leading-none"
             style={{
-              fontSize: "clamp(14px, min(1.55vw, 2.6vh), 24px)",
+              fontSize: "clamp(16px, min(1.78vw, 3vh), 27.6px)",
               textShadow: "1px 1px 0 #000",
             }}
           >
@@ -339,14 +339,14 @@ export default function GameBoard({
 
         <div className="flex items-center gap-1.5 sm:gap-2">
           <span
-            style={{ fontSize: "clamp(10px, min(0.95vw, 1.6vh), 15px)" }}
+            style={{ fontSize: "clamp(11.5px, min(1.09vw, 1.84vh), 17.3px)" }}
             className="text-[#d5bba2] font-game-sub uppercase tracking-wider font-semibold"
           >
             GOAL:
           </span>
           {role === "navigator" ? (
             <span
-              style={{ fontSize: "clamp(10px, min(0.9vw, 1.5vh), 14px)" }}
+              style={{ fontSize: "clamp(11.5px, min(1.04vw, 1.73vh), 16px)" }}
               className="text-sky-300 font-game-sub font-medium bg-black/60 px-2 py-0.5 rounded-lg border border-sky-500/40 uppercase tracking-wide whitespace-nowrap"
             >
               Awaiting Driver
@@ -355,7 +355,7 @@ export default function GameBoard({
             <span
               className="text-amber-300 font-bold tracking-wider font-pixel bg-black/60 px-2 py-0.5 rounded-lg border border-amber-500/50 shadow-inner leading-none"
               style={{
-                fontSize: "clamp(14px, min(1.55vw, 2.6vh), 24px)",
+                fontSize: "clamp(16px, min(1.78vw, 3vh), 27.6px)",
                 textShadow: "1px 1px 0 #000",
               }}
             >
@@ -366,15 +366,15 @@ export default function GameBoard({
 
         <div className="flex items-center gap-1.5 sm:gap-2">
           <span
-            style={{ fontSize: "clamp(10px, min(0.95vw, 1.6vh), 15px)" }}
+            style={{ fontSize: "clamp(11.5px, min(1.09vw, 1.84vh), 17.3px)" }}
             className="text-[#d5bba2] font-game-sub uppercase tracking-wider font-semibold"
           >
             CURSOR:
           </span>
           <span
-            className="text-sky-300 font-bold tracking-wider font-pixel bg-black/60 px-2 py-0.5 rounded-lg border border-sky-500/50 min-w-[2.4rem] text-center shadow-inner leading-none"
+            className="text-sky-300 font-bold tracking-wider font-pixel bg-black/60 px-2 py-0.5 rounded-lg border border-sky-500/50 min-w-[2.76rem] text-center shadow-inner leading-none"
             style={{
-              fontSize: "clamp(14px, min(1.55vw, 2.6vh), 24px)",
+              fontSize: "clamp(16px, min(1.78vw, 3vh), 27.6px)",
               textShadow: "1px 1px 0 #000",
             }}
           >
