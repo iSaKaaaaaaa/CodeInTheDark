@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import * as Blockly from "blockly";
 import { Socket } from "socket.io-client";
+import { SWAP_TIME } from "../constants/game";
 
 interface UseGameSyncOptions {
   socket: Socket | null;
@@ -126,9 +127,10 @@ export function useGameSync({
   // Handle Role Swap Receiver
   useEffect(() => {
     if (!socket) return;
-    const onRoleSwap = (data: { newRole: "driver" | "navigator" }) => {
+    const onRoleSwap = (data: { newRole: "driver" | "navigator"; swapTimeLeft?: number }) => {
       // Immediately switch role so the swap alert banner displays the player's true new role
       setRole(data.newRole);
+      setSwapTimeLeft(data.swapTimeLeft ?? SWAP_TIME);
       setShowSwapAlert(true);
       setExecutionError(null);
       if (workspaceRef.current) {
@@ -143,5 +145,5 @@ export function useGameSync({
     return () => {
       socket.off("role_swap", onRoleSwap);
     };
-  }, [socket, setRole, setShowSwapAlert, workspaceRef, availableQuotaRef, setBlocksLeft, setExecutionError]);
+  }, [socket, setRole, setSwapTimeLeft, setShowSwapAlert, workspaceRef, availableQuotaRef, setBlocksLeft, setExecutionError]);
 }

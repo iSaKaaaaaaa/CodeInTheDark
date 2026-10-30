@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Socket } from "socket.io-client";
-import { DUNGEON_TIME, MAX_BLOCKS } from "../constants/game";
+import { DUNGEON_TIME, MAX_BLOCKS, SWAP_TIME } from "../constants/game";
 
 interface UseGameTimerOptions {
   socket: Socket | null;
@@ -37,7 +37,10 @@ export function useGameTimer({
   setDungeonTimeLeft,
   setSwapTimeLeft,
 }: UseGameTimerOptions) {
+  const isSwappingRef = useRef(false);
+
   useEffect(() => {
+    isSwappingRef.current = false;
     if (role !== "driver") return;
     const timer = setInterval(() => {
       // หยุดเวลาไว้ตลอดช่วงฝึกสอน (Tutorial ทุกขั้นตอน รวมถึงโหมดทดลอง 10, 11, 12, 20, 22 และการ์ดเตือน 5)
@@ -76,8 +79,11 @@ export function useGameTimer({
 
         let next = prev - 1;
         if (next <= 0) {
-          const myNewRole: "driver" | "navigator" = role === "driver" ? "navigator" : "driver";
-          const partnerNewRole: "driver" | "navigator" = role === "driver" ? "driver" : "navigator";
+          if (isSwappingRef.current) return prev;
+          isSwappingRef.current = true;
+
+          const myNewRole: "driver" | "navigator" = "navigator";
+          const partnerNewRole: "driver" | "navigator" = "driver";
 
           // Immediately switch role so the swap alert banner displays the player's true new role
           setRole(myNewRole);
@@ -90,16 +96,16 @@ export function useGameTimer({
 
           if (socket) {
             socket.emit("sync_game_state", { showSwapAlert: true });
-            socket.emit("trigger_role_swap", { newRole: partnerNewRole });
+            socket.emit("trigger_role_swap", { newRole: partnerNewRole, swapTimeLeft: SWAP_TIME });
           }
 
           setTimeout(() => {
             setShowSwapAlert(false);
             if (socket)
-              socket.emit("sync_game_state", { showSwapAlert: false, roleSwapped: true });
+              socket.emit("sync_game_state", { showSwapAlert: false });
           }, 3000);
 
-          next = 120;
+          next = SWAP_TIME;
         }
         if (socket) socket.emit("sync_game_state", { swapTimeLeft: next });
         return next;
