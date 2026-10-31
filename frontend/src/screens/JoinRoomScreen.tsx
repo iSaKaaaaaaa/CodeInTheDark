@@ -8,6 +8,11 @@ interface PublicRoom {
   players: number;
 }
 
+/**
+ * หน้าจอเข้าร่วมห้องเล่น (Join Room Screen):
+ * - แท็บที่ 1: ROOM CODE สำหรับพิมพ์รหัสตัวเลข 6 หลักเพื่อเข้าห้องแบบเจาะจง
+ * - แท็บที่ 2: PUBLIC ROOMS ดึงรายการห้องสาธารณะที่กำลังรอผู้เล่นคนที่ 2 พร้อมระบบรีเฟรชอัตโนมัติทุก 5 วินาที
+ */
 export default function JoinRoomScreen() {
   const { setScreen, joinRoom, joinError } = useSocketStore();
   const [inputCode, setInputCode] = useState('');
@@ -16,7 +21,7 @@ export default function JoinRoomScreen() {
   const [loadingRooms, setLoadingRooms] = useState(false);
   const [roomsError, setRoomsError] = useState(false);
 
-  // Ask the server which rooms are public and still waiting for a 2nd player
+  // ดึงข้อมูลรายการห้องสาธารณะที่ยังว่างจาก REST API /api/rooms/public
   const loadPublicRooms = useCallback(async () => {
     setLoadingRooms(true);
     setRoomsError(false);
@@ -31,7 +36,7 @@ export default function JoinRoomScreen() {
     }
   }, []);
 
-  // Load when the tab opens, then auto-refresh every 5s while it stays open
+  // ดึงข้อมูลเมื่อเปิดแท็บ public และตั้งเวลาดึงซ้ำทุก 5 วินาที
   useEffect(() => {
     if (tab !== 'public') return;
     loadPublicRooms();
@@ -39,6 +44,7 @@ export default function JoinRoomScreen() {
     return () => clearInterval(id);
   }, [tab, loadPublicRooms]);
 
+  // จัดการเมื่อกดเข้าร่วมห้องด้วยรหัส 6 หลัก
   const handleJoinPrivate = () => {
     if (inputCode.trim().length === 6) {
       joinRoom(inputCode.trim());
@@ -56,13 +62,13 @@ export default function JoinRoomScreen() {
       className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center font-pixel cursor-default p-3 sm:p-4"
       style={{ backgroundImage: "url('/ui/land-waitroom.png')" }}
     >
-      {/* Overlays */}
+      {/* ฟิลเตอร์แสงและเงาของฉากหลัง */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#7c2d12]/30 via-transparent to-[#450a0a]/50 pointer-events-none" />
       <div className="absolute inset-0 bg-black/15 pointer-events-none" />
 
       <TopRightMenu />
 
-      {/* Title */}
+      {/* หัวข้อหน้าจอ */}
       <h2
         className="text-[#fde68a] text-4xl sm:text-5xl md:text-6xl mb-3 sm:mb-4 uppercase text-center relative z-10 font-bold tracking-widest font-pixel"
         style={{ textShadow: "4px 4px 0px #2a1b12, -2px -2px 0px #2a1b12, 2px -2px 0px #2a1b12, -2px 2px 0px #2a1b12, 0 6px 10px rgba(0,0,0,0.8)" }}
@@ -70,7 +76,7 @@ export default function JoinRoomScreen() {
         JOIN ROOM
       </h2>
 
-      {/* Main Panel (+30% larger than 460px -> 560px) */}
+      {/* แผงควบคุมม้วนกระดาษโบราณ */}
       <div className="relative w-[min(94vw,660px)] mx-auto z-10">
         {/* Outer glow */}
         <div className="absolute -inset-3.5 bg-[#f59e0b]/15 rounded-3xl blur-2xl pointer-events-none" />

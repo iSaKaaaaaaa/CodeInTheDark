@@ -15,7 +15,7 @@ import GameBoard from "../components/driver/GameBoard";
 import ChatBox from "../components/driver/ChatBox";
 import BlockCodePanel from "../components/driver/BlockCodePanel";
 
-/* ─── Reusable parchment tutorial card ─── */
+// คอมโพเนนต์การ์ดคำแนะนำม้วนกระดาษโบราณสำหรับโหมดฝึกสอน (Tutorial Card)
 function TutorialCard({
   title,
   titleColor = '#ea580c',
@@ -37,7 +37,7 @@ function TutorialCard({
 }) {
   return (
     <div className={`pointer-events-auto max-w-[600px] w-[92vw] mx-auto shadow-[0_20px_50px_rgba(0,0,0,0.85)] rounded-xl ${className} font-game-body`}>
-      {/* Wooden frame top */}
+      {/* กรอบไม้ด้านบน */}
       <div className="mx-2 h-4 sm:h-5 rounded-t-md relative" style={{
         background: 'linear-gradient(180deg, #8B5E3C 0%, #6B3F1F 40%, #5C2E18 100%)',
         borderTop: '2px solid #A97B50', borderLeft: '2px solid #7A4E2D', borderRight: '2px solid #4A2510',
@@ -46,7 +46,7 @@ function TutorialCard({
         <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(0,0,0,0.15) 8px, rgba(0,0,0,0.15) 9px)' }} />
         {[0, 1].map(i => <div key={i} className={`absolute top-1/2 -translate-y-1/2 ${i === 0 ? 'left-2.5' : 'right-2.5'} w-2 h-2 rounded-full bg-[#C4A265] border border-[#8B6F3A]`} />)}
       </div>
-      {/* Parchment body */}
+      {/* ผิวกระดาษ (Parchment body) */}
       <div className="mx-0.5 px-5 sm:px-7 py-4 sm:py-6 relative" style={{
         background: 'linear-gradient(170deg, #F5E6C8 0%, #EDD9A3 30%, #E8D08E 60%, #DBBF78 100%)',
         borderLeft: '3px solid #B8944F', borderRight: '3px solid #9A7A3D',
@@ -54,21 +54,21 @@ function TutorialCard({
       }}>
         <div className="absolute inset-0 pointer-events-none" style={{ boxShadow: 'inset 0 0 40px rgba(101,67,33,0.12)' }} />
         <div className="relative z-10 flex flex-col items-center gap-2.5 sm:gap-3.5">
-          {/* Title badge */}
+          {/* ป้ายหัวข้อ */}
           <span className="inline-block font-bold text-white text-sm sm:text-base md:text-lg px-4 py-1.5 rounded-xl border-2 uppercase tracking-wide font-bungee text-center" style={{
             background: titleColor, borderColor: titleBorder,
             boxShadow: `0 3px 0 ${titleBorder}`, textShadow: '1.5px 1px 0 #000',
           }}>
             {title}
           </span>
-          {/* Content */}
+          {/* เนื้อหาข้อความ */}
           <div
             className="text-xs sm:text-sm md:text-base font-semibold text-[#382503] leading-relaxed text-center w-full font-game-body tracking-normal"
             style={{ textShadow: "0.5px 0.5px 0px rgba(255,255,255,0.6)" }}
           >
             {children}
           </div>
-          {/* Button */}
+          {/* ปุ่มดำเนินการ */}
           <button
             onClick={onNext}
             disabled={disabled}
@@ -83,7 +83,7 @@ function TutorialCard({
           </button>
         </div>
       </div>
-      {/* Wooden frame bottom */}
+      {/* กรอบไม้ด้านล่าง */}
       <div className="mx-2 h-4 sm:h-5 rounded-b-md relative" style={{
         background: 'linear-gradient(0deg, #8B5E3C 0%, #6B3F1F 40%, #5C2E18 100%)',
         borderBottom: '2px solid #4A2510', borderLeft: '2px solid #7A4E2D', borderRight: '2px solid #4A2510',
@@ -96,17 +96,25 @@ function TutorialCard({
   );
 }
 
-/* ─── Inline badge helper ─── */
+// ป้ายกำกับข้อความขนาดเล็ก (Badge Helper)
 function Badge({ children, color = 'bg-blue-100 text-blue-800 border-blue-800' }: { children: React.ReactNode; color?: string }) {
   return <span className={`inline-block ${color} border-2 px-2 py-0.5 rounded-md font-bold shadow-sm text-xs sm:text-sm uppercase tracking-wide font-game-sub`}>{children}</span>;
 }
 
+// แปลงวินาทีเป็นรูปแบบ mm:ss
 const formatTime = (seconds: number) => {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return `${m}:${s.toString().padStart(2, "0")}`;
 };
 
+/**
+ * หน้าจอการเล่นเกมหลัก (GameScreen):
+ * - จัดเลย์เอาต์ 3 คอลัมน์แบบ Responsive: กล่องแชต (ซ้าย) | กระดานเขาวงกต (กลาง) | พื้นที่บล็อกคำสั่ง (ขวา)
+ * - รองรับระบบ Asymmetric Co-op ระหว่าง Driver และ Navigator พร้อม Fog of War
+ * - ระบบ Role Swap ทุก 120 วินาที และเวลารวมดันเจี้ยน 300 วินาที
+ * - หน้าจอผลลัพธ์ Victory / Defeat พร้อมการคำนวณดาวรางวัลและมอบเหรียญ
+ */
 export default function GameScreen() {
   const { username, socket, role, setRole, mapData: serverMapData, startGame, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft, players, leaveStage } = useSocketStore();
   const isHost = players.length > 0 ? players[0].username === username : role === 'driver';
@@ -347,7 +355,7 @@ export default function GameScreen() {
                 {role === "driver" ? (
                   <>
                     <p className="text-base sm:text-lg">You are the <Badge color="bg-blue-100 text-blue-800 border-blue-800">DRIVER</Badge></p>
-                    <p className="mt-2 text-xs sm:text-sm">You control <strong className="text-orange-700">Code Movement Blocks</strong>, see hazards and the goal flag. But... <strong className="text-red-600">you cannot see stone walls!</strong></p>
+                    <p className="mt-2 text-xs sm:text-sm">You control <strong className="text-orange-700">Code Movement Blocks</strong>, see traps and the goal flag. But... <strong className="text-red-600">you cannot see stone walls!</strong></p>
                     <p className="mt-2 text-xs sm:text-sm text-[#78350f] bg-[#f5e6c8] p-2 rounded-lg border-2 border-[#b8944f]/40">
                       Your teammate (Navigator) sees all walls and must guide you via Chat.
                     </p>
@@ -355,7 +363,7 @@ export default function GameScreen() {
                 ) : (
                   <>
                     <p className="text-base sm:text-lg">You are the <Badge color="bg-sky-100 text-sky-800 border-sky-600">NAVIGATOR</Badge></p>
-                    <p className="mt-2 text-xs sm:text-sm">You see <strong className="text-sky-700">All Stone Walls</strong>, but... <strong className="text-red-600">you cannot see hazards or the goal flag!</strong></p>
+                    <p className="mt-2 text-xs sm:text-sm">You see <strong className="text-sky-700">All Stone Walls</strong>, but... <strong className="text-red-600">you cannot see traps or the goal flag!</strong></p>
                     <p className="mt-2 text-xs sm:text-sm text-[#78350f] bg-[#f5e6c8] p-2 rounded-lg border-2 border-[#b8944f]/40">
                       Your mission is to read the maze layout and guide the Driver via Chat.
                     </p>
@@ -377,7 +385,7 @@ export default function GameScreen() {
                       <p className="text-red-700 font-bold font-game-sub">CRITICAL RULE:</p>
                       <p>Only the <strong className="text-red-700">DRIVER sees the Goal Flag</strong> (Navigator cannot see it!).</p>
                       <p>Check the grid coordinate (e.g. <span className="text-amber-800 font-bold">{goalCoord}</span>) and always tell your Navigator in Chat!</p>
-                      <p>You also see <strong className="text-red-700">hazards</strong> (traps, spikes, rocks). Warn your Navigator about them!</p>
+                      <p>You also see <strong className="text-red-700">traps</strong> (traps, spikes, rocks). Warn your Navigator about them!</p>
                     </div>
                   </div>
                 ) : (
@@ -447,15 +455,15 @@ export default function GameScreen() {
                 title={`MISSION 2/${driverTotal} (DRIVER)`}
                 titleColor="#dc2626"
                 titleBorder="#7f1d1d"
-                buttonText={trapDone ? "✓ HAZARD REPORTED" : "SEND HAZARD COORD IN CHAT..."}
+                buttonText={trapDone ? "✓ TRAP REPORTED" : "SEND TRAP COORD IN CHAT..."}
                 onNext={() => setTutorialStep(11)}
                 disabled={!trapDone}
               >
                 <p className="text-sm sm:text-base">
-                  Find a <Badge color="bg-red-100 text-red-800 border-red-800">HAZARD</Badge> on the map (a trap, spike or rock). Only <strong className="text-red-700">you</strong> can see them. The Navigator cannot!
+                  Find a <Badge color="bg-red-100 text-red-800 border-red-800">TRAP</Badge> on the map (a trap, spike or rock). Only <strong className="text-red-700">you</strong> can see them. The Navigator cannot!
                 </p>
                 <p className="mt-1.5 text-xs text-[#8b6840]">
-                  Hazards can hurt you or block your way. Send the coordinate of one (column letter + row number) in Chat so your Navigator can route around it.
+                  Traps can hurt you or block your way. Send the coordinate of one (column letter + row number) in Chat so your Navigator can route around it.
                 </p>
               </TutorialCard>
             </div>
@@ -518,7 +526,7 @@ export default function GameScreen() {
                   Your Driver is asking for directions in Chat! Inspect the map in the center and send safe path instructions in <Badge color="bg-white text-sky-700 border-sky-300">Chat Box</Badge> on the left.
                 </p>
                 <p className="mt-1.5 text-xs text-[#8b6840]">
-                  (Inspect the maze and send an open direction like <strong className="text-amber-800">"Go Right"</strong> or <strong className="text-amber-800">"Move Down"</strong>. {hasTraps ? "The Driver reported a hazard in chat, so avoid that tile too!" : ""})
+                  (Inspect the maze and send an open direction like <strong className="text-amber-800">"Go Right"</strong> or <strong className="text-amber-800">"Move Down"</strong>. {hasTraps ? "The Driver reported a trap in chat, so avoid that tile too!" : ""})
                 </p>
               </TutorialCard>
             </div>

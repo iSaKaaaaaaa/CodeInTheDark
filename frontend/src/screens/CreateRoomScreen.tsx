@@ -2,6 +2,13 @@ import { useEffect, useState } from "react";
 import { useSocketStore } from "../store/useSocketStore";
 import TopRightMenu from "../components/TopRightMenu";
 
+/**
+ * หน้าจอห้องรอเริ่มเกม (Lobby / Create Room Screen):
+ * - แสดงรหัสห้อง 6 หลัก พร้อมปุ่มคัดลอกลงคลิปบอร์ด
+ * - สวิตช์สลับสถานะห้องเป็นแบบ PRIVATE หรือ PUBLIC (เฉพาะ Host)
+ * - แสดงรายชื่อผู้เล่นในห้อง (Player 1 Host และ Player 2 Guest)
+ * - ปุ่ม Start Game เมื่อผู้เล่นครบ 2 คน (เฉพาะ Host ที่มีสิทธิ์สั่งเริ่ม)
+ */
 export default function CreateRoomScreen() {
   const { username, roomCode, role, players, leaveRoom, createRoom, startGame, isPublic, setRoomVisibility } = useSocketStore();
   const isHost = players.length > 0 ? players[0].username === username : role === 'driver';
@@ -13,6 +20,7 @@ export default function CreateRoomScreen() {
     }
   }, [roomCode, role, createRoom]);
 
+  // คัดลอกรหัสห้องลงคลิปบอร์ด
   const handleCopyCode = () => {
     if (roomCode) {
       navigator.clipboard.writeText(roomCode);
@@ -28,13 +36,13 @@ export default function CreateRoomScreen() {
       className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat flex flex-col items-center justify-center font-pixel cursor-default p-3 sm:p-4"
       style={{ backgroundImage: "url('/ui/land-waitroom.png')" }}
     >
-      {/* Overlays */}
+      {/* ฟิลเตอร์แสงและเงาของฉากหลัง */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#7c2d12]/30 via-transparent to-[#450a0a]/50 pointer-events-none" />
       <div className="absolute inset-0 bg-black/15 pointer-events-none" />
 
       <TopRightMenu />
 
-      {/* Title */}
+      {/* หัวข้อห้องรอ */}
       <h2
         className="text-[#fde68a] text-4xl sm:text-5xl md:text-6xl mb-2.5 sm:mb-3.5 uppercase text-center relative z-10 font-bold tracking-widest font-pixel"
         style={{ textShadow: "4px 4px 0px #2a1b12, -2px -2px 0px #2a1b12, 2px -2px 0px #2a1b12, -2px 2px 0px #2a1b12, 0 6px 10px rgba(0,0,0,0.8)" }}
@@ -42,7 +50,7 @@ export default function CreateRoomScreen() {
         LOBBY
       </h2>
 
-      {/* Main Panel (+30% larger than 470px -> 580px) */}
+      {/* แผงควบคุมห้องม้วนกระดาษโบราณ */}
       <div className="relative w-[min(94vw,680px)] mx-auto z-10">
         {/* Outer glow */}
         <div className="absolute -inset-3.5 bg-[#f59e0b]/15 rounded-3xl blur-2xl pointer-events-none" />

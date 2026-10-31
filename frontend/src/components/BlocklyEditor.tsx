@@ -1,15 +1,15 @@
 import { useEffect, useRef } from "react";
 import * as Blockly from "blockly";
 import { registerBlocks } from "../blockly/blocks";
+import { registerGenerators } from "../blockly/generator";
 import { toolbox } from "../blockly/toolbox";
 
-// กำหนดธีมสไตล์อียิปต์โบราณ/พิกเซล ให้โปร่งใส
+// กำหนดธีมสไตล์อียิปต์โบราณ ปรับแต่งสีพื้นหลังและองค์ประกอบให้โปร่งใสเข้ากับดีไซน์เกม
 const egyptianTheme = Blockly.Theme.defineTheme("egyptian", {
   name: "egyptian",
   base: Blockly.Themes.Classic,
   blockStyles: {},
   categoryStyles: {},
-  // Size in pt; keep in sync with the 15pt override in index.css so Blockly measures text the way it is drawn
   fontStyle: {
     family: '"VT323", "Prompt", "Chakra Petch", sans-serif',
     weight: "600",
@@ -19,9 +19,9 @@ const egyptianTheme = Blockly.Theme.defineTheme("egyptian", {
     workspaceBackgroundColour: "transparent",
     toolboxBackgroundColour: "transparent",
     flyoutBackgroundColour: "transparent",
-    scrollbarColour: "#78350f", // bg-amber-900
+    scrollbarColour: "#78350f",
     scrollbarOpacity: 0.4,
-    insertionMarkerColour: "#f97316", // orange-500
+    insertionMarkerColour: "#f97316",
   },
 });
 
@@ -46,11 +46,13 @@ export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChan
 
   useEffect(() => {
     registerBlocks();
+    registerGenerators();
 
     if (!blocklyDiv.current) return;
 
     const container = blocklyDiv.current;
-    // Scale blocks smoothly from BOTH panel width and panel height (~15% larger & longer blocks while staying responsive)
+
+    // คำนวณสเกลของบล็อกให้พอดีกับขนาดหน้าจอทั้งแนวกว้างและแนวสูง
     const calcScale = () => {
       const w = container.clientWidth;
       const h = container.clientHeight;
@@ -58,6 +60,7 @@ export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChan
       return Math.min(1.42, Math.max(0.44, Math.min(w / 345, h / 430)));
     };
 
+    // ฝัง Google Blockly ลงในคอนเทนเนอร์พร้อมกำหนดค่าปรับแต่ง UI
     const workspace = Blockly.inject(container, {
       toolbox: toolbox,
       theme: egyptianTheme,
@@ -75,7 +78,7 @@ export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChan
         colour: "transparent",
         snap: true,
       },
-      trashcan: !readOnly, // ซ่อนถังขยะถ้า readOnly
+      trashcan: !readOnly, // แสดงถังขยะเฉพาะ Driver (ซ่อนสำหรับ Navigator)
       scrollbars: false,
       move: {
         scrollbars: false,
@@ -89,9 +92,9 @@ export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChan
       },
     });
 
-    // Deterministic SVG positioning & scaling for Blockly's 47x60 trashcan so it never drifts on lid open or resize
+    // กำหนดขนาดและตำแหน่งของ SVG ถังขยะให้อยู่เหนือปุ่ม Run Program เสมอ
     const TRASH_W = 47;
-    const TRASH_H = 60; // 16 lid + 44 body
+    const TRASH_H = 60;
     let trashBox = { left: 0, top: 0, scale: 0.85 };
 
     const positionTrashcan = (knownFlyoutW?: number) => {
@@ -117,7 +120,6 @@ export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChan
       const scaledW = TRASH_W * tScale;
       const scaledH = TRASH_H * tScale;
 
-      // Mirror BlockCodePanel's RUN PROGRAM button bottom/right offset & height so trashcan locks cleanly above it
       const runOffset = Math.round(Math.min(14, Math.max(6, 10 * s)));
       const runFont = Math.round(Math.min(18, Math.max(10, Math.min(wsW * 0.068, 15.5 * s))));
       const runBtnH = Math.round(runFont * 2.3 + 7);
@@ -153,6 +155,7 @@ export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChan
       };
     }
 
+    // ปรับสเกลของ Workspace และ Flyout เมื่อขนาดหน้าจอเปลี่ยน
     const applyScale = () => {
       const w = container.clientWidth;
       const h = container.clientHeight;
@@ -185,7 +188,7 @@ export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChan
         }
       }
 
-      // Keep main workspace origin locked at (flyoutWidth, 0) right on the divider line
+      // ล็อกจุดเริ่มต้นของ Workspace ให้อยู่ถัดจากแถบ Flyout เสมอ
       workspace.scrollX = 0;
       workspace.scrollY = 0;
       workspace.translate(flyoutWidth, 0);
@@ -204,6 +207,7 @@ export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChan
 
     applyScale();
 
+    // ตรวจจับการเปลี่ยนแปลงขนาดคอนเทนเนอร์ด้วย ResizeObserver
     const ro = new ResizeObserver(() => {
       applyScale();
     });
@@ -215,6 +219,7 @@ export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChan
       if (!disposed) applyScale();
     });
 
+    // กู้คืนผังบล็อกเดิมหากเคยบันทึกไว้
     if (savedXmlRef.current) {
       try {
         const xml = Blockly.utils.xml.textToDom(savedXmlRef.current);
@@ -226,6 +231,7 @@ export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChan
 
     onReady(workspace);
 
+    // คืนหน่วยความจำและถอนการติดตั้ง Workspace เมื่อ Unmount
     return () => {
       disposed = true;
       ro.disconnect();
@@ -246,5 +252,6 @@ export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChan
       className="bg-transparent"
     />
   );
+}
 }
 

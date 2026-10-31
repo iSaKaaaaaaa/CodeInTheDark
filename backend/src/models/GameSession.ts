@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+/** โครงสร้างข้อมูลเซสชันการเล่นเกมแต่ละรอบ บันทึกสถิติและผลการแข่งขัน */
 export interface IGameSession extends Document {
   roomCode: string;
   hostId: mongoose.Types.ObjectId;

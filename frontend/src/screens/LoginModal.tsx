@@ -2,6 +2,12 @@ import { useState } from "react";
 import { useSocketStore } from "../store/useSocketStore";
 import { useGoogleLogin } from "@react-oauth/google";
 
+/**
+ * โมดอลเข้าสู่ระบบ (Login Modal):
+ * - แสดงกล่องข้อความสไตล์ม้วนกระดาษโบราณ (Parchment Paper)
+ * - รองรับการล็อกอินผ่าน Google OAuth2 ด้วย @react-oauth/google
+ * - ส่ง Access Token ไปยืนยันที่ฝั่ง Backend เพื่อออก Session และดึงข้อมูลผู้เล่น
+ */
 export default function LoginModal() {
   const [error, setError] = useState("");
 
@@ -28,9 +34,9 @@ export default function LoginModal() {
       className="absolute inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300 ease-in-out font-pixel"
       onClick={() => setScreen("landing")}
     >
-      {/* Container กลุ่ม Title & Modal จัดกึ่งกลางจอ (+30% larger -> 520px) */}
+      {/* คอนเทนเนอร์กลุ่ม Title และกล่องโมดอลจัดกึ่งกลางจอ */}
       <div className="flex flex-col items-center justify-center gap-4 sm:gap-6 w-full max-w-[620px]">
-        {/* Title */}
+        {/* หัวข้อชื่อเกม */}
         <h2
           className="text-[#fde68a] text-4xl sm:text-5xl md:text-6xl uppercase text-center relative z-10 font-bold tracking-widest leading-tight whitespace-nowrap"
           style={{
@@ -41,15 +47,15 @@ export default function LoginModal() {
           Code In The Dark
         </h2>
 
-        {/* Parchment Modal */}
+        {/* ตัวกล่องโมดอลสไตล์ม้วนกระดาษโบราณ */}
         <div
           className="relative w-full cursor-auto"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Outer glow */}
+          {/* แสงเรืองภายนอกกล่อง */}
           <div className="absolute -inset-3.5 bg-[#f59e0b]/15 rounded-3xl blur-2xl pointer-events-none" />
 
-          {/* Wooden frame — top bar */}
+          {/* กรอบไม้ด้านบน */}
           <div
             className="relative z-10 mx-3 h-5 sm:h-6 rounded-t-md"
             style={{
@@ -73,7 +79,7 @@ export default function LoginModal() {
             <div className="absolute top-1/2 -translate-y-1/2 right-3 w-2.5 h-2.5 rounded-full bg-[#C4A265] border border-[#8B6F3A] shadow-[inset_0_1px_0_rgba(255,255,255,0.4)]" />
           </div>
 
-          {/* Parchment body */}
+          {/* ผิวม้วนกระดาษ (Parchment body) */}
           <div
             className="relative z-10 mx-1.5 px-6 sm:px-8 md:px-10 py-6 sm:py-7"
             style={{
@@ -90,7 +96,7 @@ export default function LoginModal() {
               `,
             }}
           >
-            {/* Parchment texture */}
+            {/* พื้นผิวลายกระดาษเก่า */}
             <div
               className="absolute inset-0 pointer-events-none opacity-[0.05]"
               style={{
@@ -108,7 +114,7 @@ export default function LoginModal() {
               }}
             />
 
-            {/* Close button */}
+            {/* ปุ่มปิดโมดอล */}
             <button
               className="absolute top-3 right-4 text-[#8B5E3C] text-2xl sm:text-3xl font-bold hover:text-[#C4553A] active:translate-y-0.5 transition-all duration-75 leading-none p-1 rounded-lg"
               onClick={() => setScreen("landing")}
@@ -118,7 +124,7 @@ export default function LoginModal() {
               ✕
             </button>
 
-            {/* Content */}
+            {/* เนื้อหาการเข้าสู่ระบบ */}
             <div className="flex flex-col items-center gap-4 sm:gap-5 relative z-20 font-game-body">
               <div className="text-center flex flex-col items-center gap-1.5">
                 <p
@@ -132,14 +138,14 @@ export default function LoginModal() {
                 </p>
               </div>
 
-              {/* Divider */}
+              {/* เส้นแบ่งลวดลาย */}
               <div className="w-full flex items-center gap-3">
                 <div className="flex-1 h-0.5 bg-gradient-to-r from-transparent via-[#9A7A3D] to-transparent opacity-60" />
                 <div className="w-2 h-2 rotate-45 bg-[#8B6F3A] opacity-80" />
                 <div className="flex-1 h-0.5 bg-gradient-to-r from-transparent via-[#9A7A3D] to-transparent opacity-60" />
               </div>
 
-              {/* Custom Google Login Button */}
+              {/* ปุ่มเข้าสู่ระบบด้วย Google */}
               <button
                 onClick={() => googleLogin()}
                 className="flex items-center justify-center gap-3.5 w-full bg-[#5c2e0b] hover:bg-[#7a3f12] text-[#fffbeb] font-game-sub font-semibold text-base sm:text-lg px-6 py-3.5 rounded-2xl border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#382503] shadow-[0_5px_0px_#2a1b12] hover:brightness-105 active:border-b-0 active:border-r-0 active:translate-y-[4px] active:shadow-none transition-all duration-75 cursor-pointer relative overflow-hidden uppercase tracking-wider"
@@ -169,7 +175,7 @@ export default function LoginModal() {
                 <span>Sign in with Google</span>
               </button>
 
-              {/* Error */}
+              {/* ข้อความแจ้งเตือนข้อผิดพลาด */}
               {error && (
                 <div className="w-full bg-[#7f1d1d]/90 text-[#fef2f2] border-2 border-[#b91c1c] px-4 py-2.5 rounded-xl text-center text-sm sm:text-base font-thai font-medium shadow-md">
                   ⚠ {error}
@@ -178,7 +184,7 @@ export default function LoginModal() {
             </div>
           </div>
 
-          {/* Wooden frame — bottom bar */}
+          {/* กรอบไม้ด้านล่าง */}
           <div
             className="relative z-10 mx-3 h-5 sm:h-6 rounded-b-md"
             style={{
@@ -202,7 +208,7 @@ export default function LoginModal() {
             <div className="absolute top-1/2 -translate-y-1/2 right-3 w-2.5 h-2.5 rounded-full bg-[#C4A265] border border-[#8B6F3A] shadow-[inset_0_1px_0_rgba(255,255,255,0.4)]" />
           </div>
 
-          {/* Drop shadow */}
+          {/* เงาด้านล่างของโมดอล */}
           <div className="absolute -bottom-2 left-8 right-8 h-4 bg-black/20 rounded-full blur-md -z-10" />
         </div>
       </div>

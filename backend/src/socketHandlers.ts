@@ -16,6 +16,7 @@ export function registerSocketHandlers(io: Server) {
   io.on("connection", (socket: Socket) => {
     console.log("User connected:", socket.id);
 
+    // จัดการคำขอเข้าร่วมห้อง หรือสร้างห้องใหม่
     socket.on("join_room", ({ roomCode, role, username }) => {
       if (role === "navigator" && !hasRoom(roomCode)) {
         socket.emit("join_error", "Room not found or invalid code.");
@@ -45,7 +46,7 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
-    // Host toggles PUBLIC / PRIVATE (server ignores anyone who is not the host)
+    // สลับสถานะห้องสาธารณะ/ส่วนตัว (อนุญาตเฉพาะ Host)
     socket.on("set_room_visibility", ({ isPublic }: { isPublic: boolean }) => {
       const user = getUser(socket.id);
       if (!user) return;
@@ -55,6 +56,7 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
+    // ส่งต่อข้อความแชตระหว่างผู้เล่นในห้องและบันทึกลงหน่วยความจำ
     socket.on("chat_message", ({ text, sender }) => {
       const user = getUser(socket.id);
       if (user) {
@@ -68,6 +70,7 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
+    // เริ่มต้นเกม สุ่มสร้างแผนที่เขาวงกต 15x15 และกระจายข้อมูลไปยังผู้เล่นทั้งสองฝ่าย
     socket.on("start_game", () => {
       const user = getUser(socket.id);
       if (user) {
@@ -78,6 +81,7 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
+    // บันทึกผลการกดรันโปรแกรมบล็อกแต่ละรอบ
     socket.on("run_result", (data: { blocks: string[]; success: boolean; failReason: string | null }) => {
       const user = getUser(socket.id);
       if (user) {
@@ -91,6 +95,7 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
+    // จัดการเมื่อเกมจบ บันทึกข้อมูลลงฐานข้อมูลผ่าน Transaction และมอบเหรียญรางวัล
     socket.on("end_game", async (data: { result: string; timeUsed?: number; blocksUsed?: number }) => {
       const user = getUser(socket.id);
       if (user) {
@@ -101,10 +106,10 @@ export function registerSocketHandlers(io: Server) {
         };
         addChatEntry(user.roomCode, entry);
 
-        // Normalize result: anything not 'win' becomes 'lose'
+        // จัดกลุ่มผลลัพธ์เป็น win หรือ lose
         const normalizedResult: 'win' | 'lose' = data.result === 'win' ? 'win' : 'lose';
-        
-        // Extract fail reason from result string
+
+        // แยกสาเหตุการแพ้ (เวลาหมด หรือบล็อกหมด)
         let failReason: string | undefined;
         if (data.result === 'lose_time') failReason = 'time';
         else if (data.result === 'lose_blocks') failReason = 'blocks';
@@ -120,8 +125,8 @@ export function registerSocketHandlers(io: Server) {
         }
 
         const updatedCoins = await saveChatLog(user.roomCode, getPlayerNamesInRoom(user.roomCode), gameMetrics, roomMaps.get(user.roomCode));
-        
-        // Emit updated coins to each player in the room
+
+        // ส่งอัปเดตเหรียญไปยังผู้เล่นแต่ละคนในห้อง
         if (updatedCoins) {
           const roomUserIds = getRoomUsers(user.roomCode);
           if (roomUserIds) {
@@ -138,6 +143,7 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
+    // ซิงค์สถานะเกมและตำแหน่งตัวละครแบบ Real-time
     socket.on("sync_game_state", (state) => {
       const user = getUser(socket.id);
       if (user) {
@@ -145,6 +151,7 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
+    // ซิงค์ผังบล็อกคำสั่ง (XML) จาก Driver ไปยัง Navigator
     socket.on("sync_blockly", (workspaceXml) => {
       const user = getUser(socket.id);
       if (user) {
@@ -152,6 +159,7 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
+    // ซิงค์การไฮไลต์บล็อกที่กำลังประมวลผล
     socket.on("highlight_block", (blockId) => {
       const user = getUser(socket.id);
       if (user) {
@@ -159,6 +167,7 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
+    // สลับบทบาทระหว่าง Driver และ Navigator
     socket.on("trigger_role_swap", (data) => {
       const user = getUser(socket.id);
       if (user) {
@@ -166,7 +175,7 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
-    // รีเซ็ต chat ทั้งห้อง (รวมตัวส่งเอง)
+    // ล้างกล่องข้อความแชตสำหรับทุกคนในห้อง
     socket.on("reset_chat", () => {
       const user = getUser(socket.id);
       if (user) {
@@ -174,6 +183,7 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
+    // ผู้เล่นขอย้อนกลับไปหน้าล็อบบี้
     socket.on("return_to_lobby", () => {
       const user = getUser(socket.id);
       if (user) {
@@ -185,6 +195,7 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
+    // รีเซ็ตประวัติ Log เมื่อเริ่มเกมรอบใหม่
     socket.on("reset_game", () => {
       const user = getUser(socket.id);
       if (user) {
@@ -192,6 +203,7 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
+    // ส่งข้อความแจ้งเตือนเมื่อตัวละครชนสิ่งกีดขวาง (กำแพง, หิน, หนาม, หลุมพราง)
     socket.on("obstacle_hit", ({ type, x, y, playerName }: { type: string; x: number; y: number; playerName: string }) => {
       const user = getUser(socket.id);
       if (user) {
@@ -212,6 +224,7 @@ export function registerSocketHandlers(io: Server) {
       }
     });
 
+    // จัดการเมื่อการเชื่อมต่อ Socket หลุด
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.id);
       const user = removeUserFromRoom(socket.id);
@@ -221,10 +234,10 @@ export function registerSocketHandlers(io: Server) {
           deleteChatLog(user.roomCode);
           roomMaps.delete(user.roomCode);
         } else {
-          // Partner is still in the room — destroy room since game requires 2 players
+          // แจ้งเตือนผู้เล่นอีกคนที่ยังอยู่ในห้องว่าคู่หูหลุด และปิดห้องเนื่องจากต้องใช้ผู้เล่น 2 คน
           io.to(user.roomCode).emit("room_destroyed", { reason: "Your partner has disconnected." });
-          
-          // Clean up room resources
+
+          // ล้างทรัพยากรห้องที่เหลือ
           const remainingUsers = getRoomUsers(user.roomCode);
           if (remainingUsers) {
             for (const socketId of remainingUsers) {

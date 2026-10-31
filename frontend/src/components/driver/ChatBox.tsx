@@ -13,10 +13,15 @@ interface ChatBoxProps {
   onValidateTutorialChat?: (text: string) => { valid: boolean; feedback?: string };
   isTutorialActive?: boolean;
   mockMessage?: { sender: string; text: string } | null;
-  /** Increment to clear the local chat log (e.g. when tutorial ends) */
   resetSignal?: number;
 }
 
+/**
+ * กล่องข้อความแชตสื่อสารระหว่าง Driver และ Navigator:
+ * - ส่งและรับข้อความแบบ Real-time ผ่าน Socket.IO
+ * - แสดงข้อความแจ้งเตือนระบบ [SYSTEM] เมื่อเกิดเหตุการณ์สำคัญ (เช่น ชนกำแพง/กับดัก)
+ * - รองรับ Interactive Tutorial Chat Validation เพื่อตรวจสอบความถูกต้องของภารกิจฝึกสอน
+ */
 export default function ChatBox({
   onTutorialChatSent,
   onValidateTutorialChat,
@@ -29,7 +34,7 @@ export default function ChatBox({
   const { socket, username, role } = useSocketStore();
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Clear chat (and any half-typed input) whenever the parent bumps resetSignal
+  // ล้างประวัติข้อความแชตเมื่อได้รับ resetSignal (เช่น เมื่อจบโหมดฝึกสอน)
   useEffect(() => {
     if (resetSignal > 0) {
       setMessages([]);
@@ -37,13 +42,14 @@ export default function ChatBox({
     }
   }, [resetSignal]);
 
-  // Listen for mock messages (e.g. from tutorial simulations)
+  // รับข้อความจำลองจากโหมดฝึกสอน (Tutorial Bot)
   useEffect(() => {
     if (mockMessage) {
       setMessages((prev) => [...prev, mockMessage]);
     }
   }, [mockMessage]);
 
+  // จัดการรับข้อความและสัญญาณรีเซ็ตแชตจาก Socket.IO
   useEffect(() => {
     if (!socket) return;
 
@@ -51,7 +57,6 @@ export default function ChatBox({
       setMessages((prev) => [...prev, msg]);
     };
 
-    // Reset chat on new game / restart / return to lobby
     const handleStartGame = () => setMessages([]);
     const handleSyncState = (state: any) => {
       if (state.reset) setMessages([]);
@@ -74,15 +79,15 @@ export default function ChatBox({
     };
   }, [socket]);
 
+  // จัดการเมื่อกดปุ่ม Enter เพื่อส่งข้อความ
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && inputValue.trim() !== "") {
       const trimmed = inputValue.trim();
 
-      // Tutorial Interactive Validation Mode
+      // โหมดตรวจสอบข้อความฝึกสอน (Tutorial Validation)
       if (isTutorialActive && onValidateTutorialChat) {
         const validation = onValidateTutorialChat(trimmed);
         if (!validation.valid) {
-          // Display player's attempt and system feedback locally
           setMessages((prev) => [
             ...prev,
             { sender: username || "Player", text: trimmed },
@@ -95,7 +100,6 @@ export default function ChatBox({
           return;
         }
 
-        // Valid tutorial response — keep in local chat, trigger tutorial advance
         setMessages((prev) => [
           ...prev,
           { sender: username || "Player", text: trimmed },
@@ -105,7 +109,7 @@ export default function ChatBox({
         return;
       }
 
-      // Regular In-Game Chat Flow
+      // โหมดส่งข้อความแชตปกติในเกม
       const newMsg: ChatMessage = {
         sender: username || "Player",
         text: trimmed,
@@ -113,16 +117,14 @@ export default function ChatBox({
         timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
       };
 
-      // Optimistically add to own screen
       setMessages((prev) => [...prev, newMsg]);
-
-      // Emit to server for partner
       socket?.emit("chat_message", newMsg);
       setInputValue("");
       onTutorialChatSent?.();
     }
   };
 
+  // เลื่อนหน้าจอลงล่างสุดอัตโนมัติเมื่อมีข้อความใหม่
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -132,7 +134,7 @@ export default function ChatBox({
       style={{ containerType: "inline-size" }}
       className="w-full h-full flex-1 bg-black/90 rounded-2xl border-4 border-[#382503] p-2 sm:p-3 flex flex-col shadow-2xl min-h-0 shrink-0 font-game-body"
     >
-      {/* Header bar */}
+      {/* ส่วนหัวของกล่องแชต */}
       <div className="flex items-center justify-between mb-1.5 pb-1 border-b border-[#5c2e0b]/50 shrink-0">
         <span
           className="text-[#fde68a] font-bold tracking-wider uppercase flex items-center gap-2 font-game-sub leading-tight"
@@ -149,7 +151,7 @@ export default function ChatBox({
         </span>
       </div>
 
-      {/* Messages area */}
+      {/* พื้นที่แสดงรายการข้อความ */}
       <div className="flex-1 overflow-y-auto mb-2 flex flex-col gap-2 pr-1 min-h-0">
         {messages.length === 0 && (
           <div
@@ -166,7 +168,7 @@ export default function ChatBox({
           const isMe = msg.sender === username;
           const isMock = msg.sender.includes("AI Partner") || msg.sender.includes("จำลอง");
 
-          // Distinct High-Visibility System Notification
+          // การแสดงผลข้อความแจ้งเตือนของระบบ
           if (isSystem) {
             return (
               <div
@@ -195,7 +197,7 @@ export default function ChatBox({
             );
           }
 
-          // Player Messages
+          // การแสดงผลข้อความของผู้เล่น
           return (
             <div
               key={index}
@@ -243,7 +245,7 @@ export default function ChatBox({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input row */}
+      {/* ช่องพิมพ์ข้อความ */}
       <input
         type="text"
         value={inputValue}

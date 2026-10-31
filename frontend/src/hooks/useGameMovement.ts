@@ -1,7 +1,8 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import * as Blockly from "blockly";
 import { Socket } from "socket.io-client";
 import { DUNGEON_TIME, SWAP_TIME } from "../constants/game";
+import { extractWorkspaceCommands } from "../blockly/generator";
 
 interface MapData {
   walls: { x: number; y: number }[];
@@ -50,6 +51,18 @@ interface UseGameMovementOptions {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+/**
+ * Custom Hook จัดการการเคลื่อนที่ของตัวละครและการประมวลผลบล็อกคำสั่ง (useGameMovement):
+ * - สกัดบล็อกคำสั่งจาก Blockly Workspace และรันแบบ Asynchronous ทีละสเต็ป
+ * - ไฮไลต์บล็อกที่กำลังทำงานทั้งในฝั่ง Driver และส่งต่อไปยัง Navigator แบบ Real-time
+ * - ตรวจสอบการชนสิ่งกีดขวาง (Collision Detection):
+ *   - กำแพง (Wall): ชนแล้วหยุดเดินทันที แจ้งเตือน "Hit The Wall"
+ *   - หิน (Rock): ชนแล้วหยุดเดินทันที แจ้งเตือน "Hit The Rock"
+ *   - หนาม (Spike): เด้งกลับไปยังช่องปลอดภัยก่อนหน้า (Bounce Back) แจ้งเตือน "Hit The Spike"
+ *   - กับดัก (Trap): ตกหลุมพราง วาร์ปกลับจุดเริ่มต้น (START) แจ้งเตือน "Fall In Trap"
+ * - ตรวจสอบเงื่อนไขชนะ (Goal Tile) และแพ้ (โควตาบล็อกหมด) พร้อมส่งข้อมูล Transaction ไปยัง Backend
+ * - ยกเลิก Async Execution Loop ทันทีด้วย `runIdRef` หากมีการสลับบทบาทหรือรีเซ็ตเกม
+ */
 export function useGameMovement({
   socket,
   role,
@@ -87,6 +100,24 @@ export function useGameMovement({
 }: UseGameMovementOptions) {
   const { walls: WALLS, traps: TRAPS, rocks: ROCKS, spikes: SPIKES, start: START, goal: GOAL } = mapData;
 
+  const roleRef = useRef(role);
+  roleRef.current = role;
+  const runIdRef = useRef(0);
+
+  // ยกเลิกการรันโปรแกรมที่ค้างอยู่ทันทีหากผู้เล่นถูกสลับออกจากบทบาท Driver
+  useEffect(() => {
+    if (role !== "driver") {
+      runIdRef.current++;
+      if (workspaceRef.current) {
+        workspaceRef.current.highlightBlock(null);
+      }
+      if (socket) {
+        socket.emit("highlight_block", null);
+      }
+    }
+  }, [role, socket, workspaceRef]);
+
+  // สร้าง Set เพื่อการตรวจสอบสิ่งกีดขวางความเร็วระดับ O(1)
   const wallSet = useMemo(() => new Set(WALLS.map((w) => `${w.x},${w.y}`)), [WALLS]);
   const trapSet = useMemo(() => new Set(TRAPS.map((t) => `${t.x},${t.y}`)), [TRAPS]);
   const rockSet = useMemo(() => new Set(ROCKS.map((r) => `${r.x},${r.y}`)), [ROCKS]);
@@ -97,6 +128,7 @@ export function useGameMovement({
   const isRock = (x: number, y: number) => rockSet.has(`${x},${y}`);
   const isSpike = (x: number, y: number) => spikeSet.has(`${x},${y}`);
 
+  // ส่งสถานะเกมปัจจุบันผ่าน Socket.IO
   const emitGameState = (stateOverrides: any = {}) => {
     if (role === "driver" && socket) {
       socket.emit("sync_game_state", {
@@ -117,28 +149,20 @@ export function useGameMovement({
     }
   };
 
+  // รันโปรแกรมบล็อกคำสั่งที่ผู้เล่นต่อไว้ใน Workspace
   const runProgram = async () => {
-    if (!workspaceRef.current || role !== "driver") return;
+    if (!workspaceRef.current || roleRef.current !== "driver") return;
     const isPractice = tutorialStepRef?.current !== undefined && tutorialStepRef.current !== 99;
+
+    const currentRunId = ++runIdRef.current;
 
     setIsWin(false);
     setIsLose(false);
     setExecutionError(null);
     emitGameState({ executionError: null });
 
-    const topBlocks = workspaceRef.current.getTopBlocks(true);
-    if (topBlocks.length === 0) return;
-
-    const blocksToUse = workspaceRef.current.getAllBlocks(false).length;
-
-    const commandBlocks: any[] = [];
-    const blockTypes: string[] = [];
-    let block = topBlocks[0];
-    while (block) {
-      commandBlocks.push(block);
-      blockTypes.push(block.type);
-      block = block.getNextBlock() as any;
-    }
+    const { commandBlocks, blockTypes, totalBlocks: blocksToUse } = extractWorkspaceCommands(workspaceRef.current);
+    if (commandBlocks.length === 0) return;
 
     let runSuccess = false;
     let runFailReason: string | null = null;
@@ -151,6 +175,12 @@ export function useGameMovement({
     const pathHistory: { x: number; y: number }[] = [{ x: currentX, y: currentY }];
 
     for (const cmdBlock of commandBlocks) {
+      if (runIdRef.current !== currentRunId || roleRef.current !== "driver") {
+        workspaceRef.current?.highlightBlock(null);
+        if (socket) socket.emit("highlight_block", null);
+        return;
+      }
+
       workspaceRef.current.highlightBlock(cmdBlock.id);
       if (socket) socket.emit("highlight_block", cmdBlock.id);
 
@@ -250,6 +280,11 @@ export function useGameMovement({
       pathHistory.push({ x: currentX, y: currentY });
 
       await sleep(350);
+      if (runIdRef.current !== currentRunId || roleRef.current !== "driver") {
+        workspaceRef.current?.highlightBlock(null);
+        if (socket) socket.emit("highlight_block", null);
+        return;
+      }
 
       if (!isPractice && currentX === GOAL.x && currentY === GOAL.y) {
         runSuccess = true;
@@ -325,6 +360,7 @@ export function useGameMovement({
 
   const resetGameToNewStart = useCallback(() => {
     if (!isHost) return;
+    runIdRef.current++;
     setPlayerX(START.x);
     setPlayerY(START.y);
     setDirection("up");
@@ -335,7 +371,11 @@ export function useGameMovement({
     setSwapTimeLeft(SWAP_TIME);
 
     if (workspaceRef.current) {
+      workspaceRef.current.highlightBlock(null);
       workspaceRef.current.clear();
+    }
+    if (socket) {
+      socket.emit("highlight_block", null);
     }
 
     availableQuotaRef.current = maxBlocks;

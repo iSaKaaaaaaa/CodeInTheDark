@@ -1,7 +1,13 @@
 import * as Blockly from "blockly";
-import { javascriptGenerator } from "blockly/javascript";
 
-export function registerBlocks() {
+/**
+ * ลงทะเบียนบล็อกคำสั่งแบบ Custom ให้กับ Google Blockly:
+ * - move_up: เดินขึ้นด้านบน
+ * - move_down: เดินลงด้านล่าง
+ * - move_left: เดินไปทางซ้าย
+ * - move_right: เดินไปทางขวา
+ */
+export function registerBlocks(): void {
   Blockly.defineBlocksWithJsonArray([
     {
       type: "move_up",
@@ -60,10 +66,8 @@ export function registerBlocks() {
       colour: "#AF6F37",
     },
   ]);
-
-  // Generator สำหรับแปลงบล็อกเป็นคำสั่ง
-  javascriptGenerator.forBlock["move_up"] = () => "moveUp();\n";
-  javascriptGenerator.forBlock["move_down"] = () => "moveDown();\n";
-  javascriptGenerator.forBlock["move_left"] = () => "moveLeft();\n";
-  javascriptGenerator.forBlock["move_right"] = () => "moveRight();\n";
 }
+
+/** Alias สำหรับ registerBlocks เพื่อความเข้ากันได้กับโค้ดส่วนอื่น */
+export const defineCustomBlocks = registerBlocks;
+

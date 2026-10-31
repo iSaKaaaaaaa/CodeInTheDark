@@ -1,12 +1,18 @@
 import { useSocketStore } from "../store/useSocketStore";
 import TopRightMenu from "../components/TopRightMenu";
 
+/**
+ * หน้าจอเลือกโหมดการเล่น (Select Play Mode Screen):
+ * - แสดงตัวเลือก Host Game (สร้างห้องเล่นใหม่สำหรับ 2 คน)
+ * - แสดงตัวเลือก Join Game (ค้นหาหรือใส่รหัส 6 หลักเพื่อเข้าร่วมห้อง)
+ * - รวมเมนู TopRightMenu แสดงโปรไฟล์ จำนวนเหรียญ และตัวควบคุมเสียง
+ */
 export default function SelectPlayScreen() {
   const { setScreen, createRoom } = useSocketStore();
 
   return (
     <div className="relative w-full min-h-screen flex flex-col items-center justify-center font-pixel cursor-default overflow-hidden bg-black p-4">
-      {/* Background */}
+      {/* ภาพพื้นหลังพร้อมฟิลเตอร์แสงเงา */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000"
         style={{ backgroundImage: "url('/ui/landing.png')" }}
@@ -15,9 +21,10 @@ export default function SelectPlayScreen() {
       <div className="absolute inset-0 bg-[#ea580c]/20 mix-blend-color-burn pointer-events-none" />
       <div className="absolute inset-0 bg-black/20 pointer-events-none" />
 
+      {/* เมนูผู้ใช้และเสียง */}
       <TopRightMenu />
 
-      {/* Title */}
+      {/* หัวข้อชื่อเกม */}
       <div className="relative z-10 flex flex-col items-center mb-3.5 md:mb-5">
         <div className="absolute inset-0 bg-black/40 blur-2xl rounded-full scale-150 -z-10" />
         <h2
@@ -28,7 +35,7 @@ export default function SelectPlayScreen() {
         </h2>
       </div>
 
-      {/* Panel (+30% larger than 460px -> 580px) */}
+      {/* กล่องตัวเลือกโหมดการเล่น (Select Mode Panel) */}
       <div className="relative w-[min(94vw,680px)] mx-auto z-10">
         {/* Outer glow */}
         <div className="absolute -inset-3.5 bg-[#f59e0b]/15 rounded-3xl blur-2xl pointer-events-none" />

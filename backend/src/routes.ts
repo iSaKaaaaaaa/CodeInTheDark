@@ -4,21 +4,27 @@ import { getPublicRooms } from "./roomManager";
 
 const router = Router();
 
+// Health check endpoint
 router.get("/", (_, res) => {
   res.send("Server running");
 });
 
-// Public rooms waiting for a second player (private rooms are never listed)
+// รายชื่อห้องสาธารณะที่เปิดให้ผู้เล่นอื่นเข้าร่วมได้
 router.get("/api/rooms/public", (_, res) => {
   res.json(getPublicRooms());
 });
 
-// API ดู chat logs ทั้งหมด
-router.get("/api/logs", (_, res) => {
-  res.json(getAllLogs());
+// ดึงประวัติ Match Logs ทั้งหมดจากฐานข้อมูล
+router.get("/api/logs", async (_, res) => {
+  try {
+    const logs = await getAllLogs();
+    res.json(logs);
+  } catch (err: any) {
+    res.status(500).json({ error: err.message || "Failed to fetch logs" });
+  }
 });
 
-// API ดู chat log เฉพาะไฟล์
+// ดึงประวัติ Log เฉพาะไฟล์ (Deprecated)
 router.get("/api/logs/:fileName", (req, res) => {
   const data = getLogByFileName(req.params.fileName);
   if (!data) {

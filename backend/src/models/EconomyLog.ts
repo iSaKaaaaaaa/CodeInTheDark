@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+/** โครงสร้างข้อมูลบันทึกประวัติการเปลี่ยนแปลงเหรียญและรางวัล (Audit Log) */
 export interface IEconomyLog extends Document {
   userId: mongoose.Types.ObjectId;
   amount: number;

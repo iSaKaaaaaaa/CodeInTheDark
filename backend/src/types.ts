@@ -1,15 +1,18 @@
+/** บันทึกข้อความแชตรายข้อความ */
 export interface ChatLogEntry {
   sender: string;
   text: string;
   timestamp: string;
 }
 
+/** ข้อมูลผู้เล่นและบทบาทภายในห้อง */
 export interface UserInfo {
   roomCode: string;
   role: string;
   username: string;
 }
 
+/** ประวัติการกดรันบล็อกคำสั่งในแต่ละรอบ */
 export interface RunAttempt {
   timestamp: string;
   blocks: string[];
@@ -18,6 +21,7 @@ export interface RunAttempt {
   failReason?: string | null;
 }
 
+/** โครงสร้างข้อมูลสรุปผลการแข่งขันและประวัติการเล่น (Match Log) */
 export interface ChatLogData {
   roomCode: string;
   players: string[];

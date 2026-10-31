@@ -1,9 +1,10 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+/** โครงสร้างข้อมูลผู้ใช้งานในระบบ */
 export interface IUser extends Document {
   googleId: string;
-  displayName: string; // from Google
-  username?: string; // chosen by user
+  displayName: string;
+  username?: string;
   email: string;
   avatarUrl?: string | null;
   coins: number;

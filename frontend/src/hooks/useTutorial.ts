@@ -15,33 +15,32 @@ interface UseTutorialOptions {
 
 const COL_LABELS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M"];
 
-// Convert inner-grid tile (x, y in 1..13) to a human coordinate, e.g. (3, 5) -> "C5"
+// แปลงพิกัดแกน (x, y ในช่วง 1..13) เป็นพิกัดกระดาน เช่น (3, 5) -> "C5"
 function toCoord(x: number, y: number): string {
   if (x >= 1 && x <= 13 && y >= 1 && y <= 13) return `${COL_LABELS[x - 1]}${y}`;
   return `(${x},${y})`;
 }
 
-/*
- * Tutorial step map:
- *   0  = Already completed (waiting for partner)
- *   1  = Welcome & Role intro
- *   2  = Map Focus (Driver: Goal 🚩 & Traps / Navigator: Walls 🧱 & Fog)
- *   3  = 5-Second Countdown / Screen Digest before Interactive
+/**
+ * โครงสร้างลำดับขั้นตอนโหมดฝึกสอน (Tutorial State Machine):
+ *   0  = เคยฝึกสอนแล้ว (รอเพื่อนร่วมทีม)
+ *   1  = แนะนำเกมและบทบาทผู้เล่น (Welcome & Role Intro)
+ *   2  = ทำความเข้าใจแผนที่ (Driver: ธงเป้าหมาย & กับดัก / Navigator: กำแพงหิน & หมอก Fog of War)
+ *   3  = นับถอยหลัง 5 วินาทีก่อนเริ่มภารกิจฝึกฝนจริง
  *
- *   -- DRIVER Interactive --
- *  10  = Spot the Goal 🚩 & Chat coordinates to Navigator
- *  13  = Spot a Trap 🕳 & Chat its coordinate to Navigator (skipped if map has no traps)
- *  11  = Drag a Move block into workspace
- *  12  = Press RUN ▶ to execute & click READY
+ *   -- ฝั่ง DRIVER Interactive --
+ *  10  = หาพิกัดธงเป้าหมาย 🚩 และพิมพ์บอกในช่องแชต
+ *  13  = หาพิกัดกับดัก/หนาม/หิน 🕳 และพิมพ์เตือนในช่องแชต (ข้ามหากด่านไม่มีกับดัก)
+ *  11  = ลากบล็อกคำสั่งเดินจาก Toolbox ไปวางใน Workspace
+ *  12  = กดปุ่ม RUN ▶ เพื่อทดสอบการเดิน และกดยืนยันความพร้อม READY
  *
- *   -- NAVIGATOR Interactive --
- *  20  = Step 1/2: Incoming simulated chat from Driver asking for directions -> Type in Chat
- *  22  = Step 2/2: Inspect View-Only workspace & click READY
+ *   -- ฝั่ง NAVIGATOR Interactive --
+ *  20  = รับข้อความจำลองจาก Driver -> ตรวจสอบแผนที่แล้วพิมพ์แนะนำทิศทางที่ปลอดภัยในแชต
+ *  22  = ตรวจสอบแผงโค้ดโหมดดูอย่างเดียว (VIEW ONLY) และกดยืนยันความพร้อม READY
  *
- *   5  = Time / Role Swap warning
- *  99  = Tutorial completed!
+ *   5  = แจ้งเตือนระบบการสลับบทบาท (Role Swap) และเวลารวมดันเจี้ยน
+ *  99  = โหมดฝึกสอนเสร็จสมบูรณ์ พร้อมเริ่มเล่นเกมจริง!
  */
-
 export function useTutorial({ socket, role, goalCoord, goalArea, playerPos, walls, traps }: UseTutorialOptions) {
   const [tutorialStep, setTutorialStep] = useState(() => {
     return localStorage.getItem("tutorialCompleted") === "true" ? 0 : 1;
@@ -51,7 +50,7 @@ export function useTutorial({ socket, role, goalCoord, goalArea, playerPos, wall
   const [countdown, setCountdown] = useState(5);
   const justCompletedRef = useRef(false);
 
-  // Keep latest playerPos and walls in refs for real-time collision validation
+  // อัปเดตตำแหน่งผู้เล่น กำแพง และกับดักล่าสุดลงใน Ref สำหรับการตรวจสอบความถูกต้องของแชต
   const playerPosRef = useRef(playerPos);
   const wallsRef = useRef(walls);
   const trapsRef = useRef(traps);
@@ -61,12 +60,12 @@ export function useTutorial({ socket, role, goalCoord, goalArea, playerPos, wall
     trapsRef.current = traps;
   }, [playerPos, walls, traps]);
 
-  // Trap helpers: coordinate list (e.g. ["C5", "H9"]) and whether this map has any traps
+  // คำนวณรายการพิกัดกับดัก (เช่น ["C5", "H9"]) และตรวจสอบว่ามีกับดักในด่านหรือไม่
   const trapCoords = useMemo(() => (traps || []).map((t) => toCoord(t.x, t.y)), [traps]);
   const hasTraps = trapCoords.length > 0;
   const trapCoord = trapCoords[0] || "";
 
-  // Interactive step completion flags
+  // ตัวแปรสถานะความคืบหน้าของภารกิจฝึกสอน
   const [trapDone, setTrapDone] = useState(false);
   const [dragDone, setDragDone] = useState(false);
   const [runDone, setRunDone] = useState(false);
@@ -78,7 +77,7 @@ export function useTutorial({ socket, role, goalCoord, goalArea, playerPos, wall
     tutorialStepRef.current = tutorialStep;
   }, [tutorialStep]);
 
-  // 5-second countdown timer for Step 3
+  // นับถอยหลัง 5 วินาทีใน Step 3 ก่อนเริ่ม Interactive Mode
   useEffect(() => {
     if (tutorialStep !== 3) {
       setCountdown(5);
@@ -103,7 +102,7 @@ export function useTutorial({ socket, role, goalCoord, goalArea, playerPos, wall
     return () => clearInterval(interval);
   }, [tutorialStep, role]);
 
-  // Driver Step 10: Prompt driver to spot goal
+  // Driver Step 10: แจ้งเตือนให้ Driver สังเกตและส่งพิกัดธงเป้าหมาย
   useEffect(() => {
     if (tutorialStep === 10 && role === "driver") {
       const t = setTimeout(() => {
@@ -116,21 +115,20 @@ export function useTutorial({ socket, role, goalCoord, goalArea, playerPos, wall
     }
   }, [tutorialStep, role, goalCoord, goalArea]);
 
-  // Driver Step 13: Prompt driver to spot a trap
+  // Driver Step 13: แจ้งเตือนให้ Driver สังเกตและส่งพิกัดกับดัก
   useEffect(() => {
     if (tutorialStep === 13 && role === "driver") {
       const t = setTimeout(() => {
         setMockMessage({
           sender: "[SYSTEM]",
-          text: "[TUTORIAL] The Navigator cannot see hazards! Find any trap, spike or rock on the map and send its coordinate in Chat.",
+          text: "[TUTORIAL] The Navigator cannot see traps! Find any trap, spike or rock on the map and send its coordinate in Chat.",
         });
       }, 400);
       return () => clearTimeout(t);
     }
   }, [tutorialStep, role]);
 
-  // Auto-advance Driver:
-  // Step 10: goal sent -> step 13 (Trap) if map has traps, else step 11 (Drag block)
+  // เลื่อนขั้นตอนอัตโนมัติของ Driver เมื่อทำภารกิจสำเร็จ
   useEffect(() => {
     if (tutorialStep === 10 && chatDone) {
       const t = setTimeout(() => setTutorialStep(hasTraps ? 13 : 11), 800);
@@ -138,7 +136,6 @@ export function useTutorial({ socket, role, goalCoord, goalArea, playerPos, wall
     }
   }, [tutorialStep, chatDone, hasTraps]);
 
-  // Step 13: trap coordinate sent -> step 11 (Drag block)
   useEffect(() => {
     if (tutorialStep === 13 && trapDone) {
       const t = setTimeout(() => setTutorialStep(11), 800);
@@ -146,7 +143,6 @@ export function useTutorial({ socket, role, goalCoord, goalArea, playerPos, wall
     }
   }, [tutorialStep, trapDone]);
 
-  // Step 11: block dragged -> step 12 (Run)
   useEffect(() => {
     if (tutorialStep === 11 && dragDone) {
       const t = setTimeout(() => setTutorialStep(12), 700);
@@ -154,15 +150,14 @@ export function useTutorial({ socket, role, goalCoord, goalArea, playerPos, wall
     }
   }, [tutorialStep, dragDone]);
 
-  // Navigator flow:
-  // When Navigator enters Step 20, simulate an incoming message from Driver in chat
+  // Navigator Step 20: จำลองข้อความ Driver ถามทิศทางจาก Navigator
   useEffect(() => {
     if (tutorialStep === 20 && role === "navigator") {
       const t = setTimeout(() => {
         setMockMessage({
           sender: "Driver (AI Partner)",
           text: hasTraps
-            ? `I cannot see the walls! I can see a hazard at ${trapCoord}. Which way is safe to move?`
+            ? `I cannot see the walls! I can see a trap at ${trapCoord}. Which way is safe to move?`
             : "I cannot see the walls! Which way is safe to move? Any obstacles ahead?",
         });
       }, 500);
@@ -170,7 +165,7 @@ export function useTutorial({ socket, role, goalCoord, goalArea, playerPos, wall
     }
   }, [tutorialStep, role, hasTraps, trapCoord]);
 
-  // Navigator: When Navigator replies in chat on step 20 -> mock driver responds & go to 22
+  // Navigator Step 20: เมื่อพิมพ์ตอบแล้ว บอทจะตอบรับและส่งต่อไปยัง Step 22
   useEffect(() => {
     if (tutorialStep === 20 && chatDone) {
       const t1 = setTimeout(() => {
@@ -191,7 +186,7 @@ export function useTutorial({ socket, role, goalCoord, goalArea, playerPos, wall
     }
   }, [tutorialStep, chatDone]);
 
-  // Validation function: checks if user input is genuinely valid for the current tutorial step
+  // ตรวจสอบความถูกต้องของข้อความแชตในโหมดฝึกสอน (Interactive Validation)
   const validateTutorialChat = useCallback((input: string): { valid: boolean; feedback?: string } => {
     const text = input.trim();
     if (!text) {
@@ -228,7 +223,7 @@ export function useTutorial({ socket, role, goalCoord, goalArea, playerPos, wall
       }
       return {
         valid: false,
-        feedback: "That tile is not a hazard! Look for a trap, spike or rock on the map and send its coordinate (column letter + row number).",
+        feedback: "That tile is not a trap! Look for a trap, spike or rock on the map and send its coordinate (column letter + row number).",
       };
     }
 
@@ -294,7 +289,7 @@ export function useTutorial({ socket, role, goalCoord, goalArea, playerPos, wall
         const suggestion = openOptions.length > 0 ? ` (Safe paths: ${openOptions.join(" or ")})` : "";
         return {
           valid: false,
-          feedback: `Moving ${blockedDirections.join(" / ")} is blocked by a wall or hazard! Check the map for an open path${suggestion}.`,
+          feedback: `Moving ${blockedDirections.join(" / ")} is blocked by a wall or trap! Check the map for an open path${suggestion}.`,
         };
       }
 

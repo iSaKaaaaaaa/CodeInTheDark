@@ -1,6 +1,17 @@
+/** จำนวนโควตาบล็อกคำสั่งสูงสุดที่สามารถใช้งานได้ต่อเกม */
 export const MAX_BLOCKS = 50;
-export const DUNGEON_TIME = 300; // seconds (5 minutes)
-export const SWAP_TIME = 120;    // seconds (2 minutes)
+
+/** เวลารวมทั้งหมดของดันเจี้ยน (300 วินาที / 5 นาที) */
+export const DUNGEON_TIME = 300;
+
+/** ระยะเวลาในการสลับบทบาท Driver และ Navigator (120 วินาที / 2 นาที) */
+export const SWAP_TIME = 120;
+
+/** ขนาดของตารางแผนที่ภายนอก (15x15 ช่อง รวมกำแพงหินรอบนอก) */
 export const GRID_SIZE = 15;
+
+/** ขนาดของตารางเขาวงกตภายในที่ผู้เล่นเดินได้ (13x13 ช่อง กำกับพิกัด A-M และ 1-13) */
 export const INNER_GRID_SIZE = 13;
-export const MOVE_DELAY = 350;   // ms per step
+
+/** ระยะเวลาหน่วงในแต่ละก้าวเดินของตัวละคร (350 มิลลิวินาที) */
+export const MOVE_DELAY = 350;

@@ -1,5 +1,4 @@
-import { UserInfo } from "../types";
-
+/** โครงสร้างข้อมูลแผนที่เขาวงกตที่ถูกสุ่มสร้างขึ้น */
 export interface GeneratedMap {
   seed: number;
   map: string[];
@@ -11,6 +10,7 @@ export interface GeneratedMap {
   goal: { x: number; y: number };
 }
 
+/** ตัวสร้างตัวเลขสุ่มแบบกำหนด Seed เพื่อให้ผลลัพธ์การสร้างแผนที่เหมือนเดิมทุกครั้งจาก Seed เดียวกัน */
 class SeededRandom {
   private seed: number;
   constructor(seed: number) {
@@ -28,13 +28,14 @@ class SeededRandom {
   }
 }
 
+/** สุ่มเลือกจุดเริ่มต้นของผู้เล่นบนขอบเขตของตารางแผนที่ */
 function chooseStartNode(
   logicalWidth: number,
   logicalHeight: number,
   rng: SeededRandom
 ): { startPhysical: { x: number; y: number }; startLogical: [number, number] } {
   const borderEdges: { logical: [number, number]; physical: [number, number] }[] = [];
-  
+
   for (let y = 0; y < logicalHeight; y++) {
     borderEdges.push({ logical: [0, y], physical: [0, y * 2 + 1] });
     borderEdges.push({ logical: [logicalWidth - 1, y], physical: [logicalWidth * 2, y * 2 + 1] });
@@ -52,6 +53,7 @@ function chooseStartNode(
   };
 }
 
+/** ค้นหาตำแหน่งจุดสิ้นสุด (Goal) โดยใช้ระยะทางขั้นต่ำและสูงสุดผ่าน BFS */
 function findGoalByDistance(
   startLogical: [number, number],
   adjacency: Map<string, Set<string>>,
@@ -103,6 +105,7 @@ function findGoalByDistance(
   }
 }
 
+/** สร้างเส้นทางเขาวงกตด้วย Growing Tree Algorithm */
 function generateGrowingTree(
   logicalWidth: number,
   logicalHeight: number,
@@ -162,6 +165,7 @@ function generateGrowingTree(
   return adjacency;
 }
 
+/** ค้นหาเส้นทางที่สั้นที่สุดจากจุดเริ่มต้นไปยังเป้าหมายเพื่อป้องกันไม่ให้วางสิ่งกีดขวางทับ */
 function findShortestPath(
   start: { x: number; y: number },
   goal: { x: number; y: number },
@@ -198,6 +202,7 @@ function findShortestPath(
   return new Set();
 }
 
+/** สลับตำแหน่งข้อมูลในอาเรย์แบบสุ่ม */
 function shuffle<T>(array: T[], rng: SeededRandom): T[] {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
@@ -207,6 +212,14 @@ function shuffle<T>(array: T[], rng: SeededRandom): T[] {
   return arr;
 }
 
+/**
+ * ฟังก์ชันหลักในการสร้างแผนที่เขาวงกต 15x15:
+ * 1. คำนวณ Logical Grid (7x7) และขยายเป็น Physical Grid (15x15)
+ * 2. สุ่มสร้างเส้นทางเขาวงกตและหาตำแหน่ง Goal ที่เหมาะสม
+ * 3. หาเส้นทางที่สั้นที่สุด (Optimal Path) เพื่อสงวนไว้เป็นทางเดินที่ปลอดภัย
+ * 4. สุ่มวางสิ่งกีดขวาง (หลุมพราง, หิน, หนาม) ในเส้นทางแยกหรือทางตัน
+ * 5. ประกอบตารางสตริงและรวบรวมพิกัดอุปสรรคทั้งหมด
+ */
 export function generateMap(
   physicalWidth: number,
   physicalHeight: number,
@@ -250,12 +263,11 @@ export function generateMap(
     }
   }
 
-  // --- Obstacle Generation ---
+  // กำหนดตำแหน่งสิ่งกีดขวาง โดยไม่วางทับเส้นทางที่สั้นที่สุดและช่องรอบจุดเกิด
   const startKey = toKey(startPhysical.x, startPhysical.y);
   const goalKey = toKey(goalPhysical.x, goalPhysical.y);
   const pathSet = findShortestPath(startPhysical, goalPhysical, walkable);
 
-  // Exclude start neighbors to ensure safe starting area
   const startNeighbors = new Set<string>();
   const dirs = [
     [0, -1],
@@ -278,7 +290,7 @@ export function generateMap(
 
   const shuffledCandidates = shuffle(candidates, rng);
 
-  // Determine amount of obstacles dynamically based on available wrong paths
+  // คำนวณจำนวนสิ่งกีดขวางแต่ละประเภทตามพื้นที่ทางตันที่ว่างอยู่
   const numTraps = Math.min(3, Math.floor(shuffledCandidates.length / 3));
   const numRocks = Math.min(3, Math.floor(shuffledCandidates.length / 3));
   const numSpikes = Math.min(3, Math.floor(shuffledCandidates.length / 3));

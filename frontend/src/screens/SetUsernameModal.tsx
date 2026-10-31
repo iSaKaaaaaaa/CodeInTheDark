@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import { useSocketStore } from '../store/useSocketStore';
 
+/**
+ * โมดอลตั้งชื่อผู้เล่นครั้งแรก (Set Username Modal):
+ * - แสดงสำหรับผู้เล่นใหม่ที่เพิ่งล็อกอินผ่าน Google OAuth เป็นครั้งแรก
+ * - มีการตรวจสอบความถูกต้องของชื่อ (ไม่เป็นค่าว่าง ความยาวไม่เกิน 20 ตัวอักษร)
+ * - บันทึกชื่อผู้ใช้ลงฐานข้อมูลผ่าน REST API /api/auth/username
+ */
 export default function SetUsernameModal() {
   const [username, setUsername] = useState('');
   const [error, setError] = useState('');
@@ -8,6 +14,7 @@ export default function SetUsernameModal() {
 
   const submitUsername = useSocketStore((state) => state.submitUsername);
 
+  // ส่งชื่อผู้ใช้เพื่อบันทึกลงระบบ
   const handleSubmit = async () => {
     if (username.trim() === '') {
       setError('Please enter a username.');
@@ -26,6 +33,7 @@ export default function SetUsernameModal() {
     }
   };
 
+  // ดักจับปุ่ม Enter เพื่อกดยืนยันได้ทันที
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') {
       handleSubmit();
@@ -37,7 +45,7 @@ export default function SetUsernameModal() {
       className="absolute inset-0 bg-black/60 z-50 flex flex-col items-center justify-center p-4 backdrop-blur-sm transition-opacity duration-300 ease-in-out font-pixel cursor-default"
     >
       <div className="flex flex-col items-center justify-center gap-4 sm:gap-6 w-full max-w-[620px]">
-        {/* Title */}
+        {/* หัวข้อชื่อเกม */}
         <h2
           className="text-[#fde68a] text-4xl sm:text-5xl md:text-6xl uppercase text-center relative z-10 font-bold tracking-widest leading-tight whitespace-nowrap"
           style={{ textShadow: "4px 4px 0px #2a1b12, -2px -2px 0px #2a1b12, 2px -2px 0px #2a1b12, -2px 2px 0px #2a1b12, 0 6px 10px rgba(0,0,0,0.8)" }}
@@ -45,15 +53,15 @@ export default function SetUsernameModal() {
           Code In The Dark
         </h2>
 
-        {/* Parchment Modal */}
+        {/* ตัวกล่องโมดอลกระดาษม้วนโบราณ */}
         <div
           className="relative w-full cursor-auto"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Outer glow */}
+          {/* แสงเรืองภายนอกกล่อง */}
           <div className="absolute -inset-3.5 bg-[#f59e0b]/15 rounded-3xl blur-2xl pointer-events-none" />
 
-          {/* Wooden frame — top bar */}
+          {/* กรอบไม้ด้านบน */}
           <div
             className="relative z-10 mx-3 h-5 sm:h-6 rounded-t-md"
             style={{
@@ -71,7 +79,7 @@ export default function SetUsernameModal() {
             <div className="absolute top-1/2 -translate-y-1/2 right-3 w-2.5 h-2.5 rounded-full bg-[#C4A265] border border-[#8B6F3A] shadow-[inset_0_1px_0_rgba(255,255,255,0.4)]" />
           </div>
 
-          {/* Parchment body */}
+          {/* ผิวม้วนกระดาษ (Parchment body) */}
           <div
             className="relative z-10 mx-1.5 px-6 sm:px-8 md:px-10 py-6 sm:py-7"
             style={{
@@ -87,7 +95,7 @@ export default function SetUsernameModal() {
               `,
             }}
           >
-            {/* Parchment texture overlay */}
+            {/* ลวดลายพื้นผิวกระดาษ */}
             <div className="absolute inset-0 pointer-events-none opacity-[0.05]" style={{
               backgroundImage: `
                 radial-gradient(ellipse at 20% 50%, rgba(101,67,33,1) 0%, transparent 50%),
@@ -99,7 +107,7 @@ export default function SetUsernameModal() {
               boxShadow: 'inset 0 0 45px rgba(101,67,33,0.15)',
             }} />
 
-            {/* Content */}
+            {/* เนื้อหาฟอร์มกำหนดชื่อผู้ใช้ */}
             <div className="flex flex-col items-center gap-4 sm:gap-5 relative z-10 font-game-body">
               <div className="text-center flex flex-col items-center gap-1.5">
                 <p
@@ -113,13 +121,14 @@ export default function SetUsernameModal() {
                 </p>
               </div>
 
-              {/* Divider */}
+              {/* เส้นคั่นตกแต่ง */}
               <div className="w-full flex items-center gap-3">
                 <div className="flex-1 h-0.5 bg-gradient-to-r from-transparent via-[#9A7A3D] to-transparent opacity-60" />
                 <div className="w-2 h-2 rotate-45 bg-[#8B6F3A] opacity-80" />
                 <div className="flex-1 h-0.5 bg-gradient-to-r from-transparent via-[#9A7A3D] to-transparent opacity-60" />
               </div>
 
+              {/* ช่องกรอกชื่อ */}
               <div className="w-full flex flex-col gap-2">
                 <label className="text-[#6d4621] text-xs sm:text-sm font-game-sub uppercase tracking-wider font-bold ml-1">
                   USERNAME
@@ -136,12 +145,14 @@ export default function SetUsernameModal() {
                 />
               </div>
 
+              {/* ข้อความแจ้งเตือนข้อผิดพลาด */}
               {error && (
                 <div className="w-full bg-[#7f1d1d]/90 text-[#fef2f2] border-2 border-[#b91c1c] px-4 py-2.5 rounded-xl text-center text-sm sm:text-base font-game-body font-medium shadow-md">
                   ⚠ {error}
                 </div>
               )}
 
+              {/* ปุ่มบันทึกชื่อ */}
               <button
                 onClick={handleSubmit}
                 disabled={loading || username.trim() === ''}

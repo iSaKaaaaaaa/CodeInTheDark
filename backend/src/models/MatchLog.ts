@@ -14,6 +14,7 @@ interface IRunAttempt {
   timestamp: string;
 }
 
+/** โครงสร้างข้อมูลประวัติการสนทนาและการรันบล็อกคำสั่ง (มี TTL Index กำหนดหมดอายุใน 90 วัน) */
 export interface IMatchLog extends Document {
   sessionId: mongoose.Types.ObjectId;
   messages: IMessage[];
@@ -39,7 +40,7 @@ const MatchLogSchema = new Schema<IMatchLog>({
       timestamp: { type: String, required: true },
     },
   ],
-  createdAt: { type: Date, default: Date.now, expires: '90d' }, // TTL index for 90 days
+  createdAt: { type: Date, default: Date.now, expires: '90d' }, // ดัชนี TTL ลบข้อมูลอัตโนมัติเมื่อครบ 90 วัน
 });
 
 export const MatchLog = mongoose.model<IMatchLog>('MatchLog', MatchLogSchema);

@@ -1,4 +1,13 @@
-node_modules
-dist
+# ละเว้นโฟลเดอร์ระบบและแคช
+node_modules/
+dist/
 .env
+.env.*
 logs/
+
+# บล็อกไฟล์ .md ทั้งหมด (เช่น ไฟล์สรุปโค้ดส่วนตัว)
+*.md
+
+# ยกเว้นเฉพาะไฟล์ README.md ให้เอาขึ้น Git ได้
+!README.md
+!readme.md

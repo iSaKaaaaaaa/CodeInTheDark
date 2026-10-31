@@ -5,6 +5,12 @@ interface TopRightMenuProps {
   inline?: boolean;
 }
 
+/**
+ * เมนูด้านบนขวา:
+ * - แสดงโปรไฟล์ผู้เล่นและจำนวนเหรียญ (เมื่ออยู่นอกเกม)
+ * - ปุ่มปรับระดับเสียงและเปิด/ปิดเสียงเพลง (Audio Volume & Mute)
+ * - ปุ่มออกจากห้อง/ออกจากระบบ (Leave Stage หรือ Logout) พร้อมโมดอลยืนยัน
+ */
 export default function TopRightMenu({ inline = false }: TopRightMenuProps) {
   const {
     username,
@@ -33,12 +39,12 @@ export default function TopRightMenu({ inline = false }: TopRightMenuProps) {
     setShowConfirm(false);
   };
 
-  // If in game and not inline, hide floating version
+  // หากอยู่ในหน้าจอเกมและไม่ใช่โหมด inline ให้ซ่อนเมนูลอยแบบเดิม
   if (isGame && !inline) {
     return null;
   }
 
-  // Inline mode in GameHeader: solid tactile buttons without border frame, stretched flush with STAGE TIME
+  // รูปแบบปุ่มแบบ Inline ใน GameHeader ให้มีขนาดและดีไซน์รับกับ STAGE TIME
   if (inline) {
     const muted = isMuted || volume === 0;
     const iconSizeStyle = {
@@ -52,7 +58,7 @@ export default function TopRightMenu({ inline = false }: TopRightMenuProps) {
 
     return (
       <div className="self-stretch flex flex-col justify-between gap-1.5 relative font-game-body shrink-0">
-        {/* Volume Button */}
+        {/* ปุ่มควบคุมระดับเสียง */}
         <div className="relative flex-1 flex">
           <button
             type="button"
@@ -72,7 +78,7 @@ export default function TopRightMenu({ inline = false }: TopRightMenuProps) {
             )}
           </button>
 
-          {/* Volume Slider Popover */}
+          {/* ป๊อปอัปสไลเดอร์ปรับความดังเสียง */}
           {showVolumePopup && (
             <div className="absolute right-0 top-full mt-1.5 sm:right-full sm:top-0 sm:mr-2 sm:mt-0 bg-[#2a1306]/95 border-2 border-[#b8944f] rounded-xl p-3 shadow-2xl flex flex-col items-center gap-2 min-w-[180px] z-50 backdrop-blur-md animate-in fade-in zoom-in-95 duration-150 font-game-body">
               <div className="flex items-center justify-between w-full text-sm font-bold text-amber-200 font-game-sub uppercase tracking-wider">
@@ -104,7 +110,7 @@ export default function TopRightMenu({ inline = false }: TopRightMenuProps) {
           )}
         </div>
 
-        {/* Leave Stage Button */}
+        {/* ปุ่มออกจากด่าน */}
         <button
           type="button"
           style={btnWidthStyle}
@@ -115,7 +121,7 @@ export default function TopRightMenu({ inline = false }: TopRightMenuProps) {
           <svg xmlns="http://www.w3.org/2000/svg" style={iconSizeStyle} className="drop-shadow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
         </button>
 
-        {/* Confirmation Modal */}
+        {/* โมดอลยืนยันการออกจากด่าน */}
         {showConfirm && (
           <div className="fixed inset-0 bg-black/75 z-[100] flex items-center justify-center backdrop-blur-sm p-4 font-game-body">
             <div className="bg-[#3d1f0f] border-[6px] border-[#1a0b05] rounded-2xl p-2 shadow-[0_15px_0_rgba(0,0,0,0.8),0_25px_50px_rgba(0,0,0,0.9)] max-w-md w-full mx-auto animate-in fade-in zoom-in duration-200">
@@ -157,7 +163,7 @@ export default function TopRightMenu({ inline = false }: TopRightMenuProps) {
   return (
     <>
       <div className={`fixed z-50 flex flex-col items-end gap-2 ${isGame ? "top-2 right-2 md:top-3 md:right-4" : "top-4 right-4 md:top-6 md:right-6"} font-game-body`}>
-        {/* User Badge outside game */}
+        {/* ป้ายแสดงข้อมูลผู้ใช้สำหรับหน้านอกเกม */}
         {!isGame && (
           <div className="bg-[#b45309] border-b-[4px] border-r-[4px] border-t-2 border-l-2 border-[#382503] shadow-[0_4px_0px_#2a1b12] rounded-md px-4 py-2 sm:px-5 sm:py-3 flex items-center gap-3 text-[#fffbeb]">
             {avatarUrl ? (
@@ -179,7 +185,7 @@ export default function TopRightMenu({ inline = false }: TopRightMenuProps) {
           </div>
         )}
 
-        {/* System Utilities */}
+        {/* ปุ่มควบคุมระบบ (เสียง และออกจากระบบ) */}
         <div className={`flex ${isGame ? "flex-col" : "flex-row"} items-center gap-2 relative`}>
           <div className="relative">
             <button
@@ -242,6 +248,7 @@ export default function TopRightMenu({ inline = false }: TopRightMenuProps) {
         </div>
       </div>
 
+      {/* โมดอลยืนยันการออกจากระบบ */}
       {showConfirm && (
         <div className="fixed inset-0 bg-black/75 z-[100] flex items-center justify-center backdrop-blur-sm p-4 font-game-body">
           <div className="bg-[#3d1f0f] border-[6px] border-[#1a0b05] rounded-2xl p-2 shadow-[0_15px_0_rgba(0,0,0,0.8),0_25px_50px_rgba(0,0,0,0.9)] max-w-md w-full mx-auto animate-in fade-in zoom-in duration-200">

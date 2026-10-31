@@ -13,6 +13,14 @@ interface BlockCodePanelProps {
   executionError?: string | null;
 }
 
+/**
+ * แผงควบคุมบล็อกคำสั่ง (BlockCodePanel):
+ * - แถบ Header แบ่งสัดส่วน Toolbox (ซ้าย) และ Workspace (ขวา)
+ * - ฝัง BlocklyEditor สำหรับลากวางบล็อก
+ * - แสดงป้ายเตือน "VIEW ONLY" เมื่อผู้เล่นอยู่ในบทบาท Navigator
+ * - ป้ายแสดงจำนวนโควตาบล็อกที่เหลือ (Blocks Remaining HUD)
+ * - ปุ่ม RUN PROGRAM ▶ สำหรับสั่งให้ตัวละครเริ่มเดินตามลำดับบล็อก
+ */
 export default function BlockCodePanel({
   blocksLeft,
   maxBlocks = 50,
@@ -30,6 +38,7 @@ export default function BlockCodePanel({
   const blocksWarning = blocksLeft !== undefined && blocksLeft <= 10;
   const blocksCritical = blocksLeft !== undefined && blocksLeft <= 5;
 
+  // ปรับขนาดความกว้างของแถบเมนูตามสัดส่วนที่ Blockly คำนวณได้จริง
   const handleMetricsChange = useCallback((m: BlocklyPanelMetrics) => {
     const flyoutWidth = Math.max(70, Math.round(m.flyoutWidth));
     const wsWidth = Math.max(96, Math.round(m.panelWidth - flyoutWidth));
@@ -66,9 +75,9 @@ export default function BlockCodePanel({
       style={panelCssVars}
       className="w-full h-full flex-1 relative flex flex-col min-h-0 font-game-body"
     >
-      {/* Main Container */}
+      {/* คอนเทนเนอร์หลักของแผงโค้ด */}
       <div className="flex-1 bg-white/20 backdrop-blur-sm rounded-xl border-4 border-[#333] flex flex-col overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.5)] relative min-h-0">
-        {/* Header Bar — scales proportionally with panel scale & sub-column widths */}
+        {/* แถบ Header ด้านบน แบ่งส่วน Toolbox และ Workspace */}
         <div
           className="flex bg-black/85 border-b-4 border-[#333] shrink-0"
           style={{ height: `${headerHeightPx}px` }}
@@ -100,14 +109,14 @@ export default function BlockCodePanel({
           </div>
         </div>
 
-        {/* Blockly Workspace Container */}
+        {/* คอนเทนเนอร์พื้นที่ทำงาน Blockly */}
         <div className="flex-1 w-full relative min-h-[220px] md:min-h-0">
           <div
             className="absolute top-0 bottom-0 w-1 bg-[#333] z-10 pointer-events-none"
             style={{ left: `${flyoutWidth}px` }}
           />
 
-          {/* Blockly canvas isolated in z-0 stacking context so internal SVG/flyout layers stay behind panel HUD */}
+          {/* พื้นที่วาด SVG ของ Blockly */}
           <div className={`absolute inset-0 top-1.5 sm:top-2.5 z-0 ${readOnly ? "pointer-events-none" : ""}`}>
             <BlocklyEditor
               onReady={onReady}
@@ -116,6 +125,7 @@ export default function BlockCodePanel({
             />
           </div>
 
+          {/* ป้ายแจ้งเตือนโหมดดูอย่างเดียว (VIEW ONLY) สำหรับ Navigator */}
           {readOnly && (
             <div
               className="absolute inset-0 z-20 flex items-center justify-center pointer-events-none p-3"
@@ -138,7 +148,7 @@ export default function BlockCodePanel({
             </div>
           )}
 
-          {/* Blocks Remaining Floating Badge */}
+          {/* ป้ายแสดงโควตาบล็อกที่เหลืออยู่ */}
           {blocksLeft !== undefined && (
             <div
               style={{
@@ -182,7 +192,7 @@ export default function BlockCodePanel({
             </div>
           )}
 
-          {/* Run Program Floating Button — anchored inside Workspace sub-column above Blockly layers */}
+          {/* ปุ่มสั่งรันโปรแกรม (แสดงเฉพาะ Driver) */}
           {!readOnly && (
             <button
               type="button"
@@ -202,6 +212,7 @@ export default function BlockCodePanel({
             </button>
           )}
 
+          {/* ป๊อปอัปแจ้งเตือนกรณีรันโค้ดผิดพลาด */}
           {executionError && (
             <div
               className="absolute inset-0 bg-black/60 backdrop-blur-sm z-40 flex items-center justify-center pointer-events-none p-3"

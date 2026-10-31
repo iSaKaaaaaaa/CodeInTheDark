@@ -1,6 +1,7 @@
 /**
- * Describe where a tile sits on the 13x13 playable grid (x, y in 1..13)
- * so hints can say "top-right corner" instead of a vague "on the map".
+ * อธิบายตำแหน่งของพิกัดตารางบนกริด 13x13 (x, y ในช่วง 1..13):
+ * แปลงพิกัดตัวเลขเป็นคำอธิบายตำแหน่ง เช่น "near the top-right corner" หรือ "in the middle of the map"
+ * เพื่อใช้แสดงคำใบ้ตำแหน่งเป้าหมายในโหมดฝึกสอนหรือหน้าจอช่วยเหลือ
  */
 export function describeArea(x: number, y: number): string {
   const col = x <= 4 ? "left" : x >= 10 ? "right" : "middle";

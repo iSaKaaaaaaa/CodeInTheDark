@@ -5,6 +5,10 @@ import { User } from '../models/User';
 const router = Router();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+/**
+ * ยืนยันตัวตนผ่าน Google OAuth (ID Token หรือ Access Token)
+ * หากเป็นผู้ใช้ใหม่จะสร้างบัญชีในระบบ หากมีอยู่แล้วจะอัปเดตข้อมูลและส่งกลับสถานะผู้ใช้
+ */
 router.post('/google', async (req, res) => {
   try {
     const { credential, accessToken } = req.body;
@@ -19,7 +23,7 @@ router.post('/google', async (req, res) => {
     let picture: string | undefined;
 
     if (credential) {
-      // Verify the ID token
+      // ตรวจสอบความถูกต้องของ Google ID Token
       const ticket = await client.verifyIdToken({
         idToken: credential,
         audience: process.env.GOOGLE_CLIENT_ID,
@@ -35,7 +39,7 @@ router.post('/google', async (req, res) => {
       name = payload.name;
       picture = payload.picture;
     } else {
-      // Verify via Google userinfo endpoint using accessToken
+      // ตรวจสอบผ่าน Google UserInfo API กรณีได้รับ accessToken
       const userInfoRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
@@ -55,13 +59,13 @@ router.post('/google', async (req, res) => {
       return res.status(400).json({ error: 'Email or Google ID not found in token' });
     }
 
-    // Find user by googleId or email
-    let user = await User.findOne({ 
+    // ค้นหาผู้ใช้จาก googleId หรือ email
+    let user = await User.findOne({
       $or: [{ googleId }, { email }]
     });
 
     if (!user) {
-      // Create new user
+      // สร้างผู้ใช้ใหม่ในระบบ
       user = await User.create({
         googleId,
         email,
@@ -69,7 +73,7 @@ router.post('/google', async (req, res) => {
         avatarUrl: picture,
       });
     } else {
-      // Update googleId and avatar if missing
+      // อัปเดตข้อมูลผู้ใช้ที่มีอยู่แล้วหากมีการเปลี่ยนแปลง
       let updated = false;
       if (user.googleId !== googleId) {
         user.googleId = googleId;
@@ -88,11 +92,11 @@ router.post('/google', async (req, res) => {
       }
     }
 
-    // Send back the user data
+    // ส่งคืนข้อมูลโปรไฟล์ผู้ใช้
     res.json({
       _id: user._id,
       displayName: user.displayName,
-      username: user.username, // Might be undefined/null for new users
+      username: user.username,
       email: user.email,
       avatarUrl: user.avatarUrl,
       coins: user.coins,
@@ -105,7 +109,9 @@ router.post('/google', async (req, res) => {
   }
 });
 
-// Route to set username after first login
+/**
+ * กำหนด Username สำหรับผู้ใช้ใหม่ที่เพิ่งสมัครผ่าน Google ครั้งแรก
+ */
 router.post('/username', async (req, res) => {
   try {
     const { userId, username } = req.body;
@@ -114,13 +120,13 @@ router.post('/username', async (req, res) => {
       return res.status(400).json({ error: 'Missing userId or username' });
     }
 
-    // Check if username is already taken
+    // ตรวจสอบว่า Username นี้ถูกใช้งานไปแล้วหรือไม่
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       return res.status(409).json({ error: 'Username is already taken' });
     }
 
-    // Update user
+    // บันทึก Username ลงในเอกสารผู้ใช้
     const user = await User.findById(userId);
     if (!user) {
       return res.status(404).json({ error: 'User not found' });

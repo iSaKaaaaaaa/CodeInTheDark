@@ -7,18 +7,21 @@ import CreateRoomScreen from "./screens/CreateRoomScreen";
 import JoinRoomScreen from "./screens/JoinRoomScreen";
 import { useSocketStore } from "./store/useSocketStore";
 
+// Lazy load GameScreen เพื่อเพิ่มประสิทธิภาพในการโหลดหน้าเว็บครั้งแรก
 const GameScreen = lazy(() => import("./screens/GameScreen"));
 
 export default function App() {
   const { currentScreen, setScreen, socket, roomCode, reconnect, isMuted, volume } = useSocketStore();
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  // เชื่อมต่อ Socket อัตโนมัติหากหน้าเว็บถูกรีเฟรชแต่ยังมี roomCode ค้างอยู่ใน Session
   useEffect(() => {
     if (!socket && roomCode) {
       reconnect();
     }
   }, [socket, roomCode, reconnect]);
 
+  // ควบคุมเสียงเพลงพื้นหลัง (เริ่มเล่นเฉพาะในหน้าจอเกม และวนลูปตั้งแต่ช่วงวินาทีที่ 10)
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = Math.min(1, Math.max(0, (volume / 100) * 0.25));
@@ -36,6 +39,7 @@ export default function App() {
     }
   }, [currentScreen, isMuted, volume]);
 
+  // วนลูปเพลงพื้นหลังกลับไปที่วินาทีที่ 10 เพื่อความต่อเนื่องของดนตรี
   const handleAudioEnded = () => {
     if (audioRef.current) {
       audioRef.current.currentTime = 10;
@@ -43,6 +47,7 @@ export default function App() {
     }
   };
 
+  // กำหนดคอมโพเนนต์หน้าจอที่จะแสดงผลตามสถานะ currentScreen ใน Store
   const renderScreen = () => {
     switch (currentScreen) {
       case 'landing':

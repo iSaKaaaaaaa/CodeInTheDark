@@ -1,5 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
+/** โครงสร้างสถิติแผนที่เขาวงกต (จัดเก็บจำนวนครั้งที่เล่นและจำนวนครั้งที่ผ่านด่าน) */
 export interface IMap extends Document<string> {
   seed: number;
   timesPlayed: number;
@@ -13,7 +14,7 @@ const MapSchema = new Schema<IMap>(
     timesPlayed: { type: Number, default: 0 },
     timesCleared: { type: Number, default: 0 },
   },
-  { _id: false } // We are explicitly providing _id
+  { _id: false }
 );
 
 export const MapModel = mongoose.model<IMap>('Map', MapSchema);

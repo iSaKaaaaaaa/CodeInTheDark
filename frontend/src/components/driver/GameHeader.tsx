@@ -10,6 +10,13 @@ interface GameHeaderProps {
   blocksLeft?: number;
 }
 
+/**
+ * แถบหัวด้านบนของหน้าจอเกม (GameHeader):
+ * - แสดงป้ายบอกบทบาทของผู้เล่น (DRIVER / NAVIGATOR) พร้อมคำแนะนำเป้าหมาย
+ * - แถบนับถอยหลังการสลับบทบาท (Role Swap Countdown)
+ * - นาฬิกาจับเวลาด่านดันเจี้ยน (Stage Time 300 วินาที พร้อมแถบสีเตือนความเร่งด่วน เขียว -> เหลือง -> ส้ม -> แดง)
+ * - เมนูควบคุมเสียงและปุ่มออกจากด่าน (TopRightMenu Inline)
+ */
 export default function GameHeader({
   role = "DRIVER",
   dungeonTime = "5:00",
@@ -21,7 +28,7 @@ export default function GameHeader({
 }: GameHeaderProps) {
   const isDriver = role.toUpperCase().includes("DRIVER");
 
-  // Role swap bar: colored by current role (Driver = amber, Navigator = sky). Pulses only when swap is imminent.
+  // กำหนดธีมสีของแถบสลับบทบาท (Driver = สีอำพัน/ส้ม, Navigator = สีฟ้า) และกะพริบเตือนเมื่อใกล้หมดเวลา (<= 10 วินาที)
   const isSwapUrgent = (swapTimeLeft !== undefined && swapTimeLeft <= 10) || swapProgress <= 8.5;
   const swapTheme = isDriver
     ? {
@@ -41,7 +48,7 @@ export default function GameHeader({
         soon: "text-sky-300",
       };
 
-  // Urgency levels for dungeon stage time (300s total: Green -> Yellow -> Orange -> Red)
+  // ระดับความเร่งด่วนของเวลาดันเจี้ยน (เวลารวม 300 วินาที)
   const isStageFinal = dungeonTimeLeft <= 10 && dungeonTimeLeft > 0;
   const isStageCritical = dungeonTimeLeft <= 30 && dungeonTimeLeft > 10;
   const isStageWarning = dungeonTimeLeft <= 60 && dungeonTimeLeft > 30;
@@ -50,9 +57,9 @@ export default function GameHeader({
 
   return (
     <header className="w-full flex flex-col md:flex-row items-center justify-between gap-2 md:gap-3 font-game-body">
-      {/* ─── LEFT & CENTER GROUP: ROLE + SWAP COUNTDOWN BAR ─── */}
+      {/* ─── กลุ่มฝั่งซ้ายและตรงกลาง: บทบาทผู้เล่น และแถบนับถอยหลัง Role Swap ─── */}
       <div className="w-full md:w-auto flex flex-col sm:flex-row items-start sm:items-center gap-2 md:gap-3.5 lg:gap-5 flex-1 min-w-0">
-        {/* Role Title & Objective */}
+        {/* ป้ายแสดงบทบาทและเป้าหมาย */}
         <div className="flex flex-col items-start shrink-0 px-1 max-w-full">
           <h1
             className={`font-bold uppercase tracking-wider font-pixel leading-none ${
@@ -96,14 +103,14 @@ export default function GameHeader({
           </div>
         </div>
 
-        {/* Role Swap Countdown Bar (colored by current role) */}
+        {/* แถบนับถอยหลัง Role Swap */}
         <div
           style={{ padding: "clamp(5px, 0.85vh, 9px) clamp(10px, 1.1vw, 16px)" }}
           className={`w-full sm:w-auto flex-1 max-w-[450px] min-w-[170px] border-2 rounded-xl backdrop-blur-sm flex flex-col justify-center gap-1 transition-all duration-300 ${swapTheme.box} ${
             isSwapUrgent ? "animate-pulse" : ""
           }`}
         >
-          {/* Top Label & Timer */}
+          {/* ป้ายกำกับและตัวเลขนับถอยหลัง */}
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-1.5 font-game-sub min-w-0">
               <span
@@ -135,7 +142,7 @@ export default function GameHeader({
             </span>
           </div>
 
-          {/* Progress Bar Track & Fill */}
+          {/* แถบหลอดความคืบหน้า */}
           <div
             style={{ height: "clamp(6px, 0.9vh, 10px)" }}
             className="w-full bg-black/85 rounded-full border border-white/10 overflow-hidden relative shadow-inner"
@@ -150,9 +157,9 @@ export default function GameHeader({
         </div>
       </div>
 
-      {/* ─── RIGHT GROUP: STAGE TIME & UTILITY CONTROLS ─── */}
+      {/* ─── กลุ่มฝั่งขวา: STAGE TIME และปุ่มเมนูระบบ ─── */}
       <div className="flex items-stretch justify-end gap-2 sm:gap-2.5 shrink-0">
-        {/* Blocks Left Counter */}
+        {/* ตัวนับโควตาบล็อกที่เหลือ */}
         {blocksLeft !== undefined && (
           <div className="bg-[#140b06]/95 border-2 border-[#8B5E3C]/80 rounded-xl px-3 py-1.5 shadow-xl backdrop-blur-md flex flex-col items-center justify-center min-w-[72px]">
             <span className="text-[#fde68a] text-xs font-bold font-game-sub uppercase tracking-wider leading-none mb-0.5">
@@ -167,7 +174,7 @@ export default function GameHeader({
           </div>
         )}
 
-        {/* Stage Time Box (Green -> Yellow -> Orange -> Red) */}
+        {/* กล่องเวลารวมดันเจี้ยน (เปลี่ยนสีตามความเร่งด่วน เขียว -> เหลือง -> ส้ม -> แดง) */}
         <div
           style={{
             minWidth: "clamp(124px, 13vw, 225px)",
@@ -225,7 +232,7 @@ export default function GameHeader({
             {dungeonTime}
           </span>
 
-          {/* Stage Progress Bar */}
+          {/* แถบแสดงความคืบหน้าของเวลาในด่าน */}
           <div
             style={{ height: "clamp(4px, 0.65vh, 6px)" }}
             className="w-full bg-black/80 rounded-full overflow-hidden mt-1.5 border border-white/10"
@@ -245,7 +252,7 @@ export default function GameHeader({
           </div>
         </div>
 
-        {/* Utility Menu (Volume + Leave vertically stacked) */}
+        {/* เมนูควบคุมระดับเสียงและออกจากเกม */}
         <TopRightMenu inline />
       </div>
     </header>
