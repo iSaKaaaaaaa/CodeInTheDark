@@ -1,3 +1,4 @@
+import { setSessionIo, registerSocket, unregisterSocket } from "./sessionManager";
 import { Server, Socket } from "socket.io";
 import { ChatLogEntry } from "./types";
 import {
@@ -13,8 +14,22 @@ import { generateMap, GeneratedMap } from "./utils/mapGenerator";
 const roomMaps = new Map<string, GeneratedMap>();
 
 export function registerSocketHandlers(io: Server) {
+  setSessionIo(io);
+
   io.on("connection", (socket: Socket) => {
     console.log("User connected:", socket.id);
+
+    const userId = socket.handshake.auth?.userId;
+    const sessionId = socket.handshake.auth?.sessionId;
+
+    if (userId && sessionId) {
+      const allowed = registerSocket(userId, sessionId, socket.id);
+      if (!allowed) {
+        socket.emit("force_logout", { reason: "บัญชีนี้มีการเข้าสู่ระบบจากอุปกรณ์อื่น" });
+        socket.disconnect(true);
+        return;
+      }
+    }
 
     // จัดการคำขอเข้าร่วมห้อง หรือสร้างห้องใหม่
     socket.on("join_room", ({ roomCode, role, username }) => {
@@ -227,6 +242,9 @@ export function registerSocketHandlers(io: Server) {
     // จัดการเมื่อการเชื่อมต่อ Socket หลุด
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.id);
+      if (userId) {
+        unregisterSocket(userId, socket.id);
+      }
       const user = removeUserFromRoom(socket.id);
       if (user) {
         if (isRoomEmpty(user.roomCode)) {

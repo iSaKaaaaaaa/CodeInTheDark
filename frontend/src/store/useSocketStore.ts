@@ -41,6 +41,7 @@ export const getBackendUrl = () => {
 interface SocketState {
   socket: Socket | null;
   userId: string | null;
+  sessionId: string | null;
   username: string;
   email: string | null;
   avatarUrl: string | null;
@@ -70,6 +71,7 @@ interface SocketState {
   setUsername: (username: string) => void;
   setRole: (role: 'driver' | 'navigator') => void;
 
+  initSocket: () => void;
   loginWithGoogle: (payload: string | { credential?: string; accessToken?: string }) => Promise<void>;
   submitUsername: (username: string) => Promise<void>;
   createRoom: () => void;
@@ -96,6 +98,7 @@ export const useSocketStore = create<SocketState>()(
     (set, get) => ({
       socket: null,
       userId: null,
+      sessionId: null,
       username: '',
       email: null,
       avatarUrl: null,
@@ -143,6 +146,7 @@ export const useSocketStore = create<SocketState>()(
 
           set({
             userId: user._id,
+            sessionId: user.sessionId || null,
             username: user.username || '',
             email: user.email,
             avatarUrl: user.avatarUrl || null,
@@ -188,7 +192,15 @@ export const useSocketStore = create<SocketState>()(
         }
 
         const backendUrl = getBackendUrl();
-        const socket = io(backendUrl, { transports: ['websocket', 'polling'] });
+        const { userId, sessionId } = get();
+        const socket = io(backendUrl, {
+          auth: { userId, sessionId },
+          transports: ['websocket', 'polling'],
+        });
+        socket.on('force_logout', (data: { reason?: string }) => {
+          get().disconnect();
+          alert(data?.reason || "บัญชีนี้มีการเข้าสู่ระบบจากอุปกรณ์อื่น");
+        });
         socket.on('connect', () => {
           socket.emit('join_room', { roomCode: generatedCode, role: 'driver', username: get().username });
           set({ currentScreen: 'create' });
@@ -231,7 +243,15 @@ export const useSocketStore = create<SocketState>()(
         }
 
         const backendUrl = getBackendUrl();
-        const socket = io(backendUrl, { transports: ['websocket', 'polling'] });
+        const { userId, sessionId } = get();
+        const socket = io(backendUrl, {
+          auth: { userId, sessionId },
+          transports: ['websocket', 'polling'],
+        });
+        socket.on('force_logout', (data: { reason?: string }) => {
+          get().disconnect();
+          alert(data?.reason || "บัญชีนี้มีการเข้าสู่ระบบจากอุปกรณ์อื่น");
+        });
 
         socket.on('connect', () => {
           socket.emit('join_room', { roomCode, role: 'navigator', username: get().username });
@@ -307,7 +327,40 @@ export const useSocketStore = create<SocketState>()(
         if (socket) {
           socket.disconnect();
         }
-        set({ socket: null, roomCode: '', role: null, currentScreen: 'landing', players: [] });
+        set({
+          socket: null,
+          userId: null,
+          sessionId: null,
+          username: '',
+          email: null,
+          avatarUrl: null,
+          coins: 0,
+          roomCode: '',
+          role: null,
+          currentScreen: 'landing',
+          players: [],
+          mapData: null,
+        });
+        sessionStorage.removeItem('codeinthedark-storage');
+      },
+
+      // เชื่อมต่อ Socket ไว้รับ Event ระบบ (เช่น โดนเตะเมื่อล็อกอินซ้อน) ขณะอยู่นอกห้อง
+      initSocket: () => {
+        const { userId, sessionId, socket } = get();
+        if (!userId || !sessionId || socket) return;
+
+        const backendUrl = getBackendUrl();
+        const newSocket = io(backendUrl, {
+          auth: { userId, sessionId },
+          transports: ['websocket', 'polling'],
+        });
+
+        newSocket.on('force_logout', (data: { reason?: string }) => {
+          get().disconnect();
+          alert(data?.reason || "บัญชีนี้มีการเข้าสู่ระบบจากอุปกรณ์อื่น");
+        });
+
+        set({ socket: newSocket });
       },
 
       // เชื่อมต่อห้องเดิมใหม่อัตโนมัติเมื่อผู้ใช้รีเฟรชหน้าเว็บ
@@ -316,7 +369,15 @@ export const useSocketStore = create<SocketState>()(
         if (!username || !roomCode || !role || socket) return;
 
         const backendUrl = getBackendUrl();
-        const newSocket = io(backendUrl, { transports: ['websocket', 'polling'] });
+        const { userId, sessionId } = get();
+        const newSocket = io(backendUrl, {
+          auth: { userId, sessionId },
+          transports: ['websocket', 'polling'],
+        });
+        newSocket.on('force_logout', (data: { reason?: string }) => {
+          get().disconnect();
+          alert(data?.reason || "บัญชีนี้มีการเข้าสู่ระบบจากอุปกรณ์อื่น");
+        });
         newSocket.on('connect', () => {
           newSocket.emit('join_room', { roomCode, role, username });
         });
@@ -362,6 +423,7 @@ export const useSocketStore = create<SocketState>()(
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         userId: state.userId,
+        sessionId: state.sessionId,
         username: state.username,
         email: state.email,
         avatarUrl: state.avatarUrl,

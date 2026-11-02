@@ -11,15 +11,19 @@ import { useSocketStore } from "./store/useSocketStore";
 const GameScreen = lazy(() => import("./screens/GameScreen"));
 
 export default function App() {
-  const { currentScreen, setScreen, socket, roomCode, reconnect, isMuted, volume } = useSocketStore();
+  const { currentScreen, setScreen, socket, roomCode, reconnect, isMuted, volume, userId, initSocket } = useSocketStore();
   const audioRef = useRef<HTMLAudioElement>(null);
 
-  // เชื่อมต่อ Socket อัตโนมัติหากหน้าเว็บถูกรีเฟรชแต่ยังมี roomCode ค้างอยู่ใน Session
+  // เชื่อมต่อ Socket อัตโนมัติเมื่อล็อกอิน หรือรีเฟรชหน้าเว็บ
   useEffect(() => {
-    if (!socket && roomCode) {
-      reconnect();
+    if (userId && !socket) {
+      if (roomCode) {
+        reconnect();
+      } else {
+        initSocket();
+      }
     }
-  }, [socket, roomCode, reconnect]);
+  }, [userId, socket, roomCode, reconnect, initSocket]);
 
   // ควบคุมเสียงเพลงพื้นหลัง (เริ่มเล่นเฉพาะในหน้าจอเกม และวนลูปตั้งแต่ช่วงวินาทีที่ 10)
   useEffect(() => {

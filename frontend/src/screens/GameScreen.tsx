@@ -116,13 +116,18 @@ const formatTime = (seconds: number) => {
  * - หน้าจอผลลัพธ์ Victory / Defeat พร้อมการคำนวณดาวรางวัลและมอบเหรียญ
  */
 export default function GameScreen() {
-  const { username, socket, role, setRole, mapData: serverMapData, startGame, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft, players, leaveStage } = useSocketStore();
-  const isHost = players.length > 0 ? players[0].username === username : role === 'driver';
+  const serverMapData = useSocketStore((state) => state.mapData);
 
   if (!serverMapData) {
     return <div className="h-screen flex items-center justify-center text-white bg-black font-game-sub text-2xl">Generating Map...</div>;
   }
-  const mapData = serverMapData;
+
+  return <GameContent mapData={serverMapData} />;
+}
+
+function GameContent({ mapData }: { mapData: NonNullable<ReturnType<typeof useSocketStore.getState>['mapData']> }) {
+  const { username, socket, role, setRole, startGame, dungeonTimeLeft, setDungeonTimeLeft, swapTimeLeft, setSwapTimeLeft, players, leaveStage } = useSocketStore();
+  const isHost = players.length > 0 ? players[0].username === username : role === 'driver';
   const { walls: WALLS, start: START, goal: GOAL } = mapData;
 
   const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null);

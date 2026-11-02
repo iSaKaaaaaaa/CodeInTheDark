@@ -175,25 +175,6 @@ export function useGameSync({
       }
     };
   }, [
-      if (workspaceRef.current) {
-        workspaceRef.current.clear();
-      }
-
-      if (alertTimerRef.current) clearTimeout(alertTimerRef.current);
-      alertTimerRef.current = setTimeout(() => {
-        setShowSwapAlert(false);
-      }, 3000);
-    };
-
-    socket.on("role_swap", onRoleSwap);
-
-    return () => {
-      socket.off("role_swap", onRoleSwap);
-      if (alertTimerRef.current) {
-        clearTimeout(alertTimerRef.current);
-      }
-    };
-  }, [
     socket,
     setRole,
     setSwapTimeLeft,

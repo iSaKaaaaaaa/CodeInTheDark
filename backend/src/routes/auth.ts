@@ -1,3 +1,4 @@
+import { registerLogin } from '../sessionManager';
 import { Router } from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import { User } from '../models/User';
@@ -92,9 +93,14 @@ router.post('/google', async (req, res) => {
       }
     }
 
+    // สร้าง Session ID ใหม่ และบันทึกเซสชัน (เตะอุปกรณ์เดิมออกถ้ามี)
+    const sessionId = Math.random().toString(36).substring(2) + Date.now().toString(36);
+    registerLogin(user._id.toString(), sessionId);
+
     // ส่งคืนข้อมูลโปรไฟล์ผู้ใช้
     res.json({
       _id: user._id,
+      sessionId,
       displayName: user.displayName,
       username: user.username,
       email: user.email,

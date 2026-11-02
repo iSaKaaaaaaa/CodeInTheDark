@@ -38,7 +38,11 @@ interface Props {
   onMetricsChange?: (metrics: BlocklyPanelMetrics) => void;
 }
 
-export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChange }: Props) {
+export default function BlocklyEditor({
+  onReady,
+  readOnly = false,
+  onMetricsChange,
+}: Props) {
   const blocklyDiv = useRef<HTMLDivElement>(null);
   const savedXmlRef = useRef<string | null>(null);
   const metricsCbRef = useRef(onMetricsChange);
@@ -116,20 +120,34 @@ export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChan
             : Math.round(w * 0.44);
       const wsW = Math.max(96, w - fw);
 
-      const tScale = Math.min(1.02, Math.max(0.44, Math.min(s * 0.78, (wsW / 235) * 0.88)));
+      const tScale = Math.min(
+        1.02,
+        Math.max(0.44, Math.min(s * 0.78, (wsW / 235) * 0.88)),
+      );
       const scaledW = TRASH_W * tScale;
       const scaledH = TRASH_H * tScale;
 
       const runOffset = Math.round(Math.min(14, Math.max(6, 10 * s)));
-      const runFont = Math.round(Math.min(18, Math.max(10, Math.min(wsW * 0.068, 15.5 * s))));
+      const runFont = Math.round(
+        Math.min(18, Math.max(10, Math.min(wsW * 0.068, 15.5 * s))),
+      );
       const runBtnH = Math.round(runFont * 2.3 + 7);
       const gapAboveBtn = Math.round(Math.min(16, Math.max(8, 11 * s)));
 
-      const left = Math.max(fw + 8, Math.round(w - runOffset - scaledW - Math.round(4 * tScale)));
-      const top = Math.max(8, Math.round(h - runOffset - runBtnH - gapAboveBtn - scaledH));
+      const left = Math.max(
+        fw + 8,
+        Math.round(w - runOffset - scaledW - Math.round(4 * tScale)),
+      );
+      const top = Math.max(
+        8,
+        Math.round(h - runOffset - runBtnH - gapAboveBtn - scaledH),
+      );
 
       trashBox = { left, top, scale: tScale };
-      trashGroup.setAttribute("transform", `translate(${left}, ${top}) scale(${tScale.toFixed(3)})`);
+      trashGroup.setAttribute(
+        "transform",
+        `translate(${left}, ${top}) scale(${tScale.toFixed(3)})`,
+      );
     };
 
     if (workspace.trashcan) {
@@ -140,7 +158,12 @@ export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChan
       };
       workspace.trashcan.getBoundingRectangle = () => {
         const { left, top, scale: ts } = trashBox;
-        return new Blockly.utils.Rect(top, top + TRASH_H * ts, left, left + TRASH_W * ts);
+        return new Blockly.utils.Rect(
+          top,
+          top + TRASH_H * ts,
+          left,
+          left + TRASH_W * ts,
+        );
       };
       workspace.trashcan.getClientRect = () => {
         const rect = container.getBoundingClientRect();
@@ -150,7 +173,7 @@ export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChan
           rect.top + top - pad,
           rect.top + top + TRASH_H * ts + pad,
           rect.left + left - pad,
-          rect.left + left + TRASH_W * ts + pad
+          rect.left + left + TRASH_W * ts + pad,
         );
       };
     }
@@ -166,7 +189,8 @@ export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChan
 
       const flyout = workspace.getFlyout();
       if (flyout) {
-        (flyout as unknown as { getFlyoutScale: () => number }).getFlyoutScale = () => s;
+        (flyout as unknown as { getFlyoutScale: () => number }).getFlyoutScale =
+          () => s;
       }
 
       workspace.setScale(s);
@@ -180,7 +204,10 @@ export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChan
         flyout.reflow();
         if (flyoutWs) {
           const abs = flyoutWs.getMetricsManager().getAbsoluteMetrics();
-          flyoutWs.translate(flyoutWs.scrollX + abs.left, flyoutWs.scrollY + abs.top);
+          flyoutWs.translate(
+            flyoutWs.scrollX + abs.left,
+            flyoutWs.scrollY + abs.top,
+          );
         }
         const measured = flyout.getWidth();
         if (measured > 0) {
@@ -253,5 +280,3 @@ export default function BlocklyEditor({ onReady, readOnly = false, onMetricsChan
     />
   );
 }
-}
-
