@@ -46,7 +46,7 @@ export function useGameTimer({
   setSwapTimeLeft,
 }: UseGameTimerOptions) {
   const isSwappingRef = useRef(false);
-  const swapAlertTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
 
   useEffect(() => {
     isSwappingRef.current = false;
@@ -112,17 +112,8 @@ export function useGameTimer({
               socket.emit("sync_game_state", {
                 dungeonTimeLeft: nextDungeon,
                 swapTimeLeft: SWAP_TIME,
-                showSwapAlert: true,
               });
             }
-
-            if (swapAlertTimeoutRef.current) clearTimeout(swapAlertTimeoutRef.current);
-            swapAlertTimeoutRef.current = setTimeout(() => {
-              setShowSwapAlert(false);
-              if (socket) {
-                socket.emit("sync_game_state", { showSwapAlert: false });
-              }
-            }, 3000);
 
             return SWAP_TIME;
           }
@@ -143,9 +134,6 @@ export function useGameTimer({
 
     return () => {
       clearInterval(timer);
-      if (swapAlertTimeoutRef.current) {
-        clearTimeout(swapAlertTimeoutRef.current);
-      }
     };
   }, [
     role,

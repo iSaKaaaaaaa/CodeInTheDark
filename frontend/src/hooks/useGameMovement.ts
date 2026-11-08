@@ -29,7 +29,7 @@ interface UseGameMovementOptions {
   availableQuota: number;
   dungeonTimeLeft: number;
   swapTimeLeft: number;
-  showSwapAlert: boolean;
+
   isWin: boolean;
   isLose: boolean;
   loseReason: "blocks" | "time" | null;
@@ -79,7 +79,7 @@ export function useGameMovement({
   availableQuota,
   dungeonTimeLeft,
   swapTimeLeft,
-  showSwapAlert,
+
   isWin,
   isLose,
   loseReason,
@@ -142,7 +142,7 @@ export function useGameMovement({
         loseReason,
         dungeonTimeLeft,
         swapTimeLeft,
-        showSwapAlert,
+      
         executionError,
         ...stateOverrides,
       });

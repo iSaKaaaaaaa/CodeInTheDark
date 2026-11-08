@@ -54,8 +54,6 @@ export function useGameSync({
   const roleRef = useRef(role);
   roleRef.current = role;
 
-  const alertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
   // ดักจับข้อมูลซิงก์สถานะเกมและบล็อกคำสั่งจาก Socket.IO
   useEffect(() => {
     if (!socket) return;
@@ -77,7 +75,6 @@ export function useGameSync({
       if (state.loseReason !== undefined) setLoseReason(state.loseReason);
       if (state.dungeonTimeLeft !== undefined) setDungeonTimeLeft(state.dungeonTimeLeft);
       if (state.swapTimeLeft !== undefined) setSwapTimeLeft(state.swapTimeLeft);
-      if (state.showSwapAlert !== undefined) setShowSwapAlert(state.showSwapAlert);
       if (state.executionError !== undefined) setExecutionError(state.executionError);
 
       if (state.reset) {
@@ -160,19 +157,12 @@ export function useGameSync({
         workspaceRef.current.clear();
       }
 
-      if (alertTimerRef.current) clearTimeout(alertTimerRef.current);
-      alertTimerRef.current = setTimeout(() => {
-        setShowSwapAlert(false);
-      }, 3000);
     };
 
     socket.on("role_swap", onRoleSwap);
 
     return () => {
       socket.off("role_swap", onRoleSwap);
-      if (alertTimerRef.current) {
-        clearTimeout(alertTimerRef.current);
-      }
     };
   }, [
     socket,

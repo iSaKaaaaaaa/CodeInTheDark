@@ -151,6 +151,15 @@ function GameContent({ mapData }: { mapData: NonNullable<ReturnType<typeof useSo
   useEffect(() => { isWinRef.current = isWin; isLoseRef.current = isLose; roleRef.current = role; }, [isWin, isLose, role]);
   useEffect(() => { availableQuotaRef.current = availableQuota; if (workspaceRef.current) workspaceRef.current.options.maxBlocks = availableQuota; }, [availableQuota]);
 
+  // ปิดป้ายแจ้งเตือนสลับบทบาทอัตโนมัติหลังจากแสดงครบ 3 วินาที
+  useEffect(() => {
+    if (!showSwapAlert) return;
+    const timer = setTimeout(() => {
+      setShowSwapAlert(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [showSwapAlert]);
+
   // Calculate human-readable coordinate string for goal (e.g. "G1", "F8")
   const goalCoord = useMemo(() => {
     const colLabels = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M"];
@@ -220,7 +229,7 @@ function GameContent({ mapData }: { mapData: NonNullable<ReturnType<typeof useSo
     availableQuota,
     dungeonTimeLeft,
     swapTimeLeft,
-    showSwapAlert,
+
     isWin,
     isLose,
     loseReason,
