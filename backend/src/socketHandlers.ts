@@ -13,6 +13,14 @@ import { generateMap, GeneratedMap } from "./utils/mapGenerator";
 
 const roomMaps = new Map<string, GeneratedMap>();
 
+const COL_LABELS = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M"];
+
+function formatBoardCoord(x: number, y: number): string {
+  const col = COL_LABELS[Math.max(1, Math.min(13, x)) - 1] ?? "A";
+  const row = Math.max(1, Math.min(13, y));
+  return `(${col},${row})`;
+}
+
 export function registerSocketHandlers(io: Server) {
   setSessionIo(io);
 
@@ -222,13 +230,14 @@ export function registerSocketHandlers(io: Server) {
     socket.on("obstacle_hit", ({ type, x, y, playerName }: { type: string; x: number; y: number; playerName: string }) => {
       const user = getUser(socket.id);
       if (user) {
+        const coord = formatBoardCoord(x, y);
         const messages: Record<string, string> = {
-          wall: `${playerName} hit a wall at (${x},${y}) → Program Stop`,
-          rock: `${playerName} hit a rock at (${x},${y}) → Program Stop`,
-          spike: `${playerName} hit a spike at (${x},${y}) → Bounced back 1 spaces`,
-          trap: `${playerName} fell in a trap at (${x},${y}) → Back to start`,
+          wall: `${playerName} hit a wall at ${coord} → Program Stop`,
+          rock: `${playerName} hit a rock at ${coord} → Program Stop`,
+          spike: `${playerName} hit a spike at ${coord} → Bounced back 1 spaces`,
+          trap: `${playerName} fell in a trap at ${coord} → Back to start`,
         };
-        const text = messages[type] || `${playerName} hit an obstacle at (${x},${y})`;
+        const text = messages[type] || `${playerName} hit an obstacle at ${coord}`;
         const entry: ChatLogEntry = {
           sender: "[SYSTEM]",
           text,
